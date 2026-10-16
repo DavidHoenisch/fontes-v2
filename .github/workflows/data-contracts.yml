@@ -44,7 +44,7 @@ jobs:
       - name: Install XML schema validator
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libxml2-utils
+          sudo apt-get install --no-install-recommends -y libxml2-utils libxkbcommon-dev libwayland-dev
       - name: Check resource package examples
         run: python3 specs/resource-packages/v1/check_examples.py
       - name: Check contracts

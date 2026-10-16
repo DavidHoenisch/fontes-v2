@@ -1,0 +1,18 @@
+[package]
+name = "fontes-ui-egui"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+fontes-engine = { path = "../fontes-engine" }
+eframe.workspace = true
+egui_extras = { version = "=0.35.0", default-features = false, features = ["svg"] }
+
+[target.'cfg(not(target_os = "android"))'.dependencies]
+eframe = { workspace = true, features = ["accesskit"] }
+
+[dev-dependencies]
+egui_kittest = { version = "=0.35.0", features = ["wgpu", "eframe"] }
+tempfile = "3"

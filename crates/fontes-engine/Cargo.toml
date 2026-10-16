@@ -1,0 +1,17 @@
+[package]
+name = "fontes-engine"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+fontes-data-contracts = { path = "../fontes-data-contracts" }
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars = "1"
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"

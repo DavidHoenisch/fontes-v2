@@ -1,6 +1,6 @@
 """Collect the approved Fontes UI assets for offline native implementation."""
 from pathlib import Path
-import hashlib, json, re, shutil, urllib.request
+import hashlib, json, re, shutil, subprocess, urllib.request
 
 ROOT = Path(__file__).resolve().parent.parent
 DEST = ROOT / 'assets/ui'
@@ -77,6 +77,8 @@ rs+= ['];','','/// Font family, weight, role, TrueType bytes.','pub static FONTS
 for f in fonts:rs.append(f'    ("{f["family"]}", {500 if f["weight"]=="Medium" else 400}, "{f["role"]}", include_bytes!("{f["path"]}")),')
 rs+= ['];','']
 (DEST/'assets.rs').write_text('\n'.join(rs))
+# Native integration makes this module part of cargo fmt. Hash the formatted bytes.
+subprocess.run(['rustfmt', '--edition', '2024', str(DEST/'assets.rs')], cwd=ROOT, check=True)
 manifest={'version':1,'icons':icons,'fonts':fonts,'tokenFile':'tokens.json','rustBindings':'assets.rs','figmaUrl':'https://www.figma.com/design/fdGlrRfs8AGQfpmCDhU3Bp','references':{'mobile':'../../design/mobile/screens','mobileOverview':'../../design/mobile/mobile-mockups.png','sidebarSpacing':'../../design/sidebar-spacing/sidebar-comparison.svg','pendingSidebarEdit':'../../design/compact-desktop-sidebar.figma.js'},'files':[]}
 for p in sorted(DEST.rglob('*')):
     if p.is_file() and p.name!='manifest.json':

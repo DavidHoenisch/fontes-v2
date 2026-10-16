@@ -38,31 +38,124 @@ pub const MOBILE_REFERENCE_CELL_GAP: f32 = 5.0;
 
 /// Stable role, Phosphor name, SVG bytes. White fills support runtime tinting.
 pub static ICONS: &[(&str, &str, &[u8])] = &[
-    ("book", "book-open", include_bytes!("icons/phosphor/regular/book-open.svg")),
-    ("search", "magnifying-glass", include_bytes!("icons/phosphor/regular/magnifying-glass.svg")),
-    ("notes", "note-pencil", include_bytes!("icons/phosphor/regular/note-pencil.svg")),
-    ("tree", "tree-structure", include_bytes!("icons/phosphor/regular/tree-structure.svg")),
-    ("settings", "sliders-horizontal", include_bytes!("icons/phosphor/regular/sliders-horizontal.svg")),
-    ("chevron", "caret-right", include_bytes!("icons/phosphor/regular/caret-right.svg")),
-    ("down", "caret-down", include_bytes!("icons/phosphor/regular/caret-down.svg")),
+    (
+        "book",
+        "book-open",
+        include_bytes!("icons/phosphor/regular/book-open.svg"),
+    ),
+    (
+        "search",
+        "magnifying-glass",
+        include_bytes!("icons/phosphor/regular/magnifying-glass.svg"),
+    ),
+    (
+        "notes",
+        "note-pencil",
+        include_bytes!("icons/phosphor/regular/note-pencil.svg"),
+    ),
+    (
+        "tree",
+        "tree-structure",
+        include_bytes!("icons/phosphor/regular/tree-structure.svg"),
+    ),
+    (
+        "settings",
+        "sliders-horizontal",
+        include_bytes!("icons/phosphor/regular/sliders-horizontal.svg"),
+    ),
+    (
+        "chevron",
+        "caret-right",
+        include_bytes!("icons/phosphor/regular/caret-right.svg"),
+    ),
+    (
+        "down",
+        "caret-down",
+        include_bytes!("icons/phosphor/regular/caret-down.svg"),
+    ),
     ("close", "x", include_bytes!("icons/phosphor/regular/x.svg")),
-    ("arrow", "arrow-right", include_bytes!("icons/phosphor/regular/arrow-right.svg")),
-    ("back", "arrow-left", include_bytes!("icons/phosphor/regular/arrow-left.svg")),
-    ("bookmark", "bookmark-simple", include_bytes!("icons/phosphor/regular/bookmark-simple.svg")),
-    ("spark", "sparkle", include_bytes!("icons/phosphor/regular/sparkle.svg")),
-    ("check", "check", include_bytes!("icons/phosphor/regular/check.svg")),
-    ("copy", "copy", include_bytes!("icons/phosphor/regular/copy.svg")),
-    ("plus", "plus", include_bytes!("icons/phosphor/regular/plus.svg")),
-    ("minus", "minus", include_bytes!("icons/phosphor/regular/minus.svg")),
-    ("wifi", "wifi-high", include_bytes!("icons/phosphor/regular/wifi-high.svg")),
-    ("battery", "battery-full", include_bytes!("icons/phosphor/regular/battery-full.svg")),
+    (
+        "arrow",
+        "arrow-right",
+        include_bytes!("icons/phosphor/regular/arrow-right.svg"),
+    ),
+    (
+        "back",
+        "arrow-left",
+        include_bytes!("icons/phosphor/regular/arrow-left.svg"),
+    ),
+    (
+        "bookmark",
+        "bookmark-simple",
+        include_bytes!("icons/phosphor/regular/bookmark-simple.svg"),
+    ),
+    (
+        "spark",
+        "sparkle",
+        include_bytes!("icons/phosphor/regular/sparkle.svg"),
+    ),
+    (
+        "check",
+        "check",
+        include_bytes!("icons/phosphor/regular/check.svg"),
+    ),
+    (
+        "copy",
+        "copy",
+        include_bytes!("icons/phosphor/regular/copy.svg"),
+    ),
+    (
+        "plus",
+        "plus",
+        include_bytes!("icons/phosphor/regular/plus.svg"),
+    ),
+    (
+        "minus",
+        "minus",
+        include_bytes!("icons/phosphor/regular/minus.svg"),
+    ),
+    (
+        "wifi",
+        "wifi-high",
+        include_bytes!("icons/phosphor/regular/wifi-high.svg"),
+    ),
+    (
+        "battery",
+        "battery-full",
+        include_bytes!("icons/phosphor/regular/battery-full.svg"),
+    ),
 ];
 
 /// Font family, weight, role, TrueType bytes.
 pub static FONTS: &[(&str, u16, &str, &[u8])] = &[
-    ("IBM Plex Sans", 400, "ui_body", include_bytes!("fonts/IBMPlexSans-Regular.ttf")),
-    ("IBM Plex Sans", 500, "ui_label", include_bytes!("fonts/IBMPlexSans-Medium.ttf")),
-    ("Lora", 400, "scripture", include_bytes!("fonts/Lora-Regular.ttf")),
-    ("Noto Serif", 400, "greek_fallback", include_bytes!("fonts/NotoSerif-Regular.ttf")),
-    ("Noto Serif Hebrew", 400, "hebrew_fallback", include_bytes!("fonts/NotoSerifHebrew-Regular.ttf")),
+    (
+        "IBM Plex Sans",
+        400,
+        "ui_body",
+        include_bytes!("fonts/IBMPlexSans-Regular.ttf"),
+    ),
+    (
+        "IBM Plex Sans",
+        500,
+        "ui_label",
+        include_bytes!("fonts/IBMPlexSans-Medium.ttf"),
+    ),
+    (
+        "Lora",
+        400,
+        "scripture",
+        include_bytes!("fonts/Lora-Regular.ttf"),
+    ),
+    (
+        "Noto Serif",
+        400,
+        "greek_fallback",
+        include_bytes!("fonts/NotoSerif-Regular.ttf"),
+    ),
+    (
+        "Noto Serif Hebrew",
+        400,
+        "hebrew_fallback",
+        include_bytes!("fonts/NotoSerifHebrew-Regular.ttf"),
+    ),
 ];

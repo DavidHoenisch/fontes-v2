@@ -42,8 +42,8 @@ jobs:
       - name: Check formatting and tests
         run: |
           cargo fmt --all -- --check
-          cargo test --workspace --locked
-          cargo clippy --workspace --all-targets --locked -- -D warnings
+          cargo test --locked -p fontes-data-contracts -p fontes-data-pipeline -p fontes-resource
+          cargo clippy --locked -p fontes-data-contracts -p fontes-data-pipeline -p fontes-resource --all-targets -- -D warnings
       - name: Compile the pipeline
         run: cargo build --release --locked -p fontes-data-pipeline
       - name: Compile real reading and study sources

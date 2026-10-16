@@ -1,0 +1,711 @@
+{
+  "commands": [
+    {
+      "description": "Read the current passage, session and library metadata.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object"
+      },
+      "name": "workspace.get"
+    },
+    {
+      "description": "Navigate to an unambiguous canonical book, chapter and optional verse.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference"
+        ],
+        "type": "object"
+      },
+      "name": "reading.navigate"
+    },
+    {
+      "description": "Move one chapter backwards or forwards, across book boundaries.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "delta": {
+            "format": "int32",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "delta"
+        ],
+        "type": "object"
+      },
+      "name": "reading.chapter"
+    },
+    {
+      "description": "Select an existing canonical verse and open its chapter.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "ref_id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref_id"
+        ],
+        "type": "object"
+      },
+      "name": "reading.select"
+    },
+    {
+      "description": "Change translation while retaining canonical selection and notes.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "reading.translation"
+    },
+    {
+      "description": "Search literal terms in the active translation and installed study articles.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 30,
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "search.query"
+    },
+    {
+      "description": "Find typed links and actual original-language analyses for a verse.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "ref_id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref_id"
+        ],
+        "type": "object"
+      },
+      "name": "study.context"
+    },
+    {
+      "description": "Read an installed article, its provenance and scripture links.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "study.resource"
+    },
+    {
+      "description": "Look up a Strong's code, definitions and the first 100 canonical occurrences.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "study.word"
+    },
+    {
+      "description": "Create or update a local note/highlight on a canonical inclusive range.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "color": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_ref": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "default": null,
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "$ref": "#/$defs/AnnotationKind"
+          },
+          "start_ref": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start_ref",
+          "end_ref",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "name": "annotation.save"
+    },
+    {
+      "description": "Delete a local annotation by its stable ID.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "annotation.delete"
+    },
+    {
+      "description": "Set or clear a favorite canonical verse.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "ref_id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref_id",
+          "enabled"
+        ],
+        "type": "object"
+      },
+      "name": "reference.favorite"
+    },
+    {
+      "description": "Save bounded reading typography and verse-number preferences.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "preferences": {
+            "$ref": "#/$defs/Preferences"
+          }
+        },
+        "required": [
+          "preferences"
+        ],
+        "type": "object"
+      },
+      "name": "preferences.set"
+    }
+  ],
+  "protocol_version": 1
+}

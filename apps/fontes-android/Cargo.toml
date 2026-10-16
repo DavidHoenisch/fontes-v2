@@ -1,0 +1,34 @@
+[package]
+name = "fontes-android"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(target_os = "android")'.dependencies]
+fontes-ui-egui = { path = "../../crates/ui-egui" }
+eframe = { workspace = true, features = ["android-native-activity"] }
+winit = { version = "0.30", default-features = false, features = ["android-native-activity"] }
+android_logger = "0.15"
+log = "0.4"
+
+[package.metadata.android]
+package = "org.fontes.app"
+label = "Fontes"
+build_targets = ["aarch64-linux-android"]
+strip = "strip"
+assets = "../../assets/ui/licenses"
+
+[package.metadata.android.sdk]
+target_sdk_version = 35
+min_sdk_version = 28
+
+[package.metadata.android.application]
+label = "Fontes"
+theme = "@android:style/Theme.Material.NoActionBar"
+
+[package.metadata.android.application.activity]
+config_changes = "orientation|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode|density"

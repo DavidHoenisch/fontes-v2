@@ -4,6 +4,18 @@ Offline Bible study data and application foundations. The Rust pipeline compiles
 
 Start with **[the Fontes system specification](SPEC.md)** for product requirements, non-functional requirements, user flows, UI decisions, schema authorities, architectural choices, acceptance criteria, and implementation status. [Specification history and supporting documents](docs/specifications/README.md) include a complete Markdown transcription of the original Word baseline.
 
+## Run the application
+
+The first engine-first Rust application is implemented with egui/eframe and wgpu. It reads real reading/study snapshots, supports passage navigation, KJV/WEB switching, local keyword search, persistent notes/highlights, and linked study resources. A toolkit-independent command engine is shared by the UI, CLI, JSON control and MCP stdio.
+
+```sh
+cargo run --locked -p fontes -- --library dist/reading/library.sqlite
+# Or use a compiled study profile:
+cargo run --locked -p fontes -- --library dist/study/library.sqlite
+```
+
+See the [application guide](docs/app/README.md) for first-run data, mobile preview, headless commands and Android APK builds, and the [architecture](docs/app/architecture.md) for crate boundaries and compatibility. The responsive UI uses the approved local assets. Android arm64 APK compilation is verified locally; device/IME/accessibility and Windows/Linux runtime checks remain. Automatic content installation, the add-on catalog, AI and curated genealogy/overview features are later milestones.
+
 ## Extensible library design
 
 The [resource package and catalog addendum](docs/specifications/library-and-packages-v0.2.md) designs independent downloads, a shared installed library, paragraph-level links, and a growing concept registry. [Draft contracts and a validated example](specs/resource-packages/v1/README.md) include XML XSDs, catalog/delivery JSON Schemas, and an executable linking model. These are design artifacts; the public catalog, resource compiler, and app installer are future work. Current signed reading/study releases remain unchanged.

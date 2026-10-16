@@ -1,0 +1,146 @@
+name: Application
+
+on:
+  pull_request:
+    paths: ['apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+  push:
+    branches: [main]
+    paths: ['apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, platform: linux-x86_64}
+          - {os: macos-15, platform: macos-aarch64}
+          - {os: macos-15-intel, platform: macos-x86_64}
+          - {os: windows-2025, platform: windows-x86_64}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.93.0 --profile minimal --component rustfmt --component clippy
+      - name: Check bundled UI asset inventory
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          root = Path('assets/ui')
+          for entry in json.loads((root / 'manifest.json').read_text())['files']:
+              data = (root / entry['path']).read_bytes()
+              assert len(data) == entry['bytes'], entry['path']
+              assert hashlib.sha256(data).hexdigest() == entry['sha256'], entry['path']
+          PY
+      - name: Install Linux windowing dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libxkbcommon-dev libwayland-dev
+      - name: Format, engine and UI interaction tests
+        run: |
+          cargo fmt --all -- --check
+          cargo test --locked -p fontes-engine -p fontes-ui-egui -p fontes -p fontes-cli
+          cargo clippy --locked -p fontes-engine -p fontes-ui-egui -p fontes -p fontes-cli --all-targets -- -D warnings
+      - name: Build native wgpu app and CLI
+        run: cargo build --release --locked -p fontes -p fontes-cli
+      - name: Check generated command contract
+        shell: bash
+        run: |
+          cargo run --locked -q -p fontes-cli -- commands > generated-commands.json
+          diff -u specs/app/commands-v1.json generated-commands.json
+      - name: Enforce headless engine dependency boundary
+        shell: bash
+        run: |
+          cargo tree --locked -p fontes-engine --edges normal,build --prefix none > engine-dependencies.txt
+          if grep -E '^(egui|eframe|winit|wgpu|fontes-ui-egui|fontes-data-pipeline|fontes-resource) ' engine-dependencies.txt; then
+            echo 'The engine must not depend on UI/GPU or publisher crates.' >&2
+            exit 1
+          fi
+
+      - name: Package tested native executables
+        shell: bash
+        env:
+          PACKAGE_PLATFORM: ${{ matrix.platform }}
+        run: python tools/package-app.py --platform "$PACKAGE_PLATFORM"
+      - name: Retain downloadable desktop archive
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: app-${{ matrix.platform }}
+          path: dist/app/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CARGO_APK_VERSION: '0.10.0'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust and arm64 target
+        run: |
+          rustup toolchain install 1.93.0 --profile minimal
+          rustup target add aarch64-linux-android --toolchain 1.93.0
+      - name: Install SDK platform and NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.0' 'ndk;28.2.13676358'
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      - name: Install APK packager
+        run: cargo install cargo-apk --version "$CARGO_APK_VERSION" --locked
+      - name: Build and package NativeActivity application
+        run: |
+          cargo fetch --locked --target aarch64-linux-android
+          sha256sum Cargo.lock > /tmp/fontes-cargo-lock.sha256
+          CARGO_NET_OFFLINE=true cargo apk build -p fontes-android --lib
+          sha256sum --check /tmp/fontes-cargo-lock.sha256
+      - name: Verify APK signature and manifest
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify target/debug/apk/fontes-android.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging target/debug/apk/fontes-android.apk
+      - name: Package checked APK and provenance
+        run: python3 tools/package-app.py --platform android-aarch64
+      - name: Retain downloadable Android APK
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: app-android-aarch64
+          path: dist/app/*
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+  publish:
+    needs: [desktop, android]
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    concurrency:
+      group: fontes-app-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          pattern: app-*
+          merge-multiple: true
+          path: checked-apps
+      - name: Verify, publish development prerelease and verify downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/publish-app.py --artifacts checked-apps

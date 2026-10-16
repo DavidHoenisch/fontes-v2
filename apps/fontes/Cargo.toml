@@ -1,0 +1,12 @@
+[package]
+name = "fontes"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+fontes-ui-egui = { path = "../../crates/ui-egui" }
+eframe.workspace = true
+directories = "6"
+clap = { version = "4", features = ["derive"] }

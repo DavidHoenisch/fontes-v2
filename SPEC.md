@@ -1,6 +1,6 @@
 # Fontes system specification
 
-Revision: **0.4**. Updated: **2026-10-15**. Status: **current working implementation baseline**.
+Revision: **0.6**. Updated: **2026-10-15**. Status: **current working implementation baseline**.
 
 Fontes is an offline-first Bible study application with a readable primary text, fast reference navigation, and an extensible library whose translations, paragraphs, word studies, topics, and user notes connect through stable identities. This specification consolidates the original Word specification, the data pipeline design, approved local UI references, the resource-library design, and the implemented authoring tools. Future implementation work must be understandable from this repository without the original chat or a file in someone's Downloads folder.
 
@@ -24,7 +24,7 @@ The primary user reads and studies Scripture, follows linked sources, and mainta
 
 The initial corpus is public-domain material, including preserved regional exceptions, with reading and study selections. The first additional-resource catalog offers **free resources with verified redistribution permission**. Free does not mean public domain. The architecture reserves appropriately licensed publisher resources and future entitlements; paid commerce is deferred. NLT is a possible future licensed edition, not an approved or currently distributable resource.
 
-Application and shared data/library logic use Rust. The selected desktop UI is egui/eframe on Windows, macOS, and Linux. Android is a supported secondary target; iOS remains experimental/best-effort. SQLite is the selected embedded relational store. The local AI design uses an open-source local model, GGUF or equivalent, and local retrieval. Initial publisher tools may rely on bounded, documented build dependencies: SWORD 1.9.0 through the existing C++ extraction bridge, and `xmllint` for source XSD validation. Applications do not require SWORD or publisher XML tooling at runtime.
+Application and shared data/library logic use Rust. The selected desktop UI is egui/eframe on Windows, macOS, and Linux. Android is the first mobile target; iOS implementation is deferred. Desktop and Android share the engine and responsive egui UI. Windowing/events use eframe/winit and rendering uses wgpu. Stable typed command IDs are shared by the UI, CLI, JSON control and MCP stdio frontends; the core never depends on a toolkit. See the [application architecture](docs/app/architecture.md). SQLite is the selected embedded relational store. The local AI design uses an open-source local model, GGUF or equivalent, and local retrieval. Initial publisher tools may rely on bounded, documented build dependencies: SWORD 1.9.0 through the existing C++ extraction bridge, and `xmllint` for source XSD validation. Applications do not require SWORD or publisher XML tooling at runtime.
 
 Out of current scope: cloud sync, multi-user collaboration, social features, mobile reading plans, full syntactic/clause parsing, advanced original-language diagramming, proprietary Logos/commercial import formats, cloud-dependent AI, publisher payments, DRM/entitlements, and a publisher portal. Detailed third-party morphology interchange, enrichment archives, and anchor-remapping interchange remain open contracts rather than supported features.
 
@@ -40,7 +40,9 @@ flowchart LR
     C --> I[Planned migration and library service]
     H --> I
     I --> J[Composed installed library]
-    J --> K[Planned desktop and mobile UI]
+    J --> K[Responsive Rust UI foundation]
+    C --> M[Implemented v1 read-only engine bridge]
+    M --> K
     L[Separate user database] --> K
 ```
 
@@ -50,16 +52,16 @@ flowchart LR
 
 | ID | Required behavior | Implementation status |
 | --- | --- | --- |
-| FR1 | Support multiple translations; switch at any time while retaining canonical location, study context, and annotations. Start with public-domain texts; the reading corpus now includes KJV and WEB. | Data implemented; app planned |
-| FR2 | Provide a compact OT/NT book grid, current-book emphasis, progressively disclosed chapter/verse controls, persistent natural reference input (`John 3:16`, `j3 16`, abbreviations), recent/favorite locations, and mouse/touch/keyboard use with minimal scrolling. | Mockups and saved-reference schema; app/parser planned |
-| FR3 | Provide readable typography, configurable font/size/weight/line spacing/theme, optional verse numbers, smooth scrolling, chapter/verse navigation, and consistent notes/highlights. | UI assets/mockups; app planned |
-| FR4 | For a word, Strong's code, or lemma, show supplied surface/lemma/morphology, linked dictionary entries, occurrences and passage jumps, short glosses, and optional verified translation alignment. Show unavailable fields honestly. | Greek tokens/analyses and dictionaries implemented; UI, lemmas/alignment gaps remain |
+| FR1 | Support multiple translations; switch at any time while retaining canonical location, study context, and annotations. Start with public-domain texts; the reading corpus now includes KJV and WEB. | Implemented in initial v1 app; full package-native library later |
+| FR2 | Provide a compact OT/NT book grid, current-book emphasis, progressively disclosed chapter/verse controls, persistent natural reference input (`John 3:16`, `j3 16`, abbreviations), recent/favorite locations, and mouse/touch/keyboard use with minimal scrolling. | Initial parser/picker/recent/favorites implemented; localization/accessibility audit remains |
+| FR3 | Provide readable typography, configurable font/size/weight/line spacing/theme, optional verse numbers, smooth scrolling, chapter/verse navigation, and consistent notes/highlights. | Initial reading, size/typeface/spacing/numbers implemented; themes/weight and richer text remain |
+| FR4 | For a word, Strong's code, or lemma, show supplied surface/lemma/morphology, linked dictionary entries, occurrences and passage jumps, short glosses, and optional verified translation alignment. Show unavailable fields honestly. | Strong’s lookup, source Greek analyses and occurrence jumps implemented; word alignment, fuller lemma data and mobile sheet remain |
 | FR5 | Provide a book overview with author, date, audience, purpose, themes, outline, and summary, linked to its canonical range and available contextually and from study/navigation. Unknown/disputed fields stay unset or attributed. | Schema exists; reviewed records and app planned |
 | FR6 | Provide navigable genealogies starting with Adam–Noah and Abraham–David and other major lines; people and relationships link to their actual scripture evidence. | Schema/mockups; curated records and app planned |
-| FR7 | Surface commentaries, dictionaries, summaries, cross-references, and other relevant installed works from a selected verse/word without losing the primary reading context. | Study data implemented; paragraph-owned library and app planned |
+| FR7 | Surface commentaries, dictionaries, summaries, cross-references, and other relevant installed works from a selected verse/word without losing the primary reading context. | V1 linked article/TSK UI implemented; paragraph-native library and richer contextual panels later |
 | FR8 | Answer natural-language study queries locally through keyword + embedding retrieval; every answer cites canonical references and shows actual database verse text separately from generated explanation. Prompts forbid invented verses/references; runtime validation must enforce citation grounding. | FTS exists; embeddings/model/runtime/UI planned |
-| FR9 | Create colored highlights and free-text notes for any canonical range, retain them across sessions, and show them in reading. Content updates/removal must preserve user-owned records. | User schema and preservation tests; app planned |
-| FR10 | Use one consistent palette, typography, radii, spacing, and interaction language for reading, menus, pickers, panels, dialogs, and settings. | Approved local tokens/assets and static designs; app planned |
+| FR9 | Create colored highlights and free-text notes for any canonical range, retain them across sessions, and show them in reading. Content updates/removal must preserve user-owned records. | Transactional persistent notes/highlights implemented; GUI single-verse creation, commands also support ranges |
+| FR10 | Use one consistent palette, typography, radii, spacing, and interaction language for reading, menus, pickers, panels, dialogs, and settings. | Approved tokens/fonts/icons used in responsive app; full platform/RTL/accessibility review remains |
 
 FR4 does not authorize fabricated Hebrew morphology, lemmas, English word alignment, or glosses. Strong's definitions are not automatically lemmas. FR8 does not authorize a model to invent a citation because its system prompt asks it not to: resolve every returned reference and display its real text. If retrieval cannot support an answer, say so and expose available evidence.
 
@@ -72,7 +74,7 @@ FR4 does not authorize fabricated Hebrew morphology, lemmas, English word alignm
 | FR13 | Distribute logical works independently; represent reading/study as resource-selection bundles in the package-native app. Default updates must preserve optional installed works. | Design/contracts; delivery compiler and app planned |
 | FR14 | Browse available resources using covers, title, authors, publisher, date/edition, description, scope, rights, size, capabilities, compatibility, and release notes without downloading archives. | Catalog schema; publication/client planned |
 | FR15 | Install/update/remove selected resources safely, expose progress/errors and installed/update state, allow version pinning and explicit automatic-update preferences, and recover after interruption. | Installer/client planned |
-| FR16 | A verse context lookup searches every installed work and navigates to the relevant block, explaining whether it matched coverage, citation, quotation, authored allusion, or a separately identified related topic. | Snapshot queries and scratch linking model; app planned |
+| FR16 | A verse context lookup searches every installed work and navigates to the relevant block, explaining whether it matched coverage, citation, quotation, authored allusion, or a separately identified related topic. | V1 typed verse/article/word engine queries and UI implemented; full v2 paragraph graph later |
 | FR17 | Preserve publisher-supplied and source-imported assertions separately from editorial enrichment, inferred suggestions, and user tags, with evidence/provenance. | Partial in current provenance/links; full v2 assertion layers planned |
 | FR18 | Support a versioned concept registry with preferred/alternative labels, scope notes, multiple parents, related links, publisher proposals, reviewed mappings, and reversible deprecation/resolution. | Draft contracts and author validation; registry publication/client planned |
 | FR19 | Provide author CLI scaffolding, strict XML/semantic validation, actionable diagnostics, deterministic packaging, and schema export. | Implemented in `fontes-resource` |
@@ -80,14 +82,15 @@ FR4 does not authorize fabricated Hebrew morphology, lemmas, English word alignm
 | FR21 | Preserve stable content anchors across updates and retain notes when blocks split/merge/retire or a resource is removed. | Canonical anchors/user schema implemented; block maps/migration planned |
 | FR22 | Enforce permissions and attribution per resource for offline display, search, export, print, embeddings, and AI context. Installing works together grants no combined export/AI rights. | Source declarations/validation; client enforcement planned |
 | FR23 | Automate PR submission checks, reproducible source preparation, and trusted signed release publication through reusable GitHub workflows. Separate tooling, submission, policy, and storage configuration; restricted sources/destinations must be private. | Implemented source stage; app delivery/catalog later |
+| FR24 | Route durable app actions and domain queries through stable typed commands shared by the UI, CLI, JSON control and MCP server. Keep core/query/storage independent of egui/eframe/winit/wgpu; isolate platform startup and transient presentation. | Implemented initial 13-command engine/stdio contract and thin responsive UI; live GUI IPC later |
 
 ## 4. Non-functional requirements
 
 | ID | Requirement and verification |
 | --- | --- |
 | NFR1 | **Offline-first:** installed reading, navigation, word studies, genealogies, overviews, notes, and local AI work without network access. Missing optional data/model is reported explicitly. Network loss cannot disable installed content. Verify all implemented user flows with networking disabled. |
-| NFR2 | **Performance:** reference selection/passage loading feel instantaneous on modest hardware; typical corpus-wide lemma/Strong's queries return in under one second. Measure cold/warm latency, corpus, hardware, and query set. Exact navigation budgets, reference hardware, and percentile gates remain open; no current app benchmark demonstrates compliance. |
-| NFR3 | **Platforms:** verify desktop behavior on Windows/macOS/Linux, Android as secondary, and clearly label experimental iOS support. Share validation, query, and recovery behavior; isolate filesystem/background/lifecycle differences in platform adapters. |
+| NFR2 | **Performance:** reference selection/passage loading feel instantaneous on modest hardware; typical corpus-wide lemma/Strong's queries return in under one second. Measure cold/warm latency, corpus, hardware, and query set. Exact navigation budgets, reference hardware, and percentile gates remain open; an initial single-machine debug smoke run is recorded in [app verification](docs/app/verification.md), but it is not a cross-platform percentile benchmark. |
+| NFR3 | **Platforms:** verify desktop behavior on Windows/macOS/Linux, Android as the first mobile target; defer iOS implementation explicitly. Share validation, query, and recovery behavior; isolate filesystem/background/lifecycle differences in platform adapters. |
 | NFR4 | **Integrity:** validate actual canonical identity/existence, all references/ownership, witness consistency, coverage, SQLite integrity/foreign keys, search consistency, and verified package receipts. Existing canonical IDs cannot be deleted or reassigned by a source update; this tightens the original permissive cascade wording. |
 | NFR5 | **Extensibility:** a new work in an already supported kind/profile requires data import and catalog entry, not a new core linking schema. New semantic features or unsupported interchange profiles require a versioned extension. |
 | NFR6 | **Footprint:** retain the original goal of text + indexes under a few hundred MB before a local model. Reading SQLite is approximately 66 MB; the full study SQLite is approximately 585 MB with approximately 110 MB compressed transport. The full study set exceeds that original goal. Independent selection addresses choice, but does not prove a new budget; default bundle, device budgets, model/embedding sizes, and exceptions remain open. |
@@ -98,6 +101,7 @@ FR4 does not authorize fabricated Hebrew morphology, lemmas, English word alignm
 | NFR11 | **Privacy:** user notes/private tags and AI inference stay local in the current product scope. No cloud model or account is required for public-free resource use. Public contribution requires a separate deliberate submission action. |
 | NFR12 | **Usability:** preserve primary reading context, readable original-language glyphs, keyboard focus/navigation, configurable reading typography, recoverable failure states, and minimum mobile target sizes from section 5. Hebrew additionally requires correct RTL layout/shaping; font coverage alone is insufficient. Accessibility evaluation and toolkit support must be tested, not inferred from mockups. |
 | NFR13 | **Diagnostics/maintainability:** source validation exposes stable error codes, file, available one-based line/column, explanation, and corrective help, with JSON output for CI/editors. Keep machine contracts/examples/tests/specs synchronized and mark partial implementations honestly. |
+| NFR14 | **Engine boundary:** core commands, validation, queries and persistence MUST remain independent of UI/GPU toolkits and publisher tooling. UI, CLI, JSON and MCP MUST dispatch the same implementation. Queued native work MUST avoid blocking the render loop. Verify command parity, dependency layers and responsive error handling. |
 
 ## 5. Visual and interaction specification
 
@@ -116,13 +120,13 @@ The selected direction is the approved dark study desk described in [UI assets](
 
 [Mobile design references](design/mobile/README.md) cover reading, book selection, chapter/verse selection, contextual word study, notes/highlights, local AI search, genealogies, and reading preferences. They are static SVG/PNG mockups, not working application screens. [Figma handoff metadata](design/figma/handoff.json) records desktop references and pending work; pending scripts are not proof that interactions or compact-sidebar edits were applied remotely. The recorded export/prototype limitations are historical handoff state, not a fresh check of an account quota.
 
-The reference picker progressively reveals controls without a full mode switch. Word selection opens highlight, note, word study, copy, and ask-AI actions as data/permissions permit. Translation changes retain location and open panels. Genealogies and overviews are available contextually and through study surfaces. Generated AI explanation and quoted Scripture are visibly distinct. Detailed store wireframes and responsive desktop breakpoints remain open.
+The reference picker progressively reveals controls without a full mode switch. Word selection opens highlight, note, word study, copy, and ask-AI actions as data/permissions permit. Translation changes retain location and open panels. Genealogies and overviews are available contextually and through study surfaces. Generated AI explanation and quoted Scripture are visibly distinct. Detailed store wireframes remain open. The initial app uses a 760 logical-pixel mobile breakpoint, the 208 px compact sidebar, and a 360 px companion panel when the post-sidebar width exceeds 1,050 px. The narrow toolbar adapts and mobile actions remain reachable. Picker Open and note Save/Cancel stay at the bottom while content scrolls. These breakpoints and the [working flows](docs/app/README.md#working-flows) are implemented defaults still requiring device/accessibility validation. The mobile word-study bottom sheet and richer contextual word selection remain planned; the initial app uses Study navigation.
 
 ## 6. User and operational flows
 
 ### UF1 Read and navigate
 
-Start with the last valid canonical range and translation, or a bundled reading seed on first launch. Open the picker or type a natural reference; show a compact OT/NT grid with the current book, then chapter and optional verse. Validate input before navigation and retain the current passage on an invalid reference. Open the chosen range, update recent locations, and allow favorites. Translation switching preserves the canonical range, annotations, and study context; unavailable source verses remain explicit rather than fabricated.
+Start with the last valid canonical range and translation, or an explicitly opened local v1 snapshot in the initial app. A bundled/verified downloadable first-run seed remains planned; do not imply it is present in the current executable. Open the picker or type a natural reference; show a compact OT/NT grid with the current book, then chapter and optional verse. Validate input before navigation and retain the current passage on an invalid reference. Open the chosen range, update recent locations, and allow favorites. Translation switching preserves the canonical range, annotations, and study context; unavailable source verses remain explicit rather than fabricated.
 
 ### UF2 Study a verse or word
 
@@ -218,10 +222,11 @@ User-owned records remain in `user.sqlite`, with its local permanent reference r
 
 | Axis | Current value or policy |
 | --- | --- |
-| System specification | This document, revision 0.4; does not set data/protocol versions |
+| System specification | This document, revision 0.6; does not set data/protocol versions |
 | Content/user SQLite schemas | Published content v1 and user v1; composed library v2 remains a design target |
 | Canonical registry | v1, `fontes-protestant-66-v1`; permanent IDs never reassigned |
 | Snapshot manifest/update protocol | v1, separate from the package/catalog protocols |
+| Application commands/session extension | Initial command protocol v1 and additive `fontes_app_session_v1`; independent of content/library schema versions |
 | Resource XML source format | Draft v1, namespace `urn:fontes:resource:1` |
 | Resource delivery/catalog protocols | Draft v1 each; no live signed catalog or compiled delivery format yet |
 | Source-release protocol | Implemented v1, `validated_source_package`, with a separate signature domain and preview release tags |
@@ -232,6 +237,12 @@ User-owned records remain in `user.sqlite`, with its local permanent reference r
 | Source/adapter/compiler/app | Exact source digest/revision, adapter version, compiler commit/toolchain, and compatible app version remain independent |
 
 Content corrections do not inherently need an app release. Contract/schema changes require compatible code and an explicit version/migration policy; publication timestamps and sequences do not redefine content identity.
+
+### 7.5 Implemented initial application contracts
+
+The [application command specification](specs/app/README.md) and generated [commands-v1.json](specs/app/commands-v1.json) describe 13 stable command IDs and strictly typed inputs shared by GUI/CLI/JSON/MCP. [`fontes-engine` view models](crates/fontes-engine/src/model.rs) define the serializable replies. This application protocol version is independent of snapshot/update and package-library versions. It is the initial development API, not a promise that all view-model fields are frozen for external consumers.
+
+The engine opens trusted local content-v1 snapshots read-only and uses the existing separate user-v1 schema. It adds only `fontes_app_session_v1(singleton, json)` for typed last selection/translation/reading preferences without changing published user-v1 version or tables. Missing translations fall back to an installed one; canonical note anchors remain stable. There is no library-v2 migration, verified download/activation, or snapshot mutation. [`docs/app/architecture.md`](docs/app/architecture.md) records storage, concurrency, bootstrap and future migration boundaries; [`docs/app/README.md`](docs/app/README.md) records exact local usage and platform dependencies.
 
 ## 8. Resource authoring and CLI specification
 
@@ -425,6 +436,11 @@ This register captures chosen directions and their reasons. Detailed contracts r
 | D018 | Grounded local AI as an optional capability | Offline/private operation and real stored citations; no fabricated missing data or implicit AI rights |
 | D019 | Ship signed source-stage release automation before app delivery compilation | Immediate submission feedback and reproducible reviewed artifacts without mislabeling editable ZIPs as app payloads |
 | D020 | Separate reusable read-only builder and privileged publisher; caller-owned private policy/storage | Portable workflows with exact-hash approvals, no PR signing credentials, and enforced private distribution boundaries |
+| D021 | Engine-first stable command registry with toolkit-independent view models; thin `ui-egui`, shared CLI/JSON/MCP dispatch | Replace the presentation toolkit without rewriting domain behavior. Native UI uses a bounded serial background host. Existing data protocols/IDs remain unchanged; live GUI IPC is a later transport. |
+| D022 | egui/eframe 0.35.0, explicit wgpu renderer, existing Rust 1.93 toolchain | Latest checked compatible series; newer egui releases require Rust 1.95. Native SQLite remains the documented C dependency; app does not require publisher tooling. |
+| D023 | Read-only v1 snapshot bridge plus separate user-v1 app-session extension for the first app | Exercise real data now without mutating snapshots or presenting draft library-v2 schemas as migrations. Verified first-run downloads and resource-native composition remain separate gates. |
+| D025 | Cross-platform tested archives and Android debug APK, retained Actions artifacts and per-run immutable application prereleases | All platform jobs must pass before publication. Build manifests/checksums bind source/toolchain/payloads; development builds are distinct from production signing and the content-update trust protocol. |
+| D024 | Shared desktop/Android Rust UI; initial arm64 Android NativeActivity, minimum API 28 and target API 35; iOS deferred | Avoid an app-authored Java/Kotlin layer in the first slice. Android AccessKit requires GameActivity in eframe 0.35, so accessibility/IME/device validation remain explicit release gates. |
 
 ## 14. Implementation phases and acceptance criteria
 
@@ -436,7 +452,7 @@ This register captures chosen directions and their reasons. Detailed contracts r
 | P3 Package-native data | Planned | Complete delivery exchange/v2 schema/anchor contracts, eight independently signed resources equivalent to current snapshots, reading/study bundles, legacy anchor migration |
 | P4 Registry/catalog operation | Partial source intake; catalog planned | Source repository policy/hash approval/source releases exist; production namespace/intake/trust lifecycle, signed taxonomy/catalog and client withdrawal still required |
 | P5 Shared installer | Planned | Cross-package context, staged update/uninstall, permissions/FTS/receipts, disk estimates, platform crash recovery, note preservation |
-| P6 Application | Planned with static UI assets | FR1–FR10 and library flows, approved visual system, real local data, desktop/Android validation, performance/footprint measurements |
+| P6 Application | Partial: working v1 slice | Responsive egui/wgpu app, toolkit-independent commands, CLI/JSON/MCP, real reading/study queries and persistent notes exist. Local macOS/egui render checks and Android APK build recorded; cross-platform release verification, Android device/IME/accessibility, verified bootstrap, library flows and broader measurements remain. |
 | P7 Curated/enriched/AI content | Planned | Evidenced genealogies, reviewed overviews, approved enrichment/embedding/model contracts, grounded local retrieval/answers |
 | P8 Paid publisher resources | Deferred | Separate agreements, entitlements/restoration, restricted delivery, platform rules, offline terms, and permitted export/AI design |
 
@@ -452,6 +468,7 @@ Required verification scenarios:
 - **AC8 Migration:** text, witness/token relationships, links, FTS, notices, permissions, and old note anchors survive the v1-to-v2 transition; a profile refresh never deletes add-ons.
 - **AC9 Publication/trust:** no signing secrets in untrusted jobs, deterministic builds, immutable versions, draft/public verification, monotonic sequences, compatible fallback and replay rejection.
 - **AC10 Reading/UI/AI:** complete offline flows, approved tokens and mobile target sizes, keyboard navigation, Greek/Hebrew presentation, measured NFR2/NFR6, and AI citations resolving to actual permitted evidence.
+- **AC12 Application commands:** same command input produces equivalent domain behavior through GUI/CLI/JSON/MCP; strict input/errors and bounded stdio; no toolkit/publisher dependency in engine; real content reading/search/study, persistent notes and translation selection survive reopen; narrow picker and save controls remain reachable; record actual desktop/device validation independently from compilation.
 - **AC11 Source publication:** proposed PR approvals cannot authorize themselves; verify byte-reproducible builds, signed source assets, draft/public download integrity, no-overwrite retries, complete-draft recovery, URL bounds, separate private storage, and public-destination refusal.
 
 [Contract tests](crates/fontes-data-contracts/tests/contracts.rs), [pipeline tests](crates/fontes-data-pipeline/tests/reading.rs), [study unit tests](crates/fontes-data-pipeline/src/study.rs), [authoring tests](crates/fontes-resource/tests/authoring.rs), and [design example checks](specs/resource-packages/v1/check_examples.py) provide existing evidence. The scratch SQL tests do not establish filesystem activation, mobile recovery, real UI, or AI correctness. Future tests must implement the remaining criteria rather than treating this table as a test result.
@@ -467,14 +484,16 @@ Required verification scenarios:
 | O005 | Catalog/package signing-key rotation, emergency revocation, and offline trust policy | Production P4/P5 |
 | O006 | Platform-specific activation/flush/locking/recovery details and fault-injection harness | P5 on every supported client |
 | O007 | Default bundle/storage budgets, device benchmark hardware/query set, precise navigation budgets, and full-study footprint exception/optimization | NFR2/NFR6; P6 |
-| O008 | Catalog navigation placement, full store flows/wireframes, responsive desktop breakpoints, accessibility/RTL implementation verification | P6 |
+| O008 | Catalog navigation placement, full store flows/wireframes, device validation of initial responsive breakpoints, accessibility/RTL implementation verification | P6 |
 | O009 | Reviewed genealogy/overview authoring datasets; proposed JSONL contract if retained | FR5/FR6 and P7 |
 | O010 | Signed taxonomy lifecycle/enrichment payload contract, proposal UI/search, correction and rollback policy | P4/P7; example taxonomy is not a registry |
 | O011 | Local model/runtime choice, embedding/model artifact contracts/rights/budgets, retrieval/citation validation algorithm | FR8/P7 |
 | O012 | Publisher entitlement, private distribution and commerce design | Deferred P8; no restricted work in public PRs |
 | O013 | Stable API/versioning for converters, preview, semantic diff, and submission helpers; container image digest pinning | Expanded author tooling and CI hardening |
-| O014 | Natural-reference grammar, localized aliases, ambiguous-input feedback, and supported abbreviation fixtures | FR2/UF1 parser and navigation tests |
+| O014 | Expanded/localized natural-reference grammar and aliases | Initial English/OSIS/USFM/unique-prefix parsing, j/jn/psalm aliases, ambiguity errors and fixtures implemented; FR2 localization later |
 | O015 | Non-GitHub source-release storage backend and transport verification with equivalent immutable inventories | Later storage migration; current GitHub repositories are configurable |
+| O016 | Android device/IME/lifecycle/safe-area/accessibility validation, Windows/Linux runtime validation, app signing/distribution and verified first-run content import | P6 user release; APK compilation and responsive desktop renders are insufficient |
+| O017 | User note backup/export, unsaved-draft close protection, large-annotation view-model budgets, cancellable jobs and optional authenticated live GUI control | P6 user release/expanded automation; independent stdio sessions exist |
 
 Do not fill these gaps by treating illustrative manifests as signed releases, pending design scripts as applied UI, provisional concepts as reviewed registry entries, or a source archive as an installable payload. Advance implementation with explicit contracts, status updates, and the relevant acceptance evidence.
 
@@ -485,6 +504,8 @@ Do not fill these gaps by treating illustrative manifests as signed releases, pe
 | 0.1 | Owner's Word baseline: goals, FR1–FR10, NFR1–NFR6, constraints/behaviors, initial relational/Rust sketch and exclusions; retained in Markdown archive |
 | 0.2 | Library/package detail design: independent resources, unified installed graph, source/delivery/catalog split, taxonomy, publishing, recovery, and later implemented source authoring CLI |
 | 0.3 | This consolidated repository specification: preserved original IDs/intent, current schema authorities and corrections, approved local UI decisions, flows, decision register, status/acceptance matrix, and unresolved gates |
+| 0.6 | Cross-platform testing distribution: native release archives for Windows/Linux/macOS arm64+x64, Android debug APK, same-run provenance checks, immutable test prereleases and verified public downloads |
+| 0.5 | Initial engine-first Rust app: shared command/CLI/JSON/MCP contract, responsive egui/eframe/wgpu UI using approved assets, read-only v1 data bridge, separate persistent user storage, Android NativeActivity entry/APK build and cross-platform CI definitions; honest verification and remaining release gates |
 | 0.4 | Source-submission automation in this repository: reusable PR/build/publish workflows, exact-hash approvals, signed source-release protocol, portable policy/private storage guards, and explicit separation from app SQLite delivery |
 
 Original goals map to FR1–FR10, NFR1–NFR6, and sections 5–6. Original constraints/platforms map to section 2. Original context-menu/translation/picker/citation/genealogy behaviors map to UF1–UF4 and section 5. Original data entities map to section 7; the archived SQL/Rust examples preserve the old shape for historical comparison. The initial proprietary-resource exclusion is explicitly narrowed to the default public-domain corpus and current free catalog; licensed extensibility is supported architecturally, while actual restricted/paid distribution remains deferred. Full study footprint and missing lemma/alignment/curated content remain recorded gaps rather than removed requirements.
