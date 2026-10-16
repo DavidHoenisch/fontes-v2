@@ -876,11 +876,8 @@ fn publish_with(
             );
             if previous_tag == manifest.release_tag {
                 ensure!(
-                    old.distribution == manifest.distribution
-                        && old.taxonomy_sha256 == manifest.taxonomy_sha256
-                        && old.policy_sha256 == manifest.policy_sha256
-                        && old.entries == manifest.entries,
-                    "existing build identity has different payload/policy; increment build_revision"
+                    old.distribution == manifest.distribution && old.entries == manifest.entries,
+                    "existing build identity has different payload/distribution; increment build_revision"
                 );
                 let all = tempfile::tempdir()?;
                 download(expected_repository, previous_tag, all.path(), true, gh)?;

@@ -8,7 +8,8 @@ on:
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
-      - 'crates/**'
+      - 'crates/fontes-data-contracts/**'
+      - 'crates/fontes-data-pipeline/**'
       - 'tools/sword-export.cpp'
       - 'data/**'
   workflow_dispatch:

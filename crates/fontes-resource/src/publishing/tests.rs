@@ -559,3 +559,34 @@ fn refuses_revised_source_under_an_old_version_even_with_new_approval_and_build_
     );
     assert_eq!(state.borrow().creates, 1);
 }
+
+#[test]
+fn adding_a_publisher_does_not_force_unchanged_resource_republication() {
+    let (temp, key) = setup();
+    assert!(build_at(&temp, "first", true).valid);
+    let state = Rc::new(RefCell::new(State::default()));
+    let storage = Rc::new(tempfile::tempdir().unwrap());
+    let api = host(state.clone(), storage);
+    publish_with(
+        &temp.path().join("first"),
+        &temp.path().join("library"),
+        "test/resources",
+        &key,
+        &api,
+    )
+    .unwrap();
+    let policy_path = temp.path().join("library/policy.json");
+    let mut policy: Policy = json(&policy_path).unwrap();
+    policy.publishers.insert("org.another".into());
+    write_json(&policy_path, &policy).unwrap();
+    assert!(build_at(&temp, "next", true).valid);
+    publish_with(
+        &temp.path().join("next"),
+        &temp.path().join("library"),
+        "test/resources",
+        &key,
+        &api,
+    )
+    .unwrap();
+    assert_eq!(state.borrow().creates, 1);
+}
