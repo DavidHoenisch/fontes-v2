@@ -1,0 +1,11 @@
+# Required-review enforcement must also be enabled in repository branch rules.
+/.github/ @DavidHoenisch
+/library/policy.json @DavidHoenisch
+/library/approvals/ @DavidHoenisch
+/library/trust/ @DavidHoenisch
+/library/taxonomy.xml @DavidHoenisch
+/crates/ @DavidHoenisch
+/specs/ @DavidHoenisch
+/Cargo.toml @DavidHoenisch
+/Cargo.lock @DavidHoenisch
+/rust-toolchain.toml @DavidHoenisch

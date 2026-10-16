@@ -1,0 +1,24 @@
+name: Resource submission checks
+
+on:
+  pull_request:
+    paths:
+      - 'library/**'
+      - 'crates/fontes-resource/**'
+      - 'specs/resource-packages/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/resource-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    uses: ./.github/workflows/resource-pipeline.yml
+    with:
+      tooling_repository: ${{ github.repository }}
+      tooling_ref: ${{ github.event.pull_request.base.sha || github.sha }}
+      source_ref: ${{ github.sha }}
+      approved_only: false

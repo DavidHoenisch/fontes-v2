@@ -1,0 +1,9 @@
+{
+  "submission_version": 1,
+  "resource_id": "org.example.romans-study",
+  "publisher_id": "org.example",
+  "version": "1.0.0",
+  "build_revision": 1,
+  "source": {"type": "path", "path": "submissions/org.example.romans-study/source"},
+  "release_notes": "Original CC0 format demonstration for exercising submission validation and source-package publication. The publisher identity is fictional. This is a source-stage preview, not an app-installable Bible study resource."
+}

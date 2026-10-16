@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="urn:fontes:resource:1" format-version="1" id="org.example.romans-study" version="1.0.0" kind="study-guide" language="en">
+  <title>Example Romans Study</title>
+  <subtitle>A package format demonstration</subtitle>
+  <description>A short original example demonstrating paragraph-level scripture links, word links, and a proposed concept. It is not a complete commentary or an endorsement of a publisher.</description>
+  <contributors><contributor role="author">Fontes format example</contributor></contributors>
+  <publisher id="org.example">Example Publisher</publisher>
+  <edition>Demonstration edition</edition>
+  <publication-date>2026-10-15</publication-date>
+  <cover href="assets/cover.png" media-type="image/png" width="1200" height="1800" alt="Illustrative blue cover with a simple geometric book motif" license-id="CC0-1.0" rights-holder="Fontes format example contributors" attribution="Original placeholder artwork for this format example; CC0-1.0."/>
+  <references canonical-registry="fontes-protestant-66-v1" source-versification="KJV"/>
+  <coverage mode="selected"><range start="Rom.1.1" end="Rom.1.7"/></coverage>
+  <rights license-id="CC0-1.0" rights-holder="Fontes format example contributors" license-file="rights/LICENSE.txt" attribution-file="rights/ATTRIBUTION.txt">
+    <copyright>Original example prose, metadata, and placeholder cover dedicated to the public domain through CC0-1.0.</copyright>
+    <attribution>Fontes resource format demonstration. The publisher identity is fictional.</attribution>
+    <permissions offline-display="allow" keyword-search="allow" export="allow" print="allow" embeddings="allow" ai-context="allow"/>
+  </rights>
+</resource>

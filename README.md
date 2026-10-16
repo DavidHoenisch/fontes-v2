@@ -2,6 +2,18 @@
 
 Offline Bible study data and application foundations. The Rust pipeline compiles locked public domain Bible texts, dictionaries, morphology, commentary, topics, and cross-references into a versioned SQLite database with full-text search and permanent canonical references.
 
+Start with **[the Fontes system specification](SPEC.md)** for product requirements, non-functional requirements, user flows, UI decisions, schema authorities, architectural choices, acceptance criteria, and implementation status. [Specification history and supporting documents](docs/specifications/README.md) include a complete Markdown transcription of the original Word baseline.
+
+## Extensible library design
+
+The [resource package and catalog addendum](docs/specifications/library-and-packages-v0.2.md) designs independent downloads, a shared installed library, paragraph-level links, and a growing concept registry. [Draft contracts and a validated example](specs/resource-packages/v1/README.md) include XML XSDs, catalog/delivery JSON Schemas, and an executable linking model. These are design artifacts; the public catalog, resource compiler, and app installer are future work. Current signed reading/study releases remain unchanged.
+
+See the [resource publishing guides](docs/resource-publishing/README.md) for authoring, taxonomy proposals, maintainer review/publication, client integration, and implementation status.
+
+The implemented [resource CLI](docs/resource-publishing/cli-guide.md) scaffolds packages with optional book/publisher metadata, validates XML and referenced assets with file/line/column diagnostics, creates deterministic source ZIPs, and exports its embedded XSDs. Install with `cargo install --path crates/fontes-resource --locked`; strict validation also requires `xmllint` on `PATH`.
+
+The [submission/release pipeline](docs/resource-publishing/submission-pipeline.md) validates `library/submissions/` on PRs, prepares reproducible previews, and publishes hash-approved source packages as signed prereleases from the trusted branch. Its reusable workflows support a separate/private policy and storage repository. Source-stage releases are not app-installable SQLite delivery packages.
+
 ## Build the reading data
 
 The pinned Rust toolchain is installed through rustup. The first build downloads approximately 10 MB of source archives and checks their exact SHA-256 digests and sizes.

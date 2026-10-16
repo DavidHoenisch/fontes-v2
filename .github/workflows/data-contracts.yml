@@ -9,6 +9,8 @@ on:
       - 'rust-toolchain.toml'
       - 'crates/**'
       - 'data/**'
+      - 'specs/resource-packages/**'
+      - 'library/**'
       - 'docs/research/source-validation.json'
   push:
     branches: [main, master]
@@ -19,6 +21,8 @@ on:
       - 'rust-toolchain.toml'
       - 'crates/**'
       - 'data/**'
+      - 'specs/resource-packages/**'
+      - 'library/**'
       - 'docs/research/source-validation.json'
   workflow_dispatch:
 
@@ -37,6 +41,12 @@ jobs:
         run: rustup toolchain install 1.93.0 --profile minimal --component clippy --component rustfmt
       - name: Check formatting
         run: cargo fmt --all -- --check
+      - name: Install XML schema validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libxml2-utils
+      - name: Check resource package examples
+        run: python3 specs/resource-packages/v1/check_examples.py
       - name: Check contracts
         run: cargo test --workspace --locked
       - name: Check lints

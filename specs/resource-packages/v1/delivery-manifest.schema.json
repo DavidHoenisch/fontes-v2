@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fontes resource delivery manifest draft protocol 1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "package_protocol_version": {
+      "const": 1
+    },
+    "resource_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*){2,}$",
+      "maxLength": 160
+    },
+    "publisher_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$",
+      "maxLength": 120
+    },
+    "resource_version": {
+      "type": "string",
+      "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "build_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9223372036854775807
+    },
+    "library_schema_version": {
+      "const": 2
+    },
+    "canonical_registry_version": {
+      "const": 1
+    },
+    "taxonomy_snapshot": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_archive_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "compiler_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "signing_key_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "required_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "media_type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9223372036854775807
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "media_type",
+          "bytes",
+          "sha256"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "package_protocol_version",
+    "resource_id",
+    "publisher_id",
+    "resource_version",
+    "build_revision",
+    "library_schema_version",
+    "canonical_registry_version",
+    "taxonomy_snapshot",
+    "source_archive_sha256",
+    "compiler_commit",
+    "signing_key_id",
+    "required_capabilities",
+    "entries"
+  ]
+}

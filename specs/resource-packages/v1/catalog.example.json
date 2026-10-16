@@ -1,0 +1,106 @@
+{
+  "catalog_protocol_version": 1,
+  "repository": "example/fontes-library",
+  "channel": "preview",
+  "sequence": 1,
+  "published_at": "2026-10-16T00:00:00Z",
+  "signing_key_id": "example-catalog-key",
+  "taxonomy": {
+    "snapshot": "fontes-concepts-draft-1",
+    "url": "https://example.invalid/taxonomy/draft-1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "bytes": 1000
+  },
+  "bundles": [
+    {
+      "id": "org.example.demo-bundle",
+      "title": "Demonstration bundle",
+      "resource_ids": [
+        "org.example.romans-study"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "org.example.romans-study",
+      "version": "1.0.0",
+      "build_revision": 1,
+      "title": "Example Romans Study",
+      "description": "An unsigned illustrative catalog fixture, not a published resource.",
+      "kind": "study-guide",
+      "language": "en",
+      "contributors": [
+        {
+          "name": "Fontes format example",
+          "role": "author"
+        }
+      ],
+      "publisher": {
+        "id": "org.example",
+        "name": "Example Publisher"
+      },
+      "rights": {
+        "license_id": "CC0-1.0",
+        "rights_holder": "Fontes format example contributors",
+        "attribution": "Format demonstration only.",
+        "permissions": {
+          "offline_display": "allow",
+          "keyword_search": "allow",
+          "export": "allow",
+          "print": "allow",
+          "embeddings": "allow",
+          "ai_context": "allow"
+        },
+        "distribution": "public_free",
+        "rights_review_id": "example-not-approved"
+      },
+      "cover": {
+        "thumbnail": {
+          "url": "https://example.invalid/covers/example/200.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "bytes": 1000,
+          "media_type": "image/png",
+          "width": 200,
+          "height": 300,
+          "alt": "Illustrative placeholder cover"
+        },
+        "detail": {
+          "url": "https://example.invalid/covers/example/600.png",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "bytes": 1000,
+          "media_type": "image/png",
+          "width": 600,
+          "height": 900,
+          "alt": "Illustrative placeholder cover"
+        },
+        "license_id": "CC0-1.0",
+        "rights_holder": "Fontes format example contributors",
+        "attribution": "Original placeholder artwork for this format example."
+      },
+      "coverage": {
+        "mode": "selected",
+        "summary": "Romans 1:1–7 example notes",
+        "canonical_registry_version": 1,
+        "linked_block_count": 4,
+        "unmapped_reference_count": 0
+      },
+      "capabilities": [
+        "scripture_links",
+        "strongs_links",
+        "concept_links"
+      ],
+      "dependencies": [],
+      "artifact": {
+        "url": "https://example.invalid/resources/org.example.romans-study--1.0.0--b1.fontes.zip",
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "compressed_bytes": 10000,
+        "expanded_bytes": 50000,
+        "library_schema_version": 2,
+        "package_protocol_version": 1,
+        "minimum_app_version": "0.2.0"
+      },
+      "release_notes": "Illustrative fixture only.",
+      "metadata_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

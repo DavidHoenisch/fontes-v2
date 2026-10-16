@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<index xmlns="urn:fontes:resource:1" format-version="1" resource-id="org.example.romans-study">
+  <document id="rom-intro" title="About this demonstration" href="content/introductions/romans.xml"/>
+  <section id="romans" title="Romans">
+    <document id="rom-001" title="The opening of Romans" href="content/rom/001.xml"/>
+  </section>
+</index>

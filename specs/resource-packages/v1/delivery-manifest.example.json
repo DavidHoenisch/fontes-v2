@@ -1,0 +1,44 @@
+{
+  "package_protocol_version": 1,
+  "resource_id": "org.example.romans-study",
+  "publisher_id": "org.example",
+  "resource_version": "1.0.0",
+  "build_revision": 1,
+  "library_schema_version": 2,
+  "canonical_registry_version": 1,
+  "taxonomy_snapshot": "fontes-concepts-draft-1",
+  "source_archive_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "compiler_commit": "0000000000000000000000000000000000000000",
+  "signing_key_id": "example-untrusted-key",
+  "required_capabilities": [
+    "scripture_links",
+    "strongs_links",
+    "concept_links"
+  ],
+  "entries": [
+    {
+      "path": "NOTICE.txt",
+      "media_type": "text/plain",
+      "bytes": 1000,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "assets/cover.png",
+      "media_type": "image/png",
+      "bytes": 16912,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "content.sqlite",
+      "media_type": "application/vnd.sqlite3",
+      "bytes": 32768,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "metadata.json",
+      "media_type": "application/json",
+      "bytes": 1000,
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

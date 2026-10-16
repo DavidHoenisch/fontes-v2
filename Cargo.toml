@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/fontes-data-contracts", "crates/fontes-data-pipeline"]
+members = ["crates/fontes-data-contracts", "crates/fontes-data-pipeline", "crates/fontes-resource"]
 resolver = "3"
 
 [workspace.package]

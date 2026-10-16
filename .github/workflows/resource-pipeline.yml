@@ -1,0 +1,160 @@
+name: Reusable resource submission pipeline
+
+on:
+  workflow_call:
+    inputs:
+      tooling_repository:
+        type: string
+        required: true
+      tooling_ref:
+        description: Trusted tooling/policy commit; pin a full SHA in another repository.
+        type: string
+        required: true
+      source_ref:
+        description: Submission checkout ref in the caller repository.
+        type: string
+        default: ''
+      library_path:
+        type: string
+        default: library
+      policy_path:
+        type: string
+        default: library
+      policy_repository:
+        description: Empty uses the caller repository, so private approvals stay private.
+        type: string
+        default: ''
+      policy_ref:
+        description: Trusted caller policy commit; PR wrapper supplies its base commit.
+        type: string
+        default: ''
+      release_repository:
+        description: Empty uses the caller repository; may be a separately authorized storage repository.
+        type: string
+        default: ''
+      approved_only:
+        type: boolean
+        default: false
+    outputs:
+      policy_sha:
+        value: ${{ jobs.build.outputs.policy_sha }}
+      ready_count:
+        value: ${{ jobs.build.outputs.ready_count }}
+    secrets:
+      source_read_token:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      policy_sha: ${{ steps.provenance.outputs.policy_sha }}
+      ready_count: ${{ steps.review.outputs.ready_count }}
+    steps:
+      - name: Check out trusted tooling and publication policy
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: ${{ inputs.tooling_repository }}
+          ref: ${{ inputs.tooling_ref }}
+          path: tooling
+          persist-credentials: false
+      - name: Check out trusted caller publication policy
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: ${{ inputs.policy_repository || github.repository }}
+          ref: ${{ inputs.policy_ref || github.event.pull_request.base.sha || github.sha }}
+          token: ${{ secrets.source_read_token || github.token }}
+          path: policy
+          persist-credentials: false
+      - name: Check out submitted data separately
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+          path: content
+          token: ${{ secrets.source_read_token || github.token }}
+          persist-credentials: false
+      - name: Resolve immutable provenance
+        id: provenance
+        shell: bash
+        run: |
+          echo "policy_sha=$(git -C policy rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_COMMIT=$(git -C content rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "TOOLING_COMMIT=$(git -C tooling rev-parse HEAD)" >> "$GITHUB_ENV"
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libxml2-utils
+          rustup toolchain install 1.93.0 --profile minimal --component rustfmt --component clippy
+      - name: Test trusted authoring and publication tooling
+        working-directory: tooling
+        run: |
+          cargo fmt --all -- --check
+          cargo test --locked -p fontes-resource
+          cargo clippy --locked -p fontes-resource --all-targets -- -D warnings
+          cargo build --locked --release -p fontes-resource
+      - name: Validate submissions and prepare source releases twice
+        env:
+          LIBRARY_PATH: ${{ inputs.library_path }}
+          POLICY_PATH: ${{ inputs.policy_path }}
+          RELEASE_REPOSITORY: ${{ inputs.release_repository || github.repository }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          APPROVED_ONLY: ${{ inputs.approved_only }}
+        shell: bash
+        run: |
+          mode=check
+          if [[ "$APPROVED_ONLY" == true ]]; then mode=build; fi
+          for destination in resource-build resource-repro; do
+            tooling/target/release/fontes-resource submissions "$mode" \
+              --root "content/$LIBRARY_PATH" --policy-root "policy/$POLICY_PATH" \
+              --output "$RUNNER_TEMP/$destination" --repository "$RELEASE_REPOSITORY" \
+              --source-repository "$SOURCE_REPOSITORY" \
+              --source-commit "$SOURCE_COMMIT" --tooling-commit "$TOOLING_COMMIT"
+          done
+          diff --recursive --brief "$RUNNER_TEMP/resource-build" "$RUNNER_TEMP/resource-repro"
+      - name: Submission review summary
+        id: review
+        if: always()
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = Path(os.environ['RUNNER_TEMP']) / 'resource-build/submission-report.json'
+          count = 0
+          if report.exists():
+              count = sum(item.get('approved', False) for item in json.loads(report.read_text())['submissions'])
+              content = json.dumps(json.loads(report.read_text()), indent=2).replace(chr(96), chr(92) + 'u0060')
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+                  output.write('## Resource source-package checks' + chr(10)*2 + '```json' + chr(10) + content[:60000] + chr(10) + '```' + chr(10))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              print(f'ready_count={count}', file=output)
+          PY
+      - name: Retain diagnostics and source previews
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: resource-review
+          path: ${{ runner.temp }}/resource-build/
+          if-no-files-found: ignore
+          retention-days: 5
+          compression-level: 1
+      - name: Prepare trusted publisher executable
+        if: inputs.approved_only
+        run: |
+          mkdir -p "$RUNNER_TEMP/resource-publisher"
+          cp tooling/target/release/fontes-resource "$RUNNER_TEMP/resource-publisher/"
+      - name: Retain same-run trusted publication inputs
+        if: inputs.approved_only
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: resource-publication
+          path: |
+            ${{ runner.temp }}/resource-build/
+            ${{ runner.temp }}/resource-publisher/
+          if-no-files-found: error
+          retention-days: 2
+          compression-level: 1

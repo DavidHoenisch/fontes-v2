@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<concepts xmlns="urn:fontes:resource:1" format-version="1" publisher-id="org.example" scope="publisher">
+  <concept id="urn:fontes:publisher:org.example:concept:messianic-ancestry">
+    <label language="en" kind="preferred">Messianic ancestry</label>
+    <label language="en" kind="alternative">Ancestry of the Messiah</label>
+    <scope-note>Discussion of ancestry as presented in texts about the Messiah. This example is a proposal, not a centrally approved category.</scope-note>
+    <related id="urn:fontes:concept:incarnation"/>
+    <evidence start="Rom.1.3"/>
+  </concept>
+</concepts>

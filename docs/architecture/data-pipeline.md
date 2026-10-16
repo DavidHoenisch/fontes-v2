@@ -1,10 +1,16 @@
 # Fontes data pipeline and offline update design
 
+The current cross-system requirements and decisions are in [SPEC.md](../../SPEC.md). This document provides supporting pipeline/update detail; implemented versus planned behavior is summarized in the system specification and below.
+
 Use a Rust compiler running in GitHub Actions to turn locked source files into versioned, immutable SQLite databases. Publish compressed databases and a signed manifest as GitHub Release assets. Desktop and mobile share a Rust updater that installs each database beside the active version, verifies it, and switches a small local pointer. User notes and highlights live in a separate database throughout.
 
 This preserves the reference-centric model in Specification v0.1 while making source refreshes, reproducible builds, app compatibility, and interrupted updates explicit. The initial transport is a complete snapshot for a selected content profile. Source imports are modular inside the build; clients do not need to merge resource databases or apply SQL patches.
 
 The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, eight locked inputs, and shared contracts. The workflow compiles both reading and study twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, Matthew Henry, Nave’s, and TSK. Scheduled source discovery and client installation remain implementation work.
+
+## Independently installable resources
+
+The [extensible library addendum](../specifications/library-and-packages-v0.2.md) extends this design with a free resource catalog, publisher source packages, compiled delivery packages, paragraph-level linking, and a governed concept registry. For the future package-native app, reading/study become resource-selection bundles and installation composes a package-owned library generation; updating a default bundle must preserve optional installed resources. The current v1 snapshot compiler and published bytes remain unchanged. XML/JSON contracts and a scratch SQL model live under `specs/resource-packages/v1/` and are draft design artifacts, not production migrations or a live store.
 
 ## End to end flow
 
@@ -84,7 +90,7 @@ At first install, seed that local registry from the bundled trusted registry. La
 
 ### Source registry and lockfile
 
-The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current eight locked inputs correspond to previously inspected downloads. The full Robinson TR archive still needs a lock entry; a checked John sample is not a full-corpus acquisition.
+The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current eight locked inputs correspond to inspected downloads, including the full Robinson TR archive. The earlier checked John sample is historical acquisition evidence, not the production source.
 
 A separate source discovery configuration will describe the upstream branch/release or moving file, rights evidence URL, refresh cadence, expected coverage, and whether the source is enabled. For Git-hosted texts discover a commit and pin it. For moving download URLs compare actual hashes, using HTTP validators to reduce transfers. ETag, Last-Modified, and upstream version labels are hints; SHA-256 identifies the bytes.
 
@@ -94,7 +100,7 @@ Retain each accepted raw source in content-addressed storage and include an exac
 
 ### Adapter contracts
 
-Each adapter accepts verified source paths and a versioned configuration, then writes deterministic UTF-8 JSONL records and an import report. Acquisition is separate; adapters write normalized records and transactionally populate the content database. They do not query the network, infer missing genealogies, or fetch unapproved secondary sources. Parsing and normalized-record versions are part of the build identity.
+Each adapter accepts verified source paths and versioned configuration, normalizes records, and contributes an import report and transactionally populated content database. A deterministic UTF-8 JSONL intermediate was proposed for reusable outputs; the current implementation uses Rust normalization/insertion and has no stable public JSONL contract. Acquisition is separate. Adapters do not query the network, infer missing genealogies, or fetch unapproved secondary sources. Parsing and normalized-record versions are part of the build identity.
 
 | Input | Adapter output | Essential checks |
 | --- | --- | --- |
@@ -133,7 +139,7 @@ FTS5 is built into the SQLite profiles. Search hits retain verse/resource identi
 
 The initial `reading` profile contains KJV and WEB; `study` adds both dictionaries, Greek TR parsing, Matthew Henry, Nave, and TSK. These use the same schema and canonical registry. Mobile can select reading to reduce storage, while either platform can select study. Genealogy, book overview, and Hebrew morphology capabilities are advertised only when their actual reviewed data is included. No placeholder data enables a capability.
 
-The study profile remains blocked until its full TR source and all adapters exist. Optional larger historical dictionaries can become a later profile or a versioned extension. A profile upgrade downloads a complete replacement snapshot, preserving user data exactly as an ordinary content refresh does.
+Both reading and study profiles are implemented. Current v1 releases distribute complete snapshots. The package-native design will make each resource independently installable and represent these profiles as selection bundles; whole-profile replacement must not erase user-installed add-ons. Optional larger dictionaries can then become independent packages.
 
 Keep the version axes separate:
 

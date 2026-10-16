@@ -1,0 +1,8 @@
+{
+  "policy_version": 1,
+  "distribution": "public_free",
+  "publishers": ["org.example"],
+  "source_hosts": ["github.com", "codeload.github.com", "objects.githubusercontent.com", "release-assets.githubusercontent.com"],
+  "taxonomy": "taxonomy.xml",
+  "trust": "trust/source-release-1.json"
+}

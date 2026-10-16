@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="urn:fontes:resource:1" id="rom-intro" resource-id="org.example.romans-study">
+  <title>About this demonstration</title>
+  <block id="rom-intro-p01" kind="paragraph"><text>This demonstration shows how independently supplied notes can join a shared library through stable paragraph identities and scripture links.</text></block>
+</document>

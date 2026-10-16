@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:r="urn:fontes:resource:1" targetNamespace="urn:fontes:resource:1" elementFormDefault="qualified">
+  <xs:include schemaLocation="common.xsd"/>
+  <xs:complexType name="Block"><xs:sequence><xs:element name="text" type="r:Text" minOccurs="0"/><xs:element name="annotations" type="r:Annotations" minOccurs="0"/></xs:sequence><xs:attribute name="id" type="r:LocalId" use="required"/><xs:attribute name="kind" use="required"><xs:simpleType><xs:restriction base="xs:token"><xs:enumeration value="paragraph"/><xs:enumeration value="heading"/><xs:enumeration value="verse"/><xs:enumeration value="note"/><xs:enumeration value="list-item"/><xs:enumeration value="entry"/></xs:restriction></xs:simpleType></xs:attribute><xs:attribute name="status" default="present"><xs:simpleType><xs:restriction base="xs:token"><xs:enumeration value="present"/><xs:enumeration value="omitted"/></xs:restriction></xs:simpleType></xs:attribute><xs:attribute name="source-ref" type="r:Title"/></xs:complexType>
+  <xs:element name="document"><xs:complexType><xs:sequence><xs:element name="title" type="r:Title"/><xs:element name="annotations" type="r:Annotations" minOccurs="0"/><xs:element name="block" type="r:Block" maxOccurs="unbounded"/></xs:sequence><xs:attribute name="id" type="r:LocalId" use="required"/><xs:attribute name="resource-id" type="r:ResourceId" use="required"/></xs:complexType>
+    <xs:unique name="blockIds"><xs:selector xpath="r:block"/><xs:field xpath="@id"/></xs:unique>
+  </xs:element>
+</xs:schema>

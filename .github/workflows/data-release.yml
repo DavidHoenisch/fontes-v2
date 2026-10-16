@@ -33,7 +33,7 @@ jobs:
       - name: Install SWORD build dependency
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y libsword-dev pkg-config
+          sudo apt-get install --no-install-recommends -y libsword-dev pkg-config libxml2-utils
           test "$(pkg-config --modversion sword)" = 1.9.0
           mkdir -p target
           c++ -std=c++17 -O2 -Wall -Wextra -Werror -Wno-unused-parameter $(pkg-config --cflags sword) tools/sword-export.cpp $(pkg-config --libs sword) -o target/fontes-sword-export

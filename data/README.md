@@ -1,5 +1,7 @@
 # Fontes data contracts
 
+The current product and architecture requirements are in [SPEC.md](../SPEC.md); its schema registry identifies these versioned SQL/JSON/Rust files as the exact contract authorities.
+
 The pipeline design is in [the architecture document](../docs/architecture/data-pipeline.md). This directory defines the initial content and client update contracts. The shared Rust types are in `crates/fontes-data-contracts`.
 
 - `canonical/registry-v1.json` freezes the initial 66-book reference identities and all chapter lengths. Never regenerate or renumber it during an upstream refresh. Its 31,102 verse anchors were verified from the recorded KJV snapshot.

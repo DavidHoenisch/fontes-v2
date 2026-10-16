@@ -1,0 +1,37 @@
+name: Publish approved resource source packages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'library/**'
+      - 'crates/fontes-resource/**'
+      - 'specs/resource-packages/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/resource-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/resource-pipeline.yml
+    with:
+      tooling_repository: ${{ github.repository }}
+      tooling_ref: ${{ github.sha }}
+      source_ref: ${{ github.sha }}
+      approved_only: true
+
+  publish:
+    needs: build
+    if: needs.build.outputs.ready_count != '0'
+    permissions:
+      contents: write
+    uses: ./.github/workflows/resource-publish.yml
+    with:
+      policy_repository: ${{ github.repository }}
+      policy_ref: ${{ needs.build.outputs.policy_sha }}
+    secrets:
+      signing_key: ${{ secrets.FONTES_RESOURCE_SIGNING_KEY || secrets.FONTES_DATA_SIGNING_KEY }}

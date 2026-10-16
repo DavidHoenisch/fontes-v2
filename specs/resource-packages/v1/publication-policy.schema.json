@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "publication-policy.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "policy_version": {
+      "const": 1
+    },
+    "distribution": {
+      "enum": [
+        "public_free",
+        "private_restricted"
+      ]
+    },
+    "publishers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$",
+        "maxLength": 120
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "source_hosts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "taxonomy": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$"
+    },
+    "trust": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240,
+      "pattern": "^[A-Za-z0-9_.-]+(/[A-Za-z0-9_.-]+)*$"
+    }
+  },
+  "required": [
+    "policy_version",
+    "distribution",
+    "publishers",
+    "source_hosts",
+    "taxonomy",
+    "trust"
+  ]
+}

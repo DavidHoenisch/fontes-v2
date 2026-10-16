@@ -1,0 +1,7 @@
+Fontes resource format demonstration.
+Original demonstration content and cover: Fontes format example contributors.
+License: CC0-1.0.
+
+Example Publisher and org.example are illustrative identities, not registered
+publishers or a claim of affiliation. Scripture links identify passages but do
+not reproduce a copyrighted Bible translation.

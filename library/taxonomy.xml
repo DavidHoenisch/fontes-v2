@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<concepts xmlns="urn:fontes:resource:1" format-version="1" publisher-id="org.fontes" scope="registry" snapshot="fontes-concepts-draft-1">
+  <concept id="urn:fontes:concept:incarnation"><label language="en" kind="preferred">Incarnation</label><scope-note>The Christian theological topic of the incarnation. A topic assignment describes a resource's discussion rather than endorsing every claim in it.</scope-note></concept>
+  <concept id="urn:fontes:concept:salvation"><label language="en" kind="preferred">Salvation</label><scope-note>Discussion of salvation; narrower concepts can distinguish particular doctrines and interpretations.</scope-note></concept>
+  <concept id="urn:fontes:concept:creation"><label language="en" kind="preferred">Creation</label><scope-note>Discussion of creation. The concept does not itself specify a chronology or interpretive position.</scope-note></concept>
+  <concept id="urn:fontes:concept:flood-noah">
+    <label language="en" kind="preferred">The Flood</label><label language="en" kind="alternative">Noah's Flood</label>
+    <scope-note>The flood narrative associated with Noah in Genesis 6–9, without asserting a particular interpretation of geographical extent.</scope-note><evidence start="Gen.6" end="Gen.9"/>
+  </concept>
+  <concept id="urn:fontes:concept:flood-global-interpretation">
+    <label language="en" kind="preferred">Global Flood interpretation</label><label language="en" kind="alternative">Global flood</label>
+    <scope-note>Interpretations of the Genesis flood as global. This narrower topic must not be merged into a synonym asserting that every Flood resource takes that position.</scope-note><broader id="urn:fontes:concept:flood-noah"/><evidence start="Gen.6" end="Gen.9"/>
+  </concept>
+  <concept id="urn:fontes:concept:spiritual-warfare"><label language="en" kind="preferred">Spiritual warfare</label><scope-note>Discussion of spiritual struggle and warfare language in biblical and theological resources.</scope-note></concept>
+  <concept id="urn:fontes:concept:armor-of-god"><label language="en" kind="preferred">Armor of God</label><label language="en" kind="alternative">Armour of God</label><scope-note>The armor metaphor in Ephesians 6 and resources discussing it.</scope-note><broader id="urn:fontes:concept:spiritual-warfare"/><evidence start="Eph.6.10" end="Eph.6.18"/></concept>
+</concepts>

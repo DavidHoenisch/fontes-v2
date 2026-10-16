@@ -1,0 +1,11 @@
+CC0-1.0
+
+The original example prose, metadata, concept proposal, and placeholder artwork
+in this demonstration are dedicated to the public domain under the Creative
+Commons CC0 1.0 Universal public-domain dedication.
+
+The CC0 legal instrument is identified at:
+https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+This file records the license declaration for the example. It does not grant
+rights in any third-party book, publisher name, Bible translation, or cover.

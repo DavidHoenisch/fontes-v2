@@ -1,0 +1,9 @@
+{
+  "approval_version": 1,
+  "resource_id": "org.example.romans-study",
+  "version": "1.0.0",
+  "source_sha256": "511c4be5dba051437a8b1787290d457232d9dd5e32e0c0ba3510ea6ef66254e4",
+  "distribution": "public_free",
+  "rights_review_id": "original-cc0-format-example-text-and-cover-2026-10-15",
+  "publisher_review_id": "reserved-fictional-org-example-pipeline-fixture-only"
+}
