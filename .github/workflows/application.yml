@@ -141,7 +141,12 @@ jobs:
           rustup target add x86_64-linux-android --toolchain 1.93.0
       - name: Install oldest supported Android runtime and NDK
         run: |
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'emulator' 'system-images;android-28;default;x86_64' 'ndk;28.2.13676358'
+          python3 - <<'PY'
+          import os, subprocess
+          sdkmanager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools/latest/bin/sdkmanager')
+          subprocess.run([sdkmanager, 'emulator', 'system-images;android-28;default;x86_64', 'ndk;28.2.13676358'],
+                         input='y\n' * 20, text=True, check=True)
+          PY
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
       - name: Execute engine and bootstrap tests on Android API 28
         shell: bash
