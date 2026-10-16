@@ -33,6 +33,18 @@ All **58 regular workspace tests** pass, together with format and targeted Clipp
 
 This remains plain-paragraph display; original inline italics, typed headings and inline scripture links need structured source display metadata. No source prose or paragraph boundaries are inferred from punctuation. Existing release databases are repaired only in view models; no published data assets are rewritten. This local change is not a new GitHub release or a manual native-window/device test.
 
+## Guided first-run bootstrap · 2026-10-16
+
+The path prompt has been replaced with Reading/Study → Continue → signed size confirmation → Download and open. Normal startup does not require a local path, compiler or USB transfer. Preferences can reopen setup to change a legacy profile and return to the current library without downloading. [The setup guide](first-run-setup.md) records trust, bounds, state versions and remaining full-installer gates.
+
+- All **68 regular workspace tests** pass, including ten bootstrap checks for signatures/compatibility/limits, explicit consent before payload transfer, bad higher discovery tags, corruption/build mismatch, replay/equivocation, cancellation, process locking and preservation of active content/user notes. The normal UI test covers chooser, size confirmation and retry-action bounds at 320×640, 390×844 and 1440×960. Workspace Clippy, formatting and workflow lint pass.
+- The ignored live wizard test downloaded the actual public signed Reading release from GitHub, checked and opened real John 3:16, reopened setup from Preferences and returned to the existing library, then restarted from managed storage without a network job. After accelerated hashing and avoiding redundant full startup integrity scans, one local debug run completed in 5.85 seconds including network, render checks and restart. This is a single observation, not a device/percentile benchmark.
+- The CLI shared service separately downloaded and verified the complete real Study profile into `snapshots-v1`, with `library.setup` returning a verified generation. This is an actual public download/SQLite check, not a synthetic installer fixture. The existing real-study passage/picker/notes/search/word/TSK/article rendering flow still passes.
+- `dist/setup-captures/first-run-choose.png`, `first-run-confirm.png` and `first-run-reading.png` show actual egui/wgpu output. Captures are local acceptance artifacts, not checked-in design mockups.
+- The Android arm64 NativeActivity APK builds with the new HTTPS/crypto/zstd service. INTERNET is required; no broad storage permission is added. Local APK alignment/signature and manifest checks use the Android SDK. No physical device/AVD execution of this new networking flow is claimed.
+
+Managed generations and versioned signed receipts are app-owned bootstrap state, separate from the draft library-v2 composition schema. Setup never modifies `user.sqlite`. First launch without installed content still needs internet; offline seed, automatic updates, add-on composition, available-space preflight, resume, generation garbage collection/recovery UI and full Windows/Android crash/power-loss tests remain distinct work. The older release/run evidence below predates this source change until a new application prerelease is published.
+
 ## Initial real-study timings
 
 One debug-build stdio smoke run, macOS 27.0.1, MacBookPro18,3, 584,884,224-byte study SQLite, content ID `ec35deccbcbcad0eb0d4b2cc07ef0f92ca4fa4f0e79266fe3ea7363dc43d92c9`. Measured from writing a JSON command to receiving its complete reply, including workspace serialization; startup also includes process/library/user-store initialization. Other compilation/test work was running on the machine.

@@ -6,6 +6,7 @@ use std::{
 };
 pub enum Request {
     Open { library: PathBuf, user_db: PathBuf },
+    OpenInstalled { data_dir: PathBuf, user_db: PathBuf },
     Dispatch(Command),
 }
 pub struct Host {
@@ -22,11 +23,25 @@ pub fn spawn(wake: impl Fn() + Send + 'static) -> Host {
                 Request::Open { library, user_db } => match Engine::open(&library, &user_db) {
                     Ok(mut e) => {
                         let result = e.dispatch(Command::Workspace {});
-                        engine = Some(e);
+                        if result.is_ok() {
+                            engine = Some(e);
+                        }
                         result.map_err(|e| e.to_string())
                     }
                     Err(e) => Err(e.to_string()),
                 },
+                Request::OpenInstalled { data_dir, user_db } => {
+                    crate::bootstrap::verify_installed(&data_dir)
+                        .and_then(|path| Ok(Engine::open(&path, &user_db)?))
+                        .and_then(|mut e| {
+                            let result = e.dispatch(Command::Workspace {});
+                            if result.is_ok() {
+                                engine = Some(e);
+                            }
+                            Ok(result?)
+                        })
+                        .map_err(|e| format!("{e:#}"))
+                }
                 Request::Dispatch(command) => engine
                     .as_mut()
                     .ok_or_else(|| "Open a local library first.".to_string())

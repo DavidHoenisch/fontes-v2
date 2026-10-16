@@ -57,6 +57,38 @@ pub enum Capability {
     BookOverviews,
 }
 
+/// Published v1 snapshot profiles; shared by the compiler and first-run client.
+pub fn profile_sources(profile: &str) -> Option<&'static [&'static str]> {
+    match profile {
+        "reading" => Some(&["kjv-base", "web-classic"]),
+        "study" => Some(&[
+            "kjv-base",
+            "web-classic",
+            "strongs-greek",
+            "strongs-hebrew",
+            "robinson-tr",
+            "matthew-henry",
+            "nave",
+            "tsk",
+        ]),
+        _ => None,
+    }
+}
+pub fn profile_capabilities(profile: &str) -> Option<&'static [Capability]> {
+    match profile {
+        "reading" => Some(&[Capability::Reading]),
+        "study" => Some(&[
+            Capability::Reading,
+            Capability::StrongsLexicon,
+            Capability::GreekMorphology,
+            Capability::Commentary,
+            Capability::Topics,
+            Capability::CrossReferences,
+        ]),
+        _ => None,
+    }
+}
+
 impl Channel {
     pub fn as_str(&self) -> &'static str {
         match self {

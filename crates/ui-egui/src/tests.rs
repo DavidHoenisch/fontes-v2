@@ -2,20 +2,34 @@ use super::*;
 use egui_kittest::{Harness, kittest::Queryable};
 use std::time::{Duration, Instant};
 #[test]
-fn first_run_provides_recoverable_offline_open_flow() {
-    let dir = tempfile::tempdir().unwrap();
-    for size in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
-        let mut harness = Harness::builder()
-            .with_size(size)
+fn first_run_offers_path_free_setup_with_reachable_actions() {
+    for viewport in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(viewport)
             .build_eframe(|cc| FontesApp::new(cc, None, dir.path().to_owned()));
-        harness.get_by_label("Open library").click();
-        harness.run_ok();
-        wait(&mut harness);
-        assert!(harness.state().state.is_none());
-        assert!(harness.state().error.is_some());
-        assert!(harness.get_by_label("Open library").rect().width() <= size[0]);
+        assert!(h.query_by_label("Open library").is_none());
+        assert!(h.get_by_label("Continue").rect().right() <= viewport[0]);
+        h.get_by_label("Study").click();
+        h.run_ok();
+        assert_eq!(h.state().setup.profile, bootstrap::Profile::Study);
+        h.state_mut().setup.offer = Some(bootstrap::Offer {
+            download_bytes: 110_000_000,
+            installed_bytes: 585_000_000,
+            temporary_bytes: 730_000_000,
+        });
+        h.run_ok();
+        let download = h.get_by_label("Download and open").rect();
+        assert!(download.right() <= viewport[0] && download.bottom() <= viewport[1]);
+        assert!(h.query_by_label("Choose another library").is_some());
+        h.state_mut().setup.offer = None;
+        h.state_mut().setup.error = Some("Connection interrupted".into());
+        h.run_ok();
+        assert!(h.get_by_label("Retry setup").rect().bottom() <= viewport[1]);
+        assert!(!dir.path().join("user.sqlite").exists());
     }
 }
+
 fn wait(harness: &mut Harness<'_, FontesApp>) {
     let start = Instant::now();
     while harness.state().pending > 0 {
@@ -300,4 +314,94 @@ fn real_library_desktop_and_mobile() {
                 .unwrap();
         }
     }
+}
+
+#[test]
+#[ignore = "downloads a real signed library; requires internet and a wgpu adapter"]
+fn first_run_downloads_and_opens_published_library() {
+    let dir = tempfile::tempdir().unwrap();
+    let out = PathBuf::from(std::env::var("FONTES_CAPTURE_DIR").expect("Set FONTES_CAPTURE_DIR"));
+    std::fs::create_dir_all(&out).unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, None, dir.path().to_owned()));
+    h.render()
+        .unwrap()
+        .save(out.join("first-run-choose.png"))
+        .unwrap();
+    h.get_by_label("Continue").click();
+    h.run_ok();
+    let start = Instant::now();
+    while h.state().setup.offer.is_none() {
+        assert!(
+            start.elapsed() < Duration::from_secs(90),
+            "Setup discovery timed out"
+        );
+        assert!(
+            h.state().setup.error.is_none(),
+            "{:?}",
+            h.state().setup.error
+        );
+        std::thread::sleep(Duration::from_millis(20));
+        h.step();
+    }
+    h.run_ok();
+    h.render()
+        .unwrap()
+        .save(out.join("first-run-confirm.png"))
+        .unwrap();
+    h.get_by_label("Download and open").click();
+    h.run_ok();
+    while h.state().state.is_none() {
+        assert!(
+            start.elapsed() < Duration::from_secs(300),
+            "Download timed out"
+        );
+        assert!(
+            h.state().setup.error.is_none(),
+            "{:?}",
+            h.state().setup.error
+        );
+        assert!(h.state().error.is_none(), "{:?}", h.state().error);
+        std::thread::sleep(Duration::from_millis(20));
+        h.step();
+    }
+    h.run_ok();
+    assert!(
+        h.state()
+            .state
+            .as_ref()
+            .unwrap()
+            .passage
+            .iter()
+            .any(|v| v.text.contains("For God so loved"))
+    );
+    h.render()
+        .unwrap()
+        .save(out.join("first-run-reading.png"))
+        .unwrap();
+    h.state_mut().choose(Destination::Preferences);
+    h.run_ok();
+    h.get_by_label("Download a different library")
+        .scroll_to_me();
+    h.run_ok();
+    h.get_by_label("Download a different library").click();
+    h.run_ok();
+    assert!(h.state().setup.visible);
+    assert!(
+        h.state().state.is_some(),
+        "Reopening setup must retain the active library"
+    );
+    h.get_by_label("Back to your library").click();
+    h.run_ok();
+    assert!(!h.state().setup.visible);
+    assert!(h.state().setup.job.is_none());
+    drop(h);
+    // Restart uses verified local content and does not start a download job.
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, None, dir.path().to_owned()));
+    wait(&mut h);
+    assert!(h.state().state.is_some());
+    assert!(h.state().setup.job.is_none());
 }

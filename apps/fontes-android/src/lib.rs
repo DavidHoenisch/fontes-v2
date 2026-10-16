@@ -9,9 +9,6 @@ pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
         log::error!("Android private app storage is unavailable");
         return;
     };
-    // Development sideload location. A verified first-run downloader/SAF import is a later milestone.
-    let library = data_dir.join("library.sqlite");
-    let library = library.exists().then_some(library);
     let options = eframe::NativeOptions {
         renderer: eframe::Renderer::Wgpu,
         android_app: Some(app),
@@ -20,11 +17,7 @@ pub fn android_main(app: winit::platform::android::activity::AndroidApp) {
     if let Err(e) = eframe::run_native(
         "Fontes",
         options,
-        Box::new(move |cc| {
-            Ok(Box::new(fontes_ui_egui::FontesApp::new(
-                cc, library, data_dir,
-            )))
-        }),
+        Box::new(move |cc| Ok(Box::new(fontes_ui_egui::FontesApp::new(cc, None, data_dir)))),
     ) {
         log::error!("Fontes stopped: {e}");
     }

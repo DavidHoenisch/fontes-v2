@@ -7,12 +7,17 @@ This is the first working application slice, using real content-v1 reading/study
 From the repository root, with the pinned Rust toolchain:
 
 ```sh
+cargo run --locked -p fontes
+# Choose Reading or Study, Continue, then Download and open.
+# Advanced: open a trusted locally compiled snapshot:
 cargo run --locked -p fontes -- --library dist/reading/library.sqlite
 # A study profile enables the installed dictionaries, Greek tokens and linked articles:
 cargo run --locked -p fontes -- --library dist/study/library.sqlite
 # Preview the touch layout in a narrow desktop window:
 cargo run --locked -p fontes -- --library dist/reading/library.sqlite --mobile
 ```
+
+First launch offers a [guided library download](first-run-setup.md) on desktop and Android; no filesystem path is required. Signed release checks, download/preparation progress, cancellation and retry run in the shared background service. Once installed, reading opens offline. The remaining instructions describe optional developer imports.
 
 Build the real [reading/study data](../../README.md#build-the-reading-data) first, or use the existing data-release verifier on downloaded signed assets. For a new local reading build:
 
@@ -22,10 +27,11 @@ cargo run --locked -p fontes-data-pipeline --bin fontes-data -- build \
   --mirror-repository DavidHoenisch/fontes-v2
 ```
 
-The output directory must be new or empty. `--offline` rebuilds from an already populated verified source cache. No Scripture is embedded in the UI executable, and the app never silently downloads or substitutes content. The initial Open Library surface and Reading Preferences accept a local SQLite path. This is an **explicitly trusted local development import**: opening a file checks its schema and permanent reference registry, but does not authenticate a release signature. Do not treat it as the future verified installer.
+The output directory must be new or empty. `--offline` rebuilds from an already populated verified source cache. No Scripture is embedded in the UI executable, and the app downloads content only after the setup wizard is confirmed. Explicit desktop arguments and Reading Preferences still accept a trusted local SQLite path. This is an **explicitly trusted local development import**: opening a file checks its schema and permanent reference registry, but does not authenticate a release signature. Do not treat it as the future verified installer.
 
 `--data-dir <directory>` overrides the writable app-data location. Defaults come from the operating system's local application-data directory through `directories::ProjectDirs` (`org`, `Fontes`, `Fontes`); consult the explicit override when scripting rather than guessing its platform spelling. It contains:
 
+- `snapshots-v1/`: verified downloaded generations, activation receipt, replay high-water record and private setup staging. This is separate from the future library-v2 composed store.
 - `user.sqlite`: notes, highlights, favorites, recent references and last reading/preferences state; never replace it with a data release.
 - `library-path.txt`: the last successfully opened local content path. An optional `library-path.tmp` is only staging for this preference, not content or user-data recovery.
 
@@ -60,11 +66,13 @@ cargo run --locked -p fontes-cli -- \
   --library dist/study/library.sqlite --user-db dist/headless-user.sqlite mcp
 ```
 
+`fontes-cli setup --data-dir DIRECTORY --profile reading` (or `study`) uses the same verified bootstrap service as the GUI and prints the managed library path. Setup needs no `--library` or `--user-db`. It is a bootstrap lifecycle operation, not an initialized-engine JSON/MCP tool.
+
 CLI, JSON and MCP use the same typed command dispatch as the UI. JSON and MCP are line-delimited stdin/stdout, with no HTTP server/listener. Logs/errors outside protocol replies go to stderr. Configure the MCP client to launch `fontes-cli --library <absolute-path> --user-db <absolute-path> mcp`; MCP tools include durable local writes and state replies include private annotations. Only connect a client you intend to grant access to that user database. This is a separate headless session, not IPC remote control of an already-running GUI; sessions share stored annotations but do not broadcast navigation events between processes. See [wire details](../../specs/app/README.md).
 
 ## Android development
 
-The native arm64 library and debug APK have been built locally. Hardware/emulator execution, soft keyboard/IME, lifecycle recovery, safe areas, screen-reader support and Android storage import still require device validation. iOS is deferred. This first APK requires development sideloading of a local library; it has no first-run network installer or Storage Access Framework picker.
+The native arm64 library and debug APK have been built locally. Hardware/emulator execution, soft keyboard/IME, lifecycle recovery, safe areas, screen-reader support and Android storage import still require device validation. iOS is deferred. The APK now uses the same guided first-run downloader with INTERNET permission and app-private storage; no storage permission or filesystem path is required. A Storage Access Framework import picker is not implemented.
 
 Install Android SDK platform **35**, build-tools **35.0.0** (36.0.0 also used successfully locally), NDK **28.2.13676358**, a JDK, and the Rust target. Set `ANDROID_HOME`, `ANDROID_NDK_HOME`, `ANDROID_NDK_ROOT`, and `JAVA_HOME` to the actual installations. Both NDK variables must name the pinned NDK: cargo-apk gives an existing `ANDROID_NDK_ROOT` precedence. NDK r28's `cargo-apk` platform discovery supports up to API 35; having only SDK platforms 36/37 produces the misleading “SDK has no platforms installed” error. The app has min API 28 and target API 35.
 
@@ -77,7 +85,7 @@ CARGO_NET_OFFLINE=true cargo apk build -p fontes-android --lib
 
 `cargo-apk` 0.10.0 does not accept `--locked`. Fetch the full locked workspace graph first (cargo-apk also resolves host/workspace metadata), package offline, and verify Cargo.lock has not changed (CI checks its digest). The APK is `target/debug/apk/fontes-android.apk`, signed with the local Android **debug** key and with native debug symbols stripped from the package. This is not a production signing/release process.
 
-The following device setup recipe is provided for development; it has not been executed here because no device/AVD was available:
+Install the APK and use its Reading/Study setup wizard. The following optional offline sideload recipe is provided for development; it has not been executed here because no device/AVD was available:
 
 ```sh
 adb install -r target/debug/apk/fontes-android.apk
@@ -87,7 +95,7 @@ adb shell -T "run-as org.fontes.app sh -c 'cat > files/library.sqlite'" < dist/r
 adb shell am start -n org.fontes.app/android.app.NativeActivity
 ```
 
-The library lives in the app's private `internal_data_path()/library.sqlite`, separate from `user.sqlite`. `run-as` is only a debug-build development path. Uninstalling the app can remove its private notes; backups/export and production import are still required before user distribution. NativeActivity avoids an app-authored Java/Kotlin layer, but eframe 0.35's Android AccessKit backend requires GameActivity. Desktop AccessKit is enabled; Android accessibility is an explicit open gate, not silently claimed from desktop tests.
+Managed libraries live below the app’s private `internal_data_path()/snapshots-v1/`, separate from `user.sqlite`. The old `internal_data_path()/library.sqlite` location remains a legacy development import fallback. `run-as` is only a debug-build development path. Uninstalling the app can remove its private notes; backups/export and production import are still required before user distribution. NativeActivity avoids an app-authored Java/Kotlin layer, but eframe 0.35's Android AccessKit backend requires GameActivity. Desktop AccessKit is enabled; Android accessibility is an explicit open gate, not silently claimed from desktop tests.
 
 ## Verification
 

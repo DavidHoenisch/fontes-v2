@@ -9,12 +9,15 @@ Start with **[the Fontes system specification](SPEC.md)** for product requiremen
 The first engine-first Rust application is implemented with egui/eframe and wgpu. It reads real reading/study snapshots, supports passage navigation, KJV/WEB switching, local keyword search, persistent notes/highlights, and linked study resources. A toolkit-independent command engine is shared by the UI, CLI, JSON control and MCP stdio.
 
 ```sh
+cargo run --locked -p fontes
+# First launch: Reading or Study → Continue → Download and open.
+# Or open a trusted locally compiled reading profile:
 cargo run --locked -p fontes -- --library dist/reading/library.sqlite
 # Or use a compiled study profile:
 cargo run --locked -p fontes -- --library dist/study/library.sqlite
 ```
 
-See the [application guide](docs/app/README.md) for first-run data, mobile preview, headless commands and Android APK builds, and the [architecture](docs/app/architecture.md) for crate boundaries and compatibility. The responsive UI uses the approved local assets. [Download the development builds](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.3.1) for Windows x64, Linux x64, macOS Apple Silicon/Intel, and Android arm64, with [test setup instructions](docs/app/testing-builds.md). All platform Actions jobs passed; physical-device/native-window and accessibility checks remain. Automatic content installation, the add-on catalog, AI and curated genealogy/overview features are later milestones.
+See the [application guide](docs/app/README.md) for first-run data, mobile preview, headless commands and Android APK builds, and the [architecture](docs/app/architecture.md) for crate boundaries and compatibility. The responsive UI uses the approved local assets. [Download the development builds](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.3.1) for Windows x64, Linux x64, macOS Apple Silicon/Intel, and Android arm64, with [test setup instructions](docs/app/testing-builds.md). All platform Actions jobs passed; physical-device/native-window and accessibility checks remain. [Guided first-run download](docs/app/first-run-setup.md) is implemented; automatic updates, the add-on catalog, AI and curated genealogy/overview features are later milestones.
 
 ## Extensible library design
 

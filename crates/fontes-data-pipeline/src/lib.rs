@@ -18,34 +18,10 @@ use std::{
 };
 
 pub fn profile_sources(profile: &str) -> Result<&'static [&'static str]> {
-    match profile {
-        "reading" => Ok(&["kjv-base", "web-classic"]),
-        "study" => Ok(&[
-            "kjv-base",
-            "web-classic",
-            "strongs-greek",
-            "strongs-hebrew",
-            "robinson-tr",
-            "matthew-henry",
-            "nave",
-            "tsk",
-        ]),
-        _ => bail!("unsupported profile {profile}"),
-    }
+    fontes_data_contracts::profile_sources(profile).context("unsupported profile")
 }
 pub fn profile_capabilities(profile: &str) -> Result<&'static [Capability]> {
-    match profile {
-        "reading" => Ok(&[Capability::Reading]),
-        "study" => Ok(&[
-            Capability::Reading,
-            Capability::StrongsLexicon,
-            Capability::GreekMorphology,
-            Capability::Commentary,
-            Capability::Topics,
-            Capability::CrossReferences,
-        ]),
-        _ => bail!("unsupported profile {profile}"),
-    }
+    fontes_data_contracts::profile_capabilities(profile).context("unsupported profile")
 }
 
 pub fn digest(bytes: &[u8]) -> String {

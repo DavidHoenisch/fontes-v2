@@ -1,4 +1,5 @@
 //! Fontes' toolkit-independent application engine. Content is read-only; user writes are transactional.
+pub mod bootstrap;
 mod commands;
 mod model;
 mod queries;

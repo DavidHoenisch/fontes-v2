@@ -2,6 +2,7 @@
 #[cfg(test)]
 mod tests;
 
+mod setup;
 mod study;
 mod theme;
 
@@ -36,6 +37,7 @@ struct NoteDraft {
 }
 pub struct FontesApp {
     host: Host,
+    setup: setup::Setup,
     state: Option<Workspace>,
     data_dir: PathBuf,
     library_path: String,
@@ -77,13 +79,20 @@ impl FontesApp {
     }
     pub fn with_context(ctx: &egui::Context, library: Option<PathBuf>, data_dir: PathBuf) -> Self {
         theme::install(ctx);
+        let data_dir = std::path::absolute(&data_dir).unwrap_or(data_dir);
 
-        let library = library.or_else(|| {
-            std::fs::read_to_string(data_dir.join("library-path.txt"))
-                .ok()
-                .filter(|s| !s.trim().is_empty() && s.len() <= 4096)
-                .map(|s| PathBuf::from(s.trim()))
-        });
+        let library = library
+            .or_else(|| {
+                std::fs::read_to_string(data_dir.join("library-path.txt"))
+                    .ok()
+                    .filter(|s| !s.trim().is_empty() && s.len() <= 4096)
+                    .map(|s| PathBuf::from(s.trim()))
+            })
+            .or_else(|| bootstrap::installed_library(&data_dir).ok().flatten())
+            .or_else(|| {
+                let path = data_dir.join("library.sqlite");
+                path.is_file().then_some(path)
+            });
 
         let wake = ctx.clone();
 
@@ -96,6 +105,7 @@ impl FontesApp {
 
         let mut app = Self {
             host,
+            setup: setup::Setup::default(),
             state: None,
             data_dir,
             library_path,
@@ -146,10 +156,16 @@ impl FontesApp {
         }
         self.opening_path = Some(self.library_path.trim().to_owned());
 
-        self.send(Request::Open {
-            library: PathBuf::from(self.library_path.trim()),
-            user_db: self.data_dir.join("user.sqlite"),
-        });
+        let library = PathBuf::from(self.library_path.trim());
+        let user_db = self.data_dir.join("user.sqlite");
+        if bootstrap::is_managed_path(&self.data_dir, &library) {
+            self.send(Request::OpenInstalled {
+                data_dir: self.data_dir.clone(),
+                user_db,
+            });
+        } else {
+            self.send(Request::Open { library, user_db });
+        }
     }
     fn send(&mut self, request: Request) {
         match self.host.requests.try_send(request) {
@@ -165,12 +181,15 @@ impl FontesApp {
         self.send(Request::Dispatch(command));
     }
     fn receive(&mut self) {
+        self.receive_setup();
         while let Ok(result) = self.host.events.try_recv() {
             self.pending = self.pending.saturating_sub(1);
 
             match result {
                 Ok(response) => {
                     if let Some(path) = self.opening_path.take() {
+                        self.setup.visible = false;
+                        self.destination = Destination::Read;
                         let tmp = self.data_dir.join("library-path.tmp");
 
                         if let Err(e) = std::fs::write(&tmp, path).and_then(|()| {
@@ -327,7 +346,7 @@ impl FontesApp {
 
         ui.spacing_mut().interact_size.y = if mobile { 44.0 } else { 36.0 };
 
-        if self.state.is_none() {
+        if self.state.is_none() || self.setup.visible {
             self.welcome(ui);
 
             return;
@@ -414,30 +433,6 @@ impl FontesApp {
                     }
                 }
             });
-    }
-    fn welcome(&mut self, ui: &mut egui::Ui) {
-        egui::CentralPanel::default().frame(egui::Frame::new().fill(theme::desk()).inner_margin(24)).show(ui,|ui|{
-            ui.add_space(64.0);
-ui.label(scripture("A place for deeper reading.",32.0,true));
-
-            ui.add_space(16.0);
-ui.label("Open your Fontes reading or study library to begin. Everything you read and write stays on this device.");
-
-            ui.add_space(24.0);
-caption(ui,"LOCAL SQLITE LIBRARY");
-
-            ui.add(egui::TextEdit::singleline(&mut self.library_path).desired_width(f32::INFINITY).hint_text("Path to library.sqlite"));
-
-            if primary(ui,"Open library"){self.open();
-}
-            if self.pending>0{ui.spinner();
-}
-            if let Some(e)=&self.error{ui.colored_label(egui::Color32::LIGHT_RED,e);
-}
-            ui.add_space(24.0);
-caption(ui,"No library yet? Build the reading profile with fontes-data, or verify a signed data release using the instructions in docs/app/README.md. Automatic downloads are coming later.");
-
-        });
     }
     fn sidebar(&mut self, ui: &mut egui::Ui) {
         ui.add_space(16.0);
@@ -1080,21 +1075,32 @@ ui.separator();
                 }
                 ui.add_space(24.0);
 
-                caption(ui, "LOCAL LIBRARY");
-
-                ui.add(
-                    egui::TextEdit::singleline(&mut self.library_path).desired_width(f32::INFINITY),
-                );
-
-                if ui
-                    .add_sized(
-                        [ui.available_width(), 48.0],
-                        egui::Button::new("Open library"),
-                    )
-                    .clicked()
-                {
-                    self.open();
+                caption(ui, "YOUR LIBRARY");
+                if primary(ui, "Download a different library") {
+                    self.setup.visible = true;
+                    self.setup.error = None;
+                    self.setup.profile = if s.profile == "study" {
+                        bootstrap::Profile::Study
+                    } else {
+                        bootstrap::Profile::Reading
+                    };
                 }
+                ui.add_space(16.0);
+                ui.collapsing("Advanced: open a local library", |ui| {
+                    ui.add(
+                        egui::TextEdit::singleline(&mut self.library_path)
+                            .desired_width(f32::INFINITY),
+                    );
+                    if ui
+                        .add_sized(
+                            [ui.available_width(), 48.0],
+                            egui::Button::new("Open library"),
+                        )
+                        .clicked()
+                    {
+                        self.open();
+                    }
+                });
             });
         });
 

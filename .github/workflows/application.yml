@@ -110,7 +110,13 @@ jobs:
       - name: Verify APK signature and manifest
         run: |
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify target/debug/apk/fontes-android.apk
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging target/debug/apk/fontes-android.apk
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging target/debug/apk/fontes-android.apk > apk-badging.txt
+          cat apk-badging.txt
+          grep -q "uses-permission: name='android.permission.INTERNET'" apk-badging.txt
+          if grep -E 'android.permission.(READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE)' apk-badging.txt; then
+            echo 'Library setup must use app-private storage.' >&2
+            exit 1
+          fi
       - name: Package checked APK and provenance
         run: python3 tools/package-app.py --platform android-aarch64
       - name: Retain downloadable Android APK

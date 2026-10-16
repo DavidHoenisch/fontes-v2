@@ -32,3 +32,6 @@ theme = "@android:style/Theme.Material.NoActionBar"
 
 [package.metadata.android.application.activity]
 config_changes = "orientation|keyboardHidden|screenSize|smallestScreenSize|screenLayout|uiMode|density"
+
+[[package.metadata.android.uses_permission]]
+name = "android.permission.INTERNET"

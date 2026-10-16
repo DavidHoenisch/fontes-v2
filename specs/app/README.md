@@ -24,6 +24,10 @@ Context additionally includes `cross_references` (default empty in older seriali
 
 Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Colors are `amber`, `sage`, `blue`, `rose`. Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
 
+## First-run bootstrap
+
+The separate `library.setup` lifecycle operation is implemented by `fontes-engine::bootstrap`, with GUI confirmation and `fontes-cli setup --data-dir DIRECTORY --profile reading|study`. It runs before an initialized Engine exists, downloads only a confirmed signed profile, stores versioned app-owned receipts/generations and opens the library. It does not add a command to the existing 13-command registry or expose pre-initialization JSON/MCP access. Exact state/trust/compatibility/activation requirements are in [first-run setup](../../docs/app/first-run-setup.md). A future remote bootstrap transport needs its own authorization/lifecycle contract.
+
 ## JSON control / CLI
 
 One request object per line:

@@ -13,6 +13,13 @@ struct Args {
 }
 #[derive(Subcommand)]
 enum Mode {
+    /// Download and verify a first-run library without needing a database path.
+    Setup {
+        #[arg(long)]
+        data_dir: PathBuf,
+        #[arg(long, default_value = "reading", value_parser = ["reading", "study"])]
+        profile: String,
+    },
     /// List stable command IDs and generated input schemas; no database needed.
     Commands,
     /// Dispatch a stable command ID with a JSON object of parameters.
@@ -30,6 +37,28 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     if matches!(args.command, Mode::Commands) {
         println!("{}", serde_json::to_string_pretty(&command_catalog())?);
+        return Ok(());
+    }
+    if let Mode::Setup { data_dir, profile } = &args.command {
+        let profile = if profile == "study" {
+            fontes_engine::bootstrap::Profile::Study
+        } else {
+            fontes_engine::bootstrap::Profile::Reading
+        };
+        let path = fontes_engine::bootstrap::install(
+            data_dir,
+            profile,
+            &std::sync::atomic::AtomicBool::new(false),
+            |p| {
+                if p.total.is_none() {
+                    eprintln!("{}", p.message);
+                }
+            },
+        )?;
+        println!(
+            "{}",
+            serde_json::json!({"operation": fontes_engine::bootstrap::SETUP_OPERATION, "library": path, "verified": true, "profile": profile.id()})
+        );
         return Ok(());
     }
     let mut engine = Engine::open(
@@ -56,7 +85,7 @@ fn main() -> anyhow::Result<()> {
             io::stdout().lock(),
             matches!(args.command, Mode::Mcp),
         )?,
-        Mode::Commands => unreachable!(),
+        Mode::Commands | Mode::Setup { .. } => unreachable!(),
     }
     Ok(())
 }

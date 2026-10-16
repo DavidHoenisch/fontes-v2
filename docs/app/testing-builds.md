@@ -16,7 +16,9 @@ These are test builds: Windows is not Authenticode signed; macOS uses ad-hoc cod
 
 ## Desktop setup
 
-Extract the archive completely, then open `Fontes.app` on macOS or run the GUI executable on Windows/Linux. Choose a trusted local Fontes `library.sqlite` in the Open Library screen. Alternatively launch with an explicit path:
+Extract the archive completely, then open `Fontes.app` on macOS or run the GUI executable on Windows/Linux. On first launch choose **Reading** or **Study**, select **Continue**, review download/storage sizes and select **Download and open**. No path or compiler is needed. Once installed, reading works offline. See the [first-run guide](https://github.com/DavidHoenisch/fontes-v2/blob/main/docs/app/first-run-setup.md).
+
+Advanced development imports can still launch with an explicit trusted-local path:
 
 ```sh
 # Linux:
@@ -27,13 +29,15 @@ open Fontes.app --args --library /absolute/path/to/library.sqlite
 .\fontes.exe --library C:\path\to\library.sqlite
 ```
 
-Bible data remains a separate download, with no network dependency after setup. Use a locally compiled reading/study database or the [signed data-release verification instructions](https://github.com/DavidHoenisch/fontes-v2/blob/main/README.md#github-releases). The app's manual local-file opener checks the v1 schema/permanent registry, but does not authenticate a downloaded release on its own. The public `fontes-reading.sqlite.zst` asset must be verified/decompressed before opening; it is not itself a SQLite file. The existing Rust `fontes-data` verifier can perform that setup from a complete release download. An automatic in-app downloader is still pending.
+Bible data remains separate from application binaries. The in-app setup verifies signed release metadata, payload hashes and SQLite before activation; it downloads only the chosen compiled profile. The manual local-file opener checks schema/registry but does not authenticate arbitrary imported files. For offline developer imports, use locally compiled data or the [signed data-release verification instructions](https://github.com/DavidHoenisch/fontes-v2/blob/main/README.md#github-releases); a `.sqlite.zst` file must be verified/decompressed before manual opening.
 
 Notes stay in the platform's separate local app-data directory. `--data-dir <directory>` selects an isolated test workspace. Keep this directory when changing binaries. See [the application guide](https://github.com/DavidHoenisch/fontes-v2/blob/main/docs/app/README.md) for keyboard shortcuts, shared CLI/JSON/MCP commands and remaining feature gaps.
 
 ## Android setup
 
-Install the APK using Android's development-install flow or `adb install`. To load data into this debug build's private files directory:
+Install the APK using Android’s development-install flow or `adb install`, then follow the same **Reading/Study → Continue → Download and open** wizard. It uses app-private storage and needs no filesystem path, USB data transfer or storage permission. The first download requires internet; later reading does not.
+
+Optional legacy developer sideloading remains available:
 
 ```sh
 adb install -r fontes-android-aarch64-debug.apk

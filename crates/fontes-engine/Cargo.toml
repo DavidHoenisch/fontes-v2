@@ -13,5 +13,13 @@ serde_json.workspace = true
 schemars = "1"
 uuid = { version = "1", features = ["v4"] }
 
-[dev-dependencies]
+anyhow = "1"
+ring = "0.17"
+hex = "0.4"
+ed25519-dalek = "2.2"
+zstd = "0.13"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+tokio = { version = "1", features = ["rt", "time", "macros"] }
 tempfile = "3"
+
+[dev-dependencies]
