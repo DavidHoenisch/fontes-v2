@@ -301,6 +301,28 @@ fn sync_dir(path: &Path) -> Result<()> {
     }
     Ok(())
 }
+fn try_lock_setup(file: &File) -> std::io::Result<()> {
+    // Rust 1.93's std::fs locks return Unsupported on Android. Use the
+    // Android-supported flock syscall through rustix's safe Rust API instead.
+    // The descriptor owns the lock until close, including on process death.
+    #[cfg(target_os = "android")]
+    {
+        rustix::fs::flock(file, rustix::fs::FlockOperation::NonBlockingLockExclusive)
+            .map_err(std::io::Error::from)
+    }
+    #[cfg(not(target_os = "android"))]
+    {
+        file.try_lock().map_err(std::io::Error::from)
+    }
+}
+fn setup_lock_error(error: std::io::Error) -> anyhow::Error {
+    let message = if error.kind() == std::io::ErrorKind::WouldBlock {
+        "Library setup is already running. Wait for it to finish, then retry."
+    } else {
+        "Could not lock library storage. Check app storage access, then retry."
+    };
+    anyhow::Error::new(error).context(message)
+}
 fn verify_file(path: &Path, length: u64, expected: &str, cancel: &AtomicBool) -> Result<()> {
     ensure!(
         path.metadata()?.len() == length,
@@ -595,9 +617,9 @@ async fn install_with(
         .truncate(false)
         .read(true)
         .write(true)
-        .open(root.join("setup.lock"))?;
-    lock.try_lock()
-        .context("Library setup is already running. Wait for it to finish, then retry.")?;
+        .open(root.join("setup.lock"))
+        .context("Could not open the library setup lock. Check app storage access, then retry.")?;
+    try_lock_setup(&lock).map_err(setup_lock_error)?;
     // Only remove our abandoned staging directories while holding the process lock.
     for entry in fs::read_dir(&root)? {
         let entry = entry?;

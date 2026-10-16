@@ -2,10 +2,10 @@ name: Application
 
 on:
   pull_request:
-    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'tools/test-android-engine.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
   push:
     branches: [main]
-    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'tools/test-android-engine.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
   workflow_dispatch:
 
 permissions:
@@ -128,8 +128,59 @@ jobs:
           retention-days: 14
           compression-level: 0
 
+  android-runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust and Android test target
+        run: |
+          rustup toolchain install 1.93.0 --profile minimal
+          rustup target add x86_64-linux-android --toolchain 1.93.0
+      - name: Install oldest supported Android runtime and NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'emulator' 'system-images;android-28;default;x86_64' 'ndk;28.2.13676358'
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
+      - name: Execute engine and bootstrap tests on Android API 28
+        shell: bash
+        run: |
+          sudo chmod a+rw /dev/kvm
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name fontes-tests --package 'system-images;android-28;default;x86_64'
+          "$ANDROID_HOME/emulator/emulator" -avd fontes-tests -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -feature -Vulkan > android-emulator.log 2>&1 &
+          emulator_pid=$!
+          trap 'adb emu kill || true' EXIT
+          booted=false
+          for attempt in $(seq 1 120); do
+            if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ]; then
+              booted=true
+              break
+            fi
+            if ! kill -0 "$emulator_pid" 2>/dev/null; then
+              cat android-emulator.log
+              exit 1
+            fi
+            sleep 2
+          done
+          if [ "$booted" != true ]; then
+            cat android-emulator.log
+            exit 1
+          fi
+          python3 tools/test-android-engine.py --target x86_64-linux-android 2>&1 | tee android-engine-tests.log
+      - name: Retain Android runtime diagnostics
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: android-runtime-diagnostics
+          path: |
+            android-emulator.log
+            android-engine-tests.log
+          if-no-files-found: warn
+          retention-days: 14
+
   publish:
-    needs: [desktop, android]
+    needs: [desktop, android, android-runtime]
     if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-24.04
     timeout-minutes: 15

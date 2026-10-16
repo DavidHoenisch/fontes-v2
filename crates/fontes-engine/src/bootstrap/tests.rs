@@ -297,7 +297,7 @@ fn cancellation_during_download_and_process_lock_are_recoverable() {
         .write(true)
         .open(root(dir.path()).join("setup.lock"))
         .unwrap();
-    lock.try_lock().unwrap();
+    try_lock_setup(&lock).unwrap();
     cancel.store(false, Ordering::Relaxed);
     assert!(
         f.install(dir.path(), &cancel, |_| {})
@@ -307,6 +307,50 @@ fn cancellation_during_download_and_process_lock_are_recoverable() {
     );
     drop(lock);
     assert!(f.install(dir.path(), &cancel, |_| {}).is_ok());
+}
+#[test]
+fn lock_io_errors_are_not_reported_as_another_running_setup() {
+    use std::io::{Error, ErrorKind};
+    for kind in [
+        ErrorKind::Unsupported,
+        ErrorKind::PermissionDenied,
+        ErrorKind::Other,
+    ] {
+        let error = setup_lock_error(Error::new(kind, "platform lock failure"));
+        assert!(error.to_string().contains("Could not lock library storage"));
+        assert!(!error.to_string().contains("already running"));
+        assert!(format!("{error:#}").contains("platform lock failure"));
+    }
+    assert!(
+        setup_lock_error(ErrorKind::WouldBlock.into())
+            .to_string()
+            .contains("already running")
+    );
+}
+#[test]
+fn setup_lock_survives_existing_files_and_releases_on_close() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("setup.lock");
+    // A persistent lock file is harmless after an earlier process has exited.
+    fs::write(&path, b"").unwrap();
+    let open = || {
+        OpenOptions::new()
+            .read(true)
+            .write(true)
+            .open(&path)
+            .unwrap()
+    };
+    let first = open();
+    try_lock_setup(&first).unwrap();
+    let second = open();
+    assert_eq!(
+        try_lock_setup(&second).unwrap_err().kind(),
+        std::io::ErrorKind::WouldBlock
+    );
+    drop(first);
+    try_lock_setup(&second).unwrap();
+    drop(second);
+    try_lock_setup(&open()).unwrap();
 }
 #[test]
 fn actual_database_identity_is_checked_after_hashes() {
