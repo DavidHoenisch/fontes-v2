@@ -1,0 +1,30 @@
+{
+  "fileKey": "fdGlrRfs8AGQfpmCDhU3Bp",
+  "url": "https://www.figma.com/design/fdGlrRfs8AGQfpmCDhU3Bp",
+  "status": "Desktop frames saved in Figma; runtime assets, mobile mockups, and approved compact-sidebar reference saved locally. Desktop frame exports and Figma edits remain blocked by Starter tool quota.",
+  "screens": {
+    "read": "3:47",
+    "passagePicker": "3:48",
+    "wordStudy": "3:49",
+    "note": "3:50",
+    "search": "3:51",
+    "genealogies": "3:52",
+    "bookOverview": "3:53",
+    "preferences": "3:54"
+  },
+  "icons": "Official Phosphor Regular SVGs",
+  "pendingInteractionScript": "design/figma/pending-interactions.js",
+  "remainingQA": [
+    "Book overview screenshot",
+    "Preferences screenshot",
+    "Wire and verify prototype routes"
+  ],
+  "pendingSidebarScript": "design/compact-desktop-sidebar.figma.js",
+  "approvedSidebarSpacing": {
+    "navigationRowHeight": 36,
+    "sidebarGap": 4,
+    "savedPassageVerticalPadding": 6
+  },
+  "localUiAssets": "assets/ui/manifest.json",
+  "mobileMockups": "design/mobile/screens"
+}

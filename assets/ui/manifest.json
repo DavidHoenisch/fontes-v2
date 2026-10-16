@@ -1,0 +1,580 @@
+{
+  "version": 1,
+  "icons": [
+    {
+      "role": "book",
+      "name": "book-open",
+      "svg": "icons/phosphor/regular/book-open.svg",
+      "png24": "icons/png/24/book-open.png",
+      "png48": "icons/png/48/book-open.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/book-open.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "search",
+      "name": "magnifying-glass",
+      "svg": "icons/phosphor/regular/magnifying-glass.svg",
+      "png24": "icons/png/24/magnifying-glass.png",
+      "png48": "icons/png/48/magnifying-glass.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/magnifying-glass.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "notes",
+      "name": "note-pencil",
+      "svg": "icons/phosphor/regular/note-pencil.svg",
+      "png24": "icons/png/24/note-pencil.png",
+      "png48": "icons/png/48/note-pencil.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/note-pencil.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "tree",
+      "name": "tree-structure",
+      "svg": "icons/phosphor/regular/tree-structure.svg",
+      "png24": "icons/png/24/tree-structure.png",
+      "png48": "icons/png/48/tree-structure.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/tree-structure.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "settings",
+      "name": "sliders-horizontal",
+      "svg": "icons/phosphor/regular/sliders-horizontal.svg",
+      "png24": "icons/png/24/sliders-horizontal.png",
+      "png48": "icons/png/48/sliders-horizontal.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/sliders-horizontal.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "chevron",
+      "name": "caret-right",
+      "svg": "icons/phosphor/regular/caret-right.svg",
+      "png24": "icons/png/24/caret-right.png",
+      "png48": "icons/png/48/caret-right.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/caret-right.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "down",
+      "name": "caret-down",
+      "svg": "icons/phosphor/regular/caret-down.svg",
+      "png24": "icons/png/24/caret-down.png",
+      "png48": "icons/png/48/caret-down.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/caret-down.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "close",
+      "name": "x",
+      "svg": "icons/phosphor/regular/x.svg",
+      "png24": "icons/png/24/x.png",
+      "png48": "icons/png/48/x.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/x.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "arrow",
+      "name": "arrow-right",
+      "svg": "icons/phosphor/regular/arrow-right.svg",
+      "png24": "icons/png/24/arrow-right.png",
+      "png48": "icons/png/48/arrow-right.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/arrow-right.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "back",
+      "name": "arrow-left",
+      "svg": "icons/phosphor/regular/arrow-left.svg",
+      "png24": "icons/png/24/arrow-left.png",
+      "png48": "icons/png/48/arrow-left.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/arrow-left.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "bookmark",
+      "name": "bookmark-simple",
+      "svg": "icons/phosphor/regular/bookmark-simple.svg",
+      "png24": "icons/png/24/bookmark-simple.png",
+      "png48": "icons/png/48/bookmark-simple.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/bookmark-simple.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "spark",
+      "name": "sparkle",
+      "svg": "icons/phosphor/regular/sparkle.svg",
+      "png24": "icons/png/24/sparkle.png",
+      "png48": "icons/png/48/sparkle.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/sparkle.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "check",
+      "name": "check",
+      "svg": "icons/phosphor/regular/check.svg",
+      "png24": "icons/png/24/check.png",
+      "png48": "icons/png/48/check.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/check.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "copy",
+      "name": "copy",
+      "svg": "icons/phosphor/regular/copy.svg",
+      "png24": "icons/png/24/copy.png",
+      "png48": "icons/png/48/copy.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/copy.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "plus",
+      "name": "plus",
+      "svg": "icons/phosphor/regular/plus.svg",
+      "png24": "icons/png/24/plus.png",
+      "png48": "icons/png/48/plus.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/plus.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "minus",
+      "name": "minus",
+      "svg": "icons/phosphor/regular/minus.svg",
+      "png24": "icons/png/24/minus.png",
+      "png48": "icons/png/48/minus.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/minus.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "wifi",
+      "name": "wifi-high",
+      "svg": "icons/phosphor/regular/wifi-high.svg",
+      "png24": "icons/png/24/wifi-high.png",
+      "png48": "icons/png/48/wifi-high.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/wifi-high.svg",
+      "license": "MIT"
+    },
+    {
+      "role": "battery",
+      "name": "battery-full",
+      "svg": "icons/phosphor/regular/battery-full.svg",
+      "png24": "icons/png/24/battery-full.png",
+      "png48": "icons/png/48/battery-full.png",
+      "source": "https://raw.githubusercontent.com/phosphor-icons/core/main/assets/regular/battery-full.svg",
+      "license": "MIT"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "IBM Plex Sans",
+      "weight": "Regular",
+      "role": "ui_body",
+      "path": "fonts/IBMPlexSans-Regular.ttf",
+      "source": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXGKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1swZSAXcomDVmadSD6llzAA.ttf",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/IBM-PLEX-OFL.txt"
+    },
+    {
+      "family": "IBM Plex Sans",
+      "weight": "Medium",
+      "role": "ui_label",
+      "path": "fonts/IBMPlexSans-Medium.ttf",
+      "source": "https://fonts.gstatic.com/s/ibmplexsans/v23/zYXGKVElMYYaJe8bpLHnCwDKr932-G7dytD-Dmu1swZSAXcomDVmadSD2FlzAA.ttf",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/IBM-PLEX-OFL.txt"
+    },
+    {
+      "family": "Lora",
+      "weight": "Regular",
+      "role": "scripture",
+      "path": "fonts/Lora-Regular.ttf",
+      "source": "https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787weuyJG.ttf",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/LORA-OFL.txt"
+    },
+    {
+      "family": "Noto Serif",
+      "weight": "Regular",
+      "role": "greek_fallback",
+      "path": "fonts/NotoSerif-Regular.ttf",
+      "source": "https://fonts.gstatic.com/s/notoserif/v33/ga6iaw1J5X9T9RW6j9bNVls-hfgvz8JcMofYTa32J4wsL2JAlAhZqFCjwA.ttf",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/NOTO-SERIF-OFL.txt"
+    },
+    {
+      "family": "Noto Serif Hebrew",
+      "weight": "Regular",
+      "role": "hebrew_fallback",
+      "path": "fonts/NotoSerifHebrew-Regular.ttf",
+      "source": "https://fonts.gstatic.com/s/notoserifhebrew/v30/k3k0o9MMPvpLmixYH7euCwmkS9DohjX1-kRyiqyBqIxnoLbp93i9IKrXKF_qVAwSAG8.ttf",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/NOTO-SERIF-HEBREW-OFL.txt"
+    }
+  ],
+  "tokenFile": "tokens.json",
+  "rustBindings": "assets.rs",
+  "figmaUrl": "https://www.figma.com/design/fdGlrRfs8AGQfpmCDhU3Bp",
+  "references": {
+    "mobile": "../../design/mobile/screens",
+    "mobileOverview": "../../design/mobile/mobile-mockups.png",
+    "sidebarSpacing": "../../design/sidebar-spacing/sidebar-comparison.svg",
+    "pendingSidebarEdit": "../../design/compact-desktop-sidebar.figma.js"
+  },
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2955,
+      "sha256": "e3dfcfb599c8e264fdb15565922a2b1065cf11953814d6133ee5473b99d7b243"
+    },
+    {
+      "path": "assets.rs",
+      "bytes": 4087,
+      "sha256": "c27b794bee1ee58a732837bd7c7c65f8c08984760f57f6d9b98369f68547e817"
+    },
+    {
+      "path": "fonts/IBMPlexSans-Medium.ttf",
+      "bytes": 205292,
+      "sha256": "6f7a8c4219e021ff7c9131bc5f1f7af97bcd1436a59578d444a8cb92e9791742"
+    },
+    {
+      "path": "fonts/IBMPlexSans-Regular.ttf",
+      "bytes": 205252,
+      "sha256": "6dbe082463cf749cfa057d45c3048c90f4df031496498e5b5bdfd0b6babb9d16"
+    },
+    {
+      "path": "fonts/Lora-Regular.ttf",
+      "bytes": 132188,
+      "sha256": "1d37d1e34c77be80f0119754ad78df9aad30d5b1c78132a4cbdac0fe567f5d4f"
+    },
+    {
+      "path": "fonts/NotoSerif-Regular.ttf",
+      "bytes": 444064,
+      "sha256": "5473d2e43bdd018ee124a4addba8091fd0a29894b121cbb741023af6549662b6"
+    },
+    {
+      "path": "fonts/NotoSerifHebrew-Regular.ttf",
+      "bytes": 54636,
+      "sha256": "a9aacca0bb0723459982b4d91af89a09a8845772f9d6cf149d86de7107fecb8a"
+    },
+    {
+      "path": "icons/phosphor/regular/arrow-left.svg",
+      "bytes": 266,
+      "sha256": "dce04f604aa2da708e1b5ec1c3d574d8f454b5b4350e024d94a779b029b8f2b1"
+    },
+    {
+      "path": "icons/phosphor/regular/arrow-right.svg",
+      "bytes": 263,
+      "sha256": "74de70b1d07adc1900b1c5d010521eb6a62579c37326759ae90b4040cb4a453f"
+    },
+    {
+      "path": "icons/phosphor/regular/battery-full.svg",
+      "bytes": 500,
+      "sha256": "3362e69fe64186f4eb8e8b2074ec91833f05032679dc0b2320c695d3701fd7e8"
+    },
+    {
+      "path": "icons/phosphor/regular/book-open.svg",
+      "bytes": 414,
+      "sha256": "f76a5b2ec6f79f8ca4801d0e188dc459f7482211bd78d4033c7fdbe96db69420"
+    },
+    {
+      "path": "icons/phosphor/regular/bookmark-simple.svg",
+      "bytes": 291,
+      "sha256": "30aa625501eca10b3f7118c6bc06d2cc793861fc1ac1e3547daf70503f675867"
+    },
+    {
+      "path": "icons/phosphor/regular/caret-down.svg",
+      "bytes": 232,
+      "sha256": "ef3a3d3a1c5731c4a57813158b510d4c74d8869bde52357d074a86460a39dfb9"
+    },
+    {
+      "path": "icons/phosphor/regular/caret-right.svg",
+      "bytes": 237,
+      "sha256": "a3786cdceda35fa46f76f925f42cd2894d3c8b8df80a90e1bd4119ecf0664a79"
+    },
+    {
+      "path": "icons/phosphor/regular/check.svg",
+      "bytes": 233,
+      "sha256": "ffd5ee203a3bbd87bb474eb2036744513252c4d909893a9a229025524e5f09e1"
+    },
+    {
+      "path": "icons/phosphor/regular/copy.svg",
+      "bytes": 297,
+      "sha256": "a554df2b691f28639411cb48aa23151226f7a3d34774446b9b2f6c6c0e906a53"
+    },
+    {
+      "path": "icons/phosphor/regular/magnifying-glass.svg",
+      "bytes": 261,
+      "sha256": "565056e05e92486c6c5b6355b96c2b5cc8d5c9cd839550e83071725f1c68f4bd"
+    },
+    {
+      "path": "icons/phosphor/regular/minus.svg",
+      "bytes": 181,
+      "sha256": "d3dae25401f8543a9728c1e4691439f7e138183e2a6525c347aea18291b435b9"
+    },
+    {
+      "path": "icons/phosphor/regular/note-pencil.svg",
+      "bytes": 450,
+      "sha256": "55b5cd0aca62cdab1977b16ac547b68c82302cadf52c095169084d19dc82543f"
+    },
+    {
+      "path": "icons/phosphor/regular/plus.svg",
+      "bytes": 230,
+      "sha256": "70a34c969caaaa4eed7c6e02b9a0a775b2dcc1cf35b5baeb569b79a09e04aba5"
+    },
+    {
+      "path": "icons/phosphor/regular/sliders-horizontal.svg",
+      "bytes": 378,
+      "sha256": "ca69f3443c13fdb2512a56423433a6109bde90e481d3c9a33de153b16cbd5116"
+    },
+    {
+      "path": "icons/phosphor/regular/sparkle.svg",
+      "bytes": 684,
+      "sha256": "5e3e1f0dadf8e8568b86ef98eed162d0d0aa53311cb17a74e886d9777457b87c"
+    },
+    {
+      "path": "icons/phosphor/regular/tree-structure.svg",
+      "bytes": 542,
+      "sha256": "58ae0063bc198d460718f44e80d8134674c1fd86466490db23006919c1d524eb"
+    },
+    {
+      "path": "icons/phosphor/regular/wifi-high.svg",
+      "bytes": 485,
+      "sha256": "47492cf24b34e021111637e28f7534f33e54e9191a9b70f384625ec5749ff0e5"
+    },
+    {
+      "path": "icons/phosphor/regular/x.svg",
+      "bytes": 302,
+      "sha256": "16dcb2bb2c017598548942bf59b25f2045e292392dc7397820b0322051a6a5d4"
+    },
+    {
+      "path": "icons/png/24/arrow-left.png",
+      "bytes": 238,
+      "sha256": "28e31c2258439eff1e12ee16803c5fee1692509a67a00ea97a52359c90aa9e9e"
+    },
+    {
+      "path": "icons/png/24/arrow-right.png",
+      "bytes": 251,
+      "sha256": "ac90b9b96eada33ae3dfdee9cf372adae185d48bc4dfc35077e1a00646fe1285"
+    },
+    {
+      "path": "icons/png/24/battery-full.png",
+      "bytes": 337,
+      "sha256": "d99ea2946e19ea0c5cbc6cb255b993a706df696048b013f25bac9184ade52bcd"
+    },
+    {
+      "path": "icons/png/24/book-open.png",
+      "bytes": 284,
+      "sha256": "e14d91d3f3f6f8f6780c45a877a07bc6578a42ae0dfb9577cd1d9ac4ad8836c7"
+    },
+    {
+      "path": "icons/png/24/bookmark-simple.png",
+      "bytes": 300,
+      "sha256": "a95d097bdaddf29239dacf51684c35ac64d59471acd31913885c1a6e5555101c"
+    },
+    {
+      "path": "icons/png/24/caret-down.png",
+      "bytes": 274,
+      "sha256": "9464b8abb82d6e20f762e20a4d2656faa6a14c6d4034f78f146d6ce5907e6047"
+    },
+    {
+      "path": "icons/png/24/caret-right.png",
+      "bytes": 226,
+      "sha256": "3bca6b74358e8fc46e7727290257b8e837328c401d34c26281feebd791110332"
+    },
+    {
+      "path": "icons/png/24/check.png",
+      "bytes": 269,
+      "sha256": "c00d8d90dda73a8b4d7311d1690cb520aa0f6d2b3bd59f464403bf1d6112c67c"
+    },
+    {
+      "path": "icons/png/24/copy.png",
+      "bytes": 269,
+      "sha256": "6d2160e19e85c2c619eb37618a5047a4b153f980b98f1736a432c75a92c8de0d"
+    },
+    {
+      "path": "icons/png/24/magnifying-glass.png",
+      "bytes": 459,
+      "sha256": "4ff7660b504eb6885579b5360496748fc7722bb7030fa7915a8c9bab4925784f"
+    },
+    {
+      "path": "icons/png/24/minus.png",
+      "bytes": 132,
+      "sha256": "7ad1d0cfa046e19cf8f02523921f1202a94b7ff93686894899f4f17bf3e8a4e1"
+    },
+    {
+      "path": "icons/png/24/note-pencil.png",
+      "bytes": 404,
+      "sha256": "f2687a5b738443370a25fdb6635bc08b1394d67bf01b4ca0aa30203f6f195462"
+    },
+    {
+      "path": "icons/png/24/plus.png",
+      "bytes": 179,
+      "sha256": "91ca98eb024d79eb6a2f1c5eab65bfe26cbec786802c33f1ca53836f19d093c9"
+    },
+    {
+      "path": "icons/png/24/sliders-horizontal.png",
+      "bytes": 350,
+      "sha256": "ed5d5d2769b075e977a7f8a6ca747d8db43e79093ed32205297c6be6ca01b64f"
+    },
+    {
+      "path": "icons/png/24/sparkle.png",
+      "bytes": 582,
+      "sha256": "8b4a6ddaa742779057697da26a83478b2e570e4eebbdaa22d6822e8eaad9ae24"
+    },
+    {
+      "path": "icons/png/24/tree-structure.png",
+      "bytes": 439,
+      "sha256": "7ec56d5018f7b98b7267bc31b71e26156c42defeabd0ab67fa539a50fb89fa8a"
+    },
+    {
+      "path": "icons/png/24/wifi-high.png",
+      "bytes": 451,
+      "sha256": "ea2e75d57e6acf115d273f4ef4fd619a74d043fb1fe21bd88c01031b3a51b8b1"
+    },
+    {
+      "path": "icons/png/24/x.png",
+      "bytes": 337,
+      "sha256": "64e7fe60f734117708e08437dd6d340a88dd13d867aa43ed02ebf9eb803d0594"
+    },
+    {
+      "path": "icons/png/48/arrow-left.png",
+      "bytes": 374,
+      "sha256": "1be3e41a95b753ea0a05ddc15f7d64fc2e84d85d939006b388d25f0354ff6274"
+    },
+    {
+      "path": "icons/png/48/arrow-right.png",
+      "bytes": 384,
+      "sha256": "a3a9d148bf13ea083de954169b62c7f6bf7106796a34471aabd67e81ea59ff1e"
+    },
+    {
+      "path": "icons/png/48/battery-full.png",
+      "bytes": 663,
+      "sha256": "0bf52292e113d24b0ac6801775245a542b26a92ceb53c6b91fa9186e742a4297"
+    },
+    {
+      "path": "icons/png/48/book-open.png",
+      "bytes": 640,
+      "sha256": "5a7db0933e7e70384f5f366c3cc8877edd59e4f77cfeb53049c0bfeda94de781"
+    },
+    {
+      "path": "icons/png/48/bookmark-simple.png",
+      "bytes": 520,
+      "sha256": "c882775f646592a4ad18993a9f6a4552e0a0274933430acacd5de69cfff13fc4"
+    },
+    {
+      "path": "icons/png/48/caret-down.png",
+      "bytes": 422,
+      "sha256": "7a11523499eee7ef0ded645f02b258ebd706094c6ad7a9d7caaf4ed846291c21"
+    },
+    {
+      "path": "icons/png/48/caret-right.png",
+      "bytes": 316,
+      "sha256": "2ea871443d78e015ecbde902f63f28fc8fc1ba050fa53e1dfa8cd9d90ea8a4d4"
+    },
+    {
+      "path": "icons/png/48/check.png",
+      "bytes": 437,
+      "sha256": "e02b1a6e86ac99e7ce684deba3bc694eaecf49457edf1f4ed00d1d8710ab9654"
+    },
+    {
+      "path": "icons/png/48/copy.png",
+      "bytes": 516,
+      "sha256": "c61f5d141f45f7a0a3e678cbf4202c6c4641d218c66015f052d404731d103644"
+    },
+    {
+      "path": "icons/png/48/magnifying-glass.png",
+      "bytes": 938,
+      "sha256": "05b57804a1caa1dad8d8517e2e143e47f815664d8fad2bc5fba08884c48167c8"
+    },
+    {
+      "path": "icons/png/48/minus.png",
+      "bytes": 196,
+      "sha256": "764fa64ef97c3b7231312bd5e26d843d915b0050fb605ff83855b4bcabf991f3"
+    },
+    {
+      "path": "icons/png/48/note-pencil.png",
+      "bytes": 965,
+      "sha256": "acbe2990ba844e108e3ecab3ac6583688728f3fa064bee34eb171ad04894db28"
+    },
+    {
+      "path": "icons/png/48/plus.png",
+      "bytes": 278,
+      "sha256": "51eaf08323aff2aa414a6ee13b234c129216399a65a8c6fb40582335316c549f"
+    },
+    {
+      "path": "icons/png/48/sliders-horizontal.png",
+      "bytes": 604,
+      "sha256": "0dedb84c58b3e416d334bf502f1ef6289db7a80f4c6cc84d9cfaf5b65e17be38"
+    },
+    {
+      "path": "icons/png/48/sparkle.png",
+      "bytes": 1110,
+      "sha256": "33ec73d5b1a54ccc895a312ebc31346e11c5f0071bef9fa23b0ea86d38f5a39a"
+    },
+    {
+      "path": "icons/png/48/tree-structure.png",
+      "bytes": 751,
+      "sha256": "91b10b1f970b1a5206cdab9057ded47a89e0f0977e2ce1d6cb8c41aa251d3e3b"
+    },
+    {
+      "path": "icons/png/48/wifi-high.png",
+      "bytes": 832,
+      "sha256": "7da95a2baa0c34f41d8c8b6cdc2b1dcad884ab74002c62c2d90b5c3f4fc0b177"
+    },
+    {
+      "path": "icons/png/48/x.png",
+      "bytes": 611,
+      "sha256": "c19be96da76ef217614002a777fb357052f5c043224416bef1bd0e3ae3044c7f"
+    },
+    {
+      "path": "licenses/IBM-PLEX-OFL.txt",
+      "bytes": 4456,
+      "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da"
+    },
+    {
+      "path": "licenses/LORA-OFL.txt",
+      "bytes": 4423,
+      "sha256": "1d9a970809ac804b582a6ce7f0ebc4e7fefcbfd7ff6299cad35ee656a21be716"
+    },
+    {
+      "path": "licenses/NOTO-SERIF-HEBREW-OFL.txt",
+      "bytes": 4382,
+      "sha256": "9b9fe028b5ba74d231659a1bbaf0ed09b11e759d1ca6a070999e16d151616b47"
+    },
+    {
+      "path": "licenses/NOTO-SERIF-OFL.txt",
+      "bytes": 4396,
+      "sha256": "cee9892f9f0cc8fe882c9e9537ee6a89621d86ee7ceaf70b02e2b2b1c25c061a"
+    },
+    {
+      "path": "licenses/PHOSPHOR-LICENSE.txt",
+      "bytes": 1071,
+      "sha256": "b5b1f1da112d18ea2147decfd48ddc1bf2b5aeb6c265381579340e95b15a2bb2"
+    },
+    {
+      "path": "previews/icons.png",
+      "bytes": 39561,
+      "sha256": "f36fd3b37bf26486b2717b53dab6f08cff515ee927bf7cdd6572c997cb24439b"
+    },
+    {
+      "path": "previews/icons.svg",
+      "bytes": 7880,
+      "sha256": "7fb9df23f6a6af43217e2682bbf2fd3baba964571dcfbc2990dd1b2c1720df40"
+    },
+    {
+      "path": "previews/typography.png",
+      "bytes": 64131,
+      "sha256": "fe4a97502a40fd7f8fc6aaff6284972181442c6acddd8cbc23b0aadf4c55648b"
+    },
+    {
+      "path": "previews/typography.svg",
+      "bytes": 1360,
+      "sha256": "d8df687b9c5257701312b64b4af0d02d814f03de56731e145a1f54fee37dafdf"
+    },
+    {
+      "path": "tokens.json",
+      "bytes": 3353,
+      "sha256": "f35e5ab72c5fbf993a27c775d5601729c5d52e34e2e4d6096b2627f5fe362b03"
+    }
+  ]
+}

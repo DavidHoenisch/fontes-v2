@@ -1,0 +1,47 @@
+{
+  "screenCount": 8,
+  "screenSize": [
+    390,
+    844
+  ],
+  "textBoundsChecked": true,
+  "fonts": [
+    "Lora",
+    "IBM Plex Sans"
+  ],
+  "icons": "Phosphor Regular",
+  "screens": [
+    {
+      "name": "01-reading",
+      "textNodes": 26
+    },
+    {
+      "name": "02-select-book",
+      "textNodes": 38
+    },
+    {
+      "name": "03-chapter-and-verse",
+      "textNodes": 66
+    },
+    {
+      "name": "04-word-study-sheet",
+      "textNodes": 21
+    },
+    {
+      "name": "05-note-and-highlight",
+      "textNodes": 15
+    },
+    {
+      "name": "06-local-search",
+      "textNodes": 22
+    },
+    {
+      "name": "07-genealogies",
+      "textNodes": 22
+    },
+    {
+      "name": "08-reading-preferences",
+      "textNodes": 15
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const { Resvg } = require(process.env.FONTES_RESVG_MODULE || '/tmp/fontes-svg-render/node_modules/@resvg/resvg-js');
+const root=path.resolve(__dirname,'../assets/ui');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.json')));
+const fontFiles=manifest.fonts.map(f=>path.join(root,f.path));
+const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;');
+const render=(svg,w)=>new Resvg(svg,{font:{fontFiles,loadSystemFonts:false,defaultFontFamily:'IBM Plex Sans'},fitTo:{mode:'width',value:w}}).render().asPng();
+let board='<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480"><rect width="960" height="480" fill="#1C201E"/><text x="32" y="44" font-family="IBM Plex Sans" font-size="24" fill="#ECEDE5">Fontes / Phosphor Regular</text>';
+manifest.icons.forEach((i,index)=>{
+  const svg=fs.readFileSync(path.join(root,i.svg),'utf8');
+  for(const size of [24,48])fs.writeFileSync(path.join(root,`icons/png/${size}/${i.name}.png`),render(svg,size));
+  const x=32+(index%6)*152,y=88+Math.floor(index/6)*120;
+  const inner=svg.replace(/<svg[^>]*>|<\/svg>/g,'');
+  board+=`<g transform="translate(${x+46} ${y}) scale(0.125)" fill="#ABB3AA">${inner.replaceAll('#FFFFFF','#ABB3AA')}</g><text x="${x+62}" y="${y+62}" text-anchor="middle" font-family="IBM Plex Sans" font-size="12" fill="#ABB3AA">${escape(i.name)}</text>`;
+});
+board+='</svg>';
+fs.writeFileSync(path.join(root,'previews/icons.svg'),board);
+fs.writeFileSync(path.join(root,'previews/icons.png'),render(board,1440));
+const specimen='<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560"><rect width="960" height="560" fill="#1C201E"/><text x="40" y="54" font-family="IBM Plex Sans" font-size="24" fill="#ECEDE5">Fontes / offline typography</text><text x="40" y="116" font-family="IBM Plex Sans" font-size="14" fill="#DCBC83">LORA · SCRIPTURE</text><text x="40" y="164" font-family="Lora" font-size="32" fill="#ECEDE5">For God so loved the world…</text><text x="40" y="226" font-family="IBM Plex Sans" font-size="14" fill="#DCBC83">IBM PLEX SANS · UI BODY / MEDIUM LABEL</text><text x="40" y="266" font-family="IBM Plex Sans" font-size="20" fill="#ECEDE5">Follow a thought without losing your place.</text><text x="40" y="306" font-family="IBM Plex Sans" font-weight="500" font-size="20" fill="#ECEDE5">Read  /  Search  /  My notes  /  Genealogies</text><text x="40" y="370" font-family="IBM Plex Sans" font-size="14" fill="#DCBC83">NOTO SERIF · GREEK FALLBACK</text><text x="40" y="416" font-family="Noto Serif" font-size="32" fill="#ECEDE5">ἀγαπάω · ἠγάπησεν · λόγος</text><text x="40" y="474" font-family="IBM Plex Sans" font-size="14" fill="#DCBC83">NOTO SERIF HEBREW · HEBREW FALLBACK</text><text x="40" y="524" font-family="Noto Serif Hebrew" font-size="32" fill="#ECEDE5">שָׁלוֹם · בְּרֵאשִׁית</text></svg>';
+fs.writeFileSync(path.join(root,'previews/typography.svg'),specimen);
+fs.writeFileSync(path.join(root,'previews/typography.png'),render(specimen,1440));
+console.log(`Rendered ${manifest.icons.length} SVG icons into ${manifest.icons.length*2} transparent PNGs and 2 preview sheets.`);

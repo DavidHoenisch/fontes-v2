@@ -1,0 +1,523 @@
+{
+  "schema_version": 1,
+  "checked_on_local_date": "2026-10-15",
+  "timezone": "America/Los_Angeles",
+  "policy": "Strict public domain or CC0 initial content; conditional and licensed alternatives are separately classified. Provider declarations are evidence, not a worldwide legal determination.",
+  "resources": [
+    {
+      "id": "kjv-base",
+      "title": "King James Version base verse text",
+      "category": "translation",
+      "rights_class": "public_domain_with_regional_exception",
+      "selection_status": "first_batch",
+      "formats": [
+        "verse XML",
+        "UTF-8 VPL"
+      ],
+      "source_url": "https://ebible.org/bible/details.php?id=eng-kjv&all=1",
+      "download_urls": [
+        "https://ebible.org/Scriptures/eng-kjv_vpl.zip"
+      ],
+      "rights_evidence_url": "https://ebible.org/bible/details.php?id=eng-kjv&all=1",
+      "spec_requirements": [
+        "FR1",
+        "FR3",
+        "FR8"
+      ],
+      "import_notes": "Parse verse XML; select 66-book canon; preserve text separately from modern word annotations. Provider notes UK rights.",
+      "verification": "Downloaded and parsed: 31,102 unique canonical verse records, 1,189 chapters, 66 books"
+    },
+    {
+      "id": "web-classic",
+      "title": "World English Bible Classic",
+      "category": "translation",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "verse XML",
+        "UTF-8 VPL",
+        "USFM"
+      ],
+      "source_url": "https://ebible.org/bible/details.php?id=eng-web&all=1",
+      "download_urls": [
+        "https://ebible.org/Scriptures/eng-web_vpl.zip",
+        "https://ebible.org/Scriptures/eng-web_usfm.zip"
+      ],
+      "rights_evidence_url": "https://ebible.org/bible/details.php?id=eng-web&all=1",
+      "spec_requirements": [
+        "FR1",
+        "FR3",
+        "FR8"
+      ],
+      "import_notes": "Select initial canon explicitly; retain WEB name for unchanged text. USFM preserves reading structure.",
+      "verification": "VPL archive downloaded and inspected; USFM archive not inspected"
+    },
+    {
+      "id": "strongs-greek",
+      "title": "Strong Greek dictionary CC0 XML edition",
+      "category": "lexicon",
+      "rights_class": "CC0-1.0",
+      "selection_status": "first_batch",
+      "formats": [
+        "XML"
+      ],
+      "source_url": "https://github.com/morphgnt/strongs-dictionary-xml",
+      "download_urls": [
+        "https://raw.githubusercontent.com/morphgnt/strongs-dictionary-xml/master/strongsgreek.xml"
+      ],
+      "rights_evidence_url": "https://github.com/morphgnt/strongs-dictionary-xml#license",
+      "spec_requirements": [
+        "FR4",
+        "FR7"
+      ],
+      "import_notes": "Normalize identifiers; preserve XML mixed content and cross-references. Pin upstream commit before production acquisition.",
+      "verification": "Downloaded and XML parsed: 5,624 entries"
+    },
+    {
+      "id": "strongs-hebrew",
+      "title": "Strong Hebrew OSIS XML edition",
+      "category": "lexicon",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "OSIS XML"
+      ],
+      "source_url": "https://github.com/openscriptures/strongs/blob/master/hebrew/StrongHebrewG.xml",
+      "download_urls": [
+        "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/StrongHebrewG.xml"
+      ],
+      "rights_evidence_url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/StrongHebrewG.xml",
+      "spec_requirements": [
+        "FR4",
+        "FR7"
+      ],
+      "import_notes": "Rights are file-specific; import PD Strong entries, not modern TWOT prose or differently licensed JS exports.",
+      "verification": "Downloaded and XML parsed: 8,674 entry divisions; work header inspected"
+    },
+    {
+      "id": "robinson-tr",
+      "title": "Robinson Textus Receptus with parsing",
+      "category": "original_language",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "ASCII .UTR per book"
+      ],
+      "source_url": "https://github.com/byztxt/greektext-textus-receptus",
+      "download_urls": [
+        "https://github.com/byztxt/greektext-textus-receptus/archive/7fd4d02c3e5adebd379ebfbc824040820dde10fc.zip"
+      ],
+      "rights_evidence_url": "https://github.com/byztxt/greektext-textus-receptus#license",
+      "spec_requirements": [
+        "FR4",
+        "FR7"
+      ],
+      "import_notes": "Convert source Greek encoding; unwrap verse records; preserve multiple numeric fields and alternative parses. Separate witness and verify alignment independently.",
+      "verification": "John sample downloaded and inspected; complete archive not downloaded"
+    },
+    {
+      "id": "matthew-henry",
+      "title": "Matthew Henry Complete Commentary",
+      "category": "commentary",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "SWORD zCom4 OSIS"
+      ],
+      "source_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+      "download_urls": [
+        "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+      "spec_requirements": [
+        "FR5",
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Build-time conversion required. Preserve linked entries and scripture references; content export not yet verified.",
+      "verification": "Archive downloaded; configuration and module rights inspected"
+    },
+    {
+      "id": "nave",
+      "title": "Nave Topical Bible",
+      "category": "topics",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "SWORD zLD TEI"
+      ],
+      "source_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Nave",
+      "download_urls": [
+        "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Nave.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Nave",
+      "spec_requirements": [
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Build-time conversion required. Preserve linked entries and scripture references; content export not yet verified.",
+      "verification": "Archive downloaded; configuration and module rights inspected"
+    },
+    {
+      "id": "tsk",
+      "title": "Treasury of Scripture Knowledge",
+      "category": "cross_references",
+      "rights_class": "public_domain",
+      "selection_status": "first_batch",
+      "formats": [
+        "SWORD zCom ThML"
+      ],
+      "source_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=TSK",
+      "download_urls": [
+        "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/TSK.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=TSK",
+      "spec_requirements": [
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Build-time conversion required. Preserve linked entries and scripture references; content export not yet verified.",
+      "verification": "Archive downloaded; configuration and module rights inspected"
+    },
+    {
+      "id": "easton",
+      "title": "Easton Bible Dictionary",
+      "category": "dictionary",
+      "rights_class": "public_domain",
+      "selection_status": "expansion",
+      "formats": [
+        "SWORD zLD TEI"
+      ],
+      "source_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Easton",
+      "download_urls": [
+        "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Easton.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Easton",
+      "spec_requirements": [
+        "FR5",
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Build-time conversion required. Preserve linked entries and scripture references; content export not yet verified.",
+      "verification": "Archive downloaded; configuration and module rights inspected"
+    },
+    {
+      "id": "isbe",
+      "title": "International Standard Bible Encyclopedia old edition",
+      "category": "encyclopedia",
+      "rights_class": "public_domain",
+      "selection_status": "expansion",
+      "formats": [
+        "SWORD zLD TEI"
+      ],
+      "source_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=ISBE",
+      "download_urls": [
+        "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ISBE.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=ISBE",
+      "spec_requirements": [
+        "FR5",
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Build-time conversion required. Preserve linked entries and scripture references; content export not yet verified.",
+      "verification": "Archive downloaded; configuration and module rights inspected"
+    },
+    {
+      "id": "tidwell-overviews",
+      "title": "Tidwell The Bible Book by Book",
+      "category": "overview_source",
+      "rights_class": "public_domain_US",
+      "selection_status": "first_batch_editorial_input",
+      "formats": [
+        "UTF-8 text",
+        "HTML"
+      ],
+      "source_url": "https://www.gutenberg.org/ebooks/16290",
+      "download_urls": [
+        "https://www.gutenberg.org/cache/epub/16290/pg16290.txt"
+      ],
+      "rights_evidence_url": "https://www.gutenberg.org/ebooks/16290",
+      "spec_requirements": [
+        "FR5",
+        "FR7"
+      ],
+      "import_notes": "Split combined book discussions; map reviewed claims into overview fields; preserve historical viewpoint and uncertain claims. Observe Gutenberg packaging/trademark terms.",
+      "verification": "UTF-8 text downloaded and structure inspected"
+    },
+    {
+      "id": "asv",
+      "title": "American Standard Version 1901",
+      "category": "translation",
+      "rights_class": "public_domain",
+      "selection_status": "expansion",
+      "formats": [
+        "verse XML",
+        "UTF-8 VPL",
+        "USFM"
+      ],
+      "source_url": "https://ebible.org/bible/details.php?id=eng-asv&all=1",
+      "download_urls": [
+        "https://ebible.org/Scriptures/eng-asv_vpl.zip",
+        "https://ebible.org/Scriptures/eng-asv_usfm.zip"
+      ],
+      "rights_evidence_url": "https://ebible.org/bible/details.php?id=eng-asv&all=1",
+      "spec_requirements": [
+        "FR1",
+        "FR3",
+        "FR8"
+      ],
+      "import_notes": "Use same verse/USFM importers; provider-listed downloads not inspected",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "robinson-rp",
+      "title": "Robinson Pierpont Byzantine Greek",
+      "category": "original_language",
+      "rights_class": "public_domain_Unlicense",
+      "selection_status": "expansion",
+      "formats": [
+        "Unicode CSV",
+        "TEI XML",
+        "source ASCII"
+      ],
+      "source_url": "https://github.com/byztxt/byzantine-majority-text",
+      "download_urls": [
+        "https://github.com/byztxt/byzantine-majority-text/archive/27a45ff1b7be6c17ccbfeac414f3f55732ae8e28.zip"
+      ],
+      "rights_evidence_url": "https://github.com/byztxt/byzantine-majority-text/blob/master/LICENSE.txt",
+      "spec_requirements": [
+        "FR4",
+        "FR7"
+      ],
+      "import_notes": "CSV is verse rows with embedded token tags. Parsed sample is unaccented. Distinct witness from TR.",
+      "verification": "John parsed Unicode CSV downloaded: 879 verse rows plus header"
+    },
+    {
+      "id": "bsb-text",
+      "title": "Berean Standard Bible English text",
+      "category": "translation",
+      "rights_class": "CC0-1.0",
+      "selection_status": "expansion",
+      "formats": [
+        "text",
+        "XLSX",
+        "USFM",
+        "USX",
+        "USJ"
+      ],
+      "source_url": "https://berean.bible/downloads.htm",
+      "download_urls": [],
+      "rights_evidence_url": "https://berean.bible/terms.htm",
+      "spec_requirements": [
+        "FR1",
+        "FR3",
+        "FR8"
+      ],
+      "import_notes": "Use provider download page to select and pin current English-text file; general Bible text dedication verified",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "berean-tables",
+      "title": "Berean word translation tables",
+      "category": "original_language_and_alignment",
+      "rights_class": "annotation_scope_unresolved",
+      "selection_status": "hold_for_rights_scope",
+      "formats": [
+        "TSV",
+        "XLSX"
+      ],
+      "source_url": "https://berean.bible/downloads.htm",
+      "download_urls": [
+        "https://bereanbible.com/bsb_tables.tsv"
+      ],
+      "rights_evidence_url": "https://berean.bible/terms.htm",
+      "spec_requirements": [
+        "FR4",
+        "FR7"
+      ],
+      "import_notes": "Bible texts are CC0; annotation and third-party column coverage requires a separate determination. Sparse verse IDs, placeholders, duplicate headers, variant columns; no explicit lemma column. Alignments are BSB-specific.",
+      "verification": "Full TSV parsed: 754,647 data rows, 23 columns, 31,102 explicit distinct verse IDs"
+    },
+    {
+      "id": "kjv-tags",
+      "title": "KJV modern Strong tagging",
+      "category": "alignment",
+      "rights_class": "conflicting_provider_notices",
+      "selection_status": "hold_for_rights_scope",
+      "formats": [
+        "USFM",
+        "SWORD"
+      ],
+      "source_url": "https://ebible.org/bible/details.php?id=eng-kjv2006&all=1",
+      "download_urls": [
+        "https://ebible.org/Scriptures/eng-kjv2006_usfm.zip"
+      ],
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=KJV",
+      "spec_requirements": [
+        "FR4"
+      ],
+      "import_notes": "eBible says PD; CrossWire KJV annotation edition says GPL. Treat annotation layer separately. USFM has Strong tags; sampled Genesis and John have no morph attributes.",
+      "verification": "USFM archive downloaded; word tags inspected in Genesis and John"
+    },
+    {
+      "id": "uxlc",
+      "title": "Unicode XML Leningrad Codex biblical Hebrew text",
+      "category": "original_language",
+      "rights_class": "unrestricted_text_permission_package_reserved",
+      "selection_status": "conditional_text_only",
+      "formats": [
+        "XML"
+      ],
+      "source_url": "https://www.tanach.us/Tanach.xml",
+      "download_urls": [
+        "https://www.tanach.us/Books/Genesis.xml"
+      ],
+      "rights_evidence_url": "https://tanach.us/License.html",
+      "spec_requirements": [
+        "FR4"
+      ],
+      "import_notes": "Provider permits biblical text copying without restriction, reserves other files. Not explicit CC0 for whole XML package. Label UXLC; no morphology. Genesis URL is one-book sample only.",
+      "verification": "Genesis XML downloaded and parsed; current license reviewed"
+    },
+    {
+      "id": "oshb",
+      "title": "Open Scriptures Hebrew Bible morphology",
+      "category": "original_language",
+      "rights_class": "CC-BY-4.0_annotations_PD_base_text",
+      "selection_status": "excluded_from_strict_PD_annotations",
+      "formats": [
+        "OSIS XML"
+      ],
+      "source_url": "https://github.com/openscriptures/morphhb",
+      "download_urls": [],
+      "rights_evidence_url": "https://github.com/openscriptures/morphhb/blob/master/LICENSE.md",
+      "spec_requirements": [
+        "FR4"
+      ],
+      "import_notes": "Base WLC text remains PD; lemma and morphology require attribution license. Preserve distinction.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "morphgnt",
+      "title": "MorphGNT SBLGNT",
+      "category": "original_language",
+      "rights_class": "CC-BY-SA-3.0_annotations_separate_text_terms",
+      "selection_status": "excluded_from_strict_PD",
+      "formats": [
+        "space-delimited UTF-8"
+      ],
+      "source_url": "https://github.com/morphgnt/sblgnt",
+      "download_urls": [],
+      "rights_evidence_url": "https://github.com/morphgnt/sblgnt/blob/master/README.md",
+      "spec_requirements": [
+        "FR4"
+      ],
+      "import_notes": "Parsing/lemmatization and Greek text have separate rights; not a PD source.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "step",
+      "title": "STEPBible TAHOT TAGNT TIPNR and related data",
+      "category": "original_language_genealogy_reference",
+      "rights_class": "CC-BY-4.0",
+      "selection_status": "excluded_from_strict_PD",
+      "formats": [
+        "tab-separated UTF-8"
+      ],
+      "source_url": "https://github.com/STEPBible/STEPBible-Data",
+      "download_urls": [],
+      "rights_evidence_url": "https://github.com/STEPBible/STEPBible-Data/blob/master/README.md",
+      "spec_requirements": [
+        "FR4",
+        "FR6",
+        "FR7"
+      ],
+      "import_notes": "Strong technically if policy allows attribution licenses. Review upstream per-file sources; README identifies some descriptions as AI-generated.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "theographic",
+      "title": "Theographic Bible metadata",
+      "category": "genealogy",
+      "rights_class": "CC-BY-SA-4.0",
+      "selection_status": "excluded_from_strict_PD",
+      "formats": [
+        "JSON",
+        "CSV"
+      ],
+      "source_url": "https://github.com/robertrouse/theographic-bible-metadata",
+      "download_urls": [
+        "https://raw.githubusercontent.com/robertrouse/theographic-bible-metadata/52e049efb3b95e4f1da52d11a3303fbd2d648922/json/people.json"
+      ],
+      "rights_evidence_url": "https://github.com/robertrouse/theographic-bible-metadata/blob/master/LICENSE",
+      "spec_requirements": [
+        "FR6"
+      ],
+      "import_notes": "Ready-made people graph under share-alike, not public domain. File listing/documentation reviewed, person records not validated.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "wikidata",
+      "title": "Wikidata biblical person entities",
+      "category": "genealogy",
+      "rights_class": "CC0-1.0_structured_data",
+      "selection_status": "discovery_only",
+      "formats": [
+        "JSON",
+        "RDF",
+        "SPARQL results"
+      ],
+      "source_url": "https://www.wikidata.org/wiki/Wikidata:Data_access",
+      "download_urls": [],
+      "rights_evidence_url": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+      "spec_requirements": [
+        "FR6"
+      ],
+      "import_notes": "Candidate identifiers and relationship discovery; biblical coverage and per-edge verse provenance not verified.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "openbible",
+      "title": "OpenBible cross references",
+      "category": "cross_references",
+      "rights_class": "CC-BY",
+      "selection_status": "excluded_from_strict_PD",
+      "formats": [
+        "TSV ZIP"
+      ],
+      "source_url": "https://www.openbible.info/labs/cross-references/",
+      "download_urls": [],
+      "rights_evidence_url": "https://www.openbible.info/labs/cross-references/",
+      "spec_requirements": [
+        "FR7",
+        "FR8"
+      ],
+      "import_notes": "Use specifically PD TSK edition for strict batch. Do not treat CC BY as public domain.",
+      "verification": "Provider page reviewed; archive not inspected"
+    },
+    {
+      "id": "scrollmapper",
+      "title": "Scrollmapper Bible databases",
+      "category": "translation_collection",
+      "rights_class": "mixed_source_rights_repository_MIT",
+      "selection_status": "prototype_only_after_per_resource_review",
+      "formats": [
+        "SQLite",
+        "JSON",
+        "CSV",
+        "SQL",
+        "Parquet"
+      ],
+      "source_url": "https://github.com/scrollmapper/bible_databases",
+      "download_urls": [],
+      "rights_evidence_url": "https://github.com/scrollmapper/bible_databases/tree/master/sources",
+      "spec_requirements": [
+        "FR1",
+        "FR4"
+      ],
+      "import_notes": "Repository software license does not classify all translations and annotation layers as PD. Provenance review required.",
+      "verification": "Provider page reviewed; archive not inspected"
+    }
+  ]
+}

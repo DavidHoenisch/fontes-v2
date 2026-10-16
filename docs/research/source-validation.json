@@ -1,0 +1,329 @@
+{
+  "checked_on_local_date": "2026-10-15",
+  "scope": "Downloaded archive, schema and selected sample validation; no full textual collation, production import, SWORD content export, or legal opinion.",
+  "files": [
+    {
+      "resource_id": "kjv-base",
+      "downloaded_bytes": 5226544,
+      "sha256": "863b964d8d8fa45ebd33b41ef4ff62b50cb297100aa3ed289120784d453cdff0",
+      "source_download_url": "https://ebible.org/Scriptures/eng-kjv_vpl.zip",
+      "archive_files": [
+        "eng-kjv_about.htm",
+        "eng-kjv_vpl.sql",
+        "eng-kjv_vpl.txt",
+        "eng-kjv_vpl.xml",
+        "haiola.css"
+      ],
+      "uncompressed_bytes": 19071965,
+      "canonical_validation": {
+        "book_filter": "66 standard Protestant canon USFM book codes",
+        "book_count": 66,
+        "chapter_count": 1189,
+        "verse_count": 31102,
+        "unique_reference_count": 31102,
+        "last_reference": "REV 22:21"
+      }
+    },
+    {
+      "resource_id": "kjv-usfm-tagged",
+      "downloaded_bytes": 2462428,
+      "sha256": "77bbe9c78f4f588b1465e49ddad986293a09e7f4b140abe7248232c8c5ae2a5b",
+      "url": "https://ebible.org/Scriptures/eng-kjv2006_usfm.zip",
+      "content_type": "application/zip",
+      "total_uncompressed": 12546814,
+      "archive_files": [
+        "02-GENeng-kjv2006.usfm",
+        "03-EXOeng-kjv2006.usfm",
+        "04-LEVeng-kjv2006.usfm",
+        "05-NUMeng-kjv2006.usfm",
+        "06-DEUeng-kjv2006.usfm",
+        "07-JOSeng-kjv2006.usfm",
+        "08-JDGeng-kjv2006.usfm",
+        "09-RUTeng-kjv2006.usfm",
+        "10-1SAeng-kjv2006.usfm",
+        "11-2SAeng-kjv2006.usfm",
+        "12-1KIeng-kjv2006.usfm",
+        "13-2KIeng-kjv2006.usfm",
+        "14-1CHeng-kjv2006.usfm",
+        "15-2CHeng-kjv2006.usfm",
+        "16-EZReng-kjv2006.usfm",
+        "17-NEHeng-kjv2006.usfm",
+        "18-ESTeng-kjv2006.usfm",
+        "19-JOBeng-kjv2006.usfm",
+        "20-PSAeng-kjv2006.usfm",
+        "21-PROeng-kjv2006.usfm",
+        "22-ECCeng-kjv2006.usfm",
+        "23-SNGeng-kjv2006.usfm",
+        "24-ISAeng-kjv2006.usfm",
+        "25-JEReng-kjv2006.usfm",
+        "26-LAMeng-kjv2006.usfm",
+        "27-EZKeng-kjv2006.usfm",
+        "28-DANeng-kjv2006.usfm",
+        "29-HOSeng-kjv2006.usfm",
+        "30-JOLeng-kjv2006.usfm",
+        "31-AMOeng-kjv2006.usfm",
+        "32-OBAeng-kjv2006.usfm",
+        "33-JONeng-kjv2006.usfm",
+        "34-MICeng-kjv2006.usfm",
+        "35-NAMeng-kjv2006.usfm",
+        "36-HABeng-kjv2006.usfm",
+        "37-ZEPeng-kjv2006.usfm",
+        "38-HAGeng-kjv2006.usfm",
+        "39-ZECeng-kjv2006.usfm",
+        "40-MALeng-kjv2006.usfm",
+        "70-MATeng-kjv2006.usfm",
+        "71-MRKeng-kjv2006.usfm",
+        "72-LUKeng-kjv2006.usfm",
+        "73-JHNeng-kjv2006.usfm",
+        "74-ACTeng-kjv2006.usfm",
+        "75-ROMeng-kjv2006.usfm",
+        "76-1COeng-kjv2006.usfm",
+        "77-2COeng-kjv2006.usfm",
+        "78-GALeng-kjv2006.usfm",
+        "79-EPHeng-kjv2006.usfm",
+        "80-PHPeng-kjv2006.usfm",
+        "81-COLeng-kjv2006.usfm",
+        "82-1THeng-kjv2006.usfm",
+        "83-2THeng-kjv2006.usfm",
+        "84-1TIeng-kjv2006.usfm",
+        "85-2TIeng-kjv2006.usfm",
+        "86-TITeng-kjv2006.usfm",
+        "87-PHMeng-kjv2006.usfm",
+        "88-HEBeng-kjv2006.usfm",
+        "89-JASeng-kjv2006.usfm",
+        "90-1PEeng-kjv2006.usfm",
+        "91-2PEeng-kjv2006.usfm",
+        "92-1JNeng-kjv2006.usfm",
+        "93-2JNeng-kjv2006.usfm",
+        "94-3JNeng-kjv2006.usfm",
+        "95-JUDeng-kjv2006.usfm",
+        "96-REVeng-kjv2006.usfm",
+        "copr.htm",
+        "keys.asc",
+        "latin.css"
+      ],
+      "uncompressed_bytes": 12546814
+    },
+    {
+      "resource_id": "web-classic",
+      "downloaded_bytes": 5344189,
+      "sha256": "116f3c1a22e7e2ff316bfdae7c9b082782517d4fc1095bc5cc9a2b614308165c",
+      "url": "https://ebible.org/Scriptures/eng-web_vpl.zip",
+      "content_type": "application/zip",
+      "total_uncompressed": 19299844,
+      "archive_files": [
+        "eng-web_about.htm",
+        "eng-web_vpl.sql",
+        "eng-web_vpl.txt",
+        "eng-web_vpl.xml",
+        "haiola.css"
+      ],
+      "uncompressed_bytes": 19299844
+    },
+    {
+      "resource_id": "strongs-greek",
+      "downloaded_bytes": 2369537,
+      "sha256": "91474213b208a4e487d35f85c10e5c90737acc69082dad15dec5431406003545",
+      "url": "https://raw.githubusercontent.com/morphgnt/strongs-dictionary-xml/master/strongsgreek.xml",
+      "content_type": "text/plain; charset=utf-8",
+      "entries": 5624
+    },
+    {
+      "resource_id": "strongs-hebrew",
+      "downloaded_bytes": 6436400,
+      "sha256": "1f9659ea208f4c498843a0280dacb1448627c33ca77712642d8705793ab66061",
+      "url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/StrongHebrewG.xml",
+      "content_type": "text/plain; charset=utf-8",
+      "entries": 0,
+      "entry_divisions": 8674,
+      "rights_header": "Strong Hebrew dictionary Public Domain; separate TWOT bibliography identifies copyrighted work"
+    },
+    {
+      "resource_id": "robinson-tr-john",
+      "downloaded_bytes": 334965,
+      "sha256": "77fbb830ae3e11b79f7f47a8e68a119dc77f0722ebcc99bb00111702797bffe5",
+      "source_download_url": "https://github.com/byztxt/greektext-textus-receptus/archive/7fd4d02c3e5adebd379ebfbc824040820dde10fc.zip",
+      "url": "https://raw.githubusercontent.com/byztxt/greektext-textus-receptus/7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/JOH.UTR"
+    },
+    {
+      "resource_id": "robinson-rp-john",
+      "downloaded_bytes": 378038,
+      "sha256": "c1c004f56e931630ac98cb973dea8b2da4d5220d707cd66fe980cb8c11e1fa9c",
+      "url": "https://raw.githubusercontent.com/byztxt/byzantine-majority-text/27a45ff1b7be6c17ccbfeac414f3f55732ae8e28/csv-unicode/strongs/with-parsing/JOH.csv",
+      "content_type": "text/plain; charset=utf-8",
+      "rows": 880,
+      "widths": [
+        3
+      ]
+    },
+    {
+      "resource_id": "matthew-henry",
+      "downloaded_bytes": 15195123,
+      "sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+      "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip",
+      "content_type": "application/zip",
+      "total_uncompressed": 15607036,
+      "archive_files": [
+        "modules/comments/zcom4/mhc/nt.bzs",
+        "modules/comments/zcom4/mhc/ot.bzs",
+        "modules/comments/zcom4/mhc/ot.bzv",
+        "modules/comments/zcom4/mhc/nt.bzv",
+        "modules/comments/zcom4/mhc/ot.bzz",
+        "modules/comments/zcom4/mhc/nt.bzz",
+        "mods.d/mhc.conf"
+      ],
+      "uncompressed_bytes": 15607036,
+      "module_config": {
+        "ModDrv": "zCom4",
+        "SourceType": "OSIS",
+        "Encoding": "UTF-8",
+        "Versification": "KJV",
+        "Version": "2.2",
+        "DistributionLicense": "Public Domain"
+      }
+    },
+    {
+      "resource_id": "nave",
+      "downloaded_bytes": 1300879,
+      "sha256": "52d9b7cde04c2abb5187ae804bcb97d93c7344a1358539f50ebc178ac0c945f0",
+      "source_download_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Nave.zip",
+      "archive_files": [
+        "modules/lexdict/zld/nave/dict.zdx",
+        "modules/lexdict/zld/nave/dict.zdt",
+        "modules/lexdict/zld/nave/dict.dat",
+        "modules/lexdict/zld/nave/dict.idx",
+        "mods.d/nave.conf"
+      ],
+      "uncompressed_bytes": 1574897,
+      "module_config": {
+        "ModDrv": "zLD",
+        "SourceType": "TEI",
+        "Encoding": "UTF-8",
+        "Version": "3.0",
+        "DistributionLicense": "Public Domain"
+      }
+    },
+    {
+      "resource_id": "tsk",
+      "downloaded_bytes": 2643739,
+      "sha256": "6784c7099465995a8e66f02ead82b0bca66603c1bdeaf8332949774b7bfd4293",
+      "source_download_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/TSK.zip",
+      "archive_files": [
+        "modules/comments/zcom/tsk/nt.bzv",
+        "modules/comments/zcom/tsk/nt.bzs",
+        "modules/comments/zcom/tsk/ot.bzs",
+        "modules/comments/zcom/tsk/nt.bzz",
+        "modules/comments/zcom/tsk/ot.bzv",
+        "modules/comments/zcom/tsk/ot.bzz",
+        "mods.d/tsk.conf"
+      ],
+      "uncompressed_bytes": 2869668,
+      "module_config": {
+        "ModDrv": "zCom",
+        "SourceType": "ThML",
+        "Version": "1.4",
+        "DistributionLicense": "Public Domain"
+      }
+    },
+    {
+      "resource_id": "easton",
+      "downloaded_bytes": 1437674,
+      "sha256": "f6dd054554764e2e97d5d189a697eb26039054578a9ccf98ce668ab810341c6e",
+      "source_download_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Easton.zip",
+      "archive_files": [
+        "modules/lexdict/zld/easton/easton.idx",
+        "modules/lexdict/zld/easton/easton.zdx",
+        "modules/lexdict/zld/easton/easton.dat",
+        "modules/lexdict/zld/easton/dict.dat",
+        "modules/lexdict/zld/easton/easton.zdt",
+        "mods.d/easton.conf"
+      ],
+      "uncompressed_bytes": 1640710,
+      "module_config": {
+        "ModDrv": "zLD",
+        "SourceType": "TEI",
+        "Encoding": "UTF-8",
+        "Version": "2.0.1",
+        "DistributionLicense": "Public Domain"
+      }
+    },
+    {
+      "resource_id": "isbe",
+      "downloaded_bytes": 9987447,
+      "sha256": "4de747545d9c349ab724bc1708b01df5481e3b93e5e51077f859dd8a32023a32",
+      "source_download_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/ISBE.zip",
+      "archive_files": [
+        "mods.d/isbe.conf",
+        "modules/lexdict/zld/isbe/isbe.idx",
+        "modules/lexdict/zld/isbe/isbe.dat",
+        "modules/lexdict/zld/isbe/isbe.zdt",
+        "modules/lexdict/zld/isbe/isbe.zdx"
+      ],
+      "uncompressed_bytes": 10473813,
+      "module_config": {
+        "ModDrv": "zLD",
+        "SourceType": "TEI",
+        "Encoding": "UTF-8",
+        "Version": "2.2",
+        "DistributionLicense": "Public Domain"
+      }
+    },
+    {
+      "resource_id": "tidwell-overviews",
+      "downloaded_bytes": 302261,
+      "sha256": "a652e67ff1b8b8a3c6a58a1f631353ed01b2e9a00b9d3a3d8905a82bcea8e205",
+      "source_download_url": "https://www.gutenberg.org/cache/epub/16290/pg16290.txt"
+    },
+    {
+      "resource_id": "berean-tables",
+      "downloaded_bytes": 85525373,
+      "sha256": "09bbee6f9fe4fa22b5df28e8a9ffa99bf9c33435f4eb8c47c2dc221d855d35cb",
+      "url": "https://bereanbible.com/bsb_tables.tsv",
+      "content_type": "text/tab-separated-values",
+      "rows": 754648,
+      "header": [
+        "Heb Sort",
+        "Greek Sort",
+        "BSB Sort",
+        "Verse",
+        "Language",
+        "WLC / Nestle Base TR RP WH NE NA SBL",
+        "WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]",
+        "Translit",
+        "Parsing",
+        "Parsing",
+        "Str Heb",
+        "Str Grk",
+        "VerseId",
+        "Hdg",
+        "Crossref",
+        "Par",
+        "Space",
+        "begQ",
+        " BSB version ",
+        "pnc",
+        "endQ",
+        "footnotes",
+        "End text"
+      ],
+      "rows_by_language": {
+        "Hebrew": 529439,
+        "z": 1,
+        "Aramaic": 7506,
+        "Greek": 217701
+      },
+      "row_widths": {
+        "23": 754647
+      },
+      "distinct_explicit_verse_ids": 31102,
+      "rows_with_surface": 443625
+    },
+    {
+      "resource_id": "uxlc-genesis",
+      "downloaded_bytes": 729766,
+      "sha256": "9c1b7cab88cdb79830a29e27f6a68b21c1c42a30ce740d07086440768ccfd29d",
+      "url": "https://www.tanach.us/Books/Genesis.xml",
+      "content_type": "text/xml"
+    }
+  ]
+}
