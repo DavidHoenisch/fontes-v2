@@ -43,7 +43,15 @@ The path prompt has been replaced with Reading/Study → Continue → signed siz
 - `dist/setup-captures/first-run-choose.png`, `first-run-confirm.png` and `first-run-reading.png` show actual egui/wgpu output. Captures are local acceptance artifacts, not checked-in design mockups.
 - The Android arm64 NativeActivity APK builds with the new HTTPS/crypto/zstd service. INTERNET is required; no broad storage permission is added. Local APK alignment/signature and manifest checks use the Android SDK. No physical device/AVD execution of this new networking flow is claimed.
 
-Managed generations and versioned signed receipts are app-owned bootstrap state, separate from the draft library-v2 composition schema. Setup never modifies `user.sqlite`. First launch without installed content still needs internet; offline seed, automatic updates, add-on composition, available-space preflight, resume, generation garbage collection/recovery UI and full Windows/Android crash/power-loss tests remain distinct work. The older release/run evidence below predates this source change until a new application prerelease is published.
+Managed generations and versioned signed receipts are app-owned bootstrap state, separate from the draft library-v2 composition schema. Setup never modifies `user.sqlite`. First launch without installed content still needs internet; offline seed, automatic updates, add-on composition, available-space preflight, resume, generation garbage collection/recovery UI and full Windows/Android crash/power-loss tests remain distinct work. Earlier release/run evidence is retained below as historical context.
+
+## Published guided-setup testing release · 2026-10-16
+
+[Application run 38914253075](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38914253075), source commit `2278780172c18545ef3ebbd1a1afd674f820a2db`, passed all four desktop jobs, Android and the publisher. [Release `app-v0.1.0-dev.5.1`](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.5.1) includes the guided setup in Windows x64, Linux x64, macOS arm64/Intel archives and the [Android arm64 test APK](https://github.com/DavidHoenisch/fontes-v2/releases/download/app-v0.1.0-dev.5.1/fontes-android-aarch64-debug.apk). The publisher verified sizes, hashes and provenance, then downloaded and compared all eleven assets before and after public publication. Desktop tests/lint, optimized native builds, command/dependency checks and archive checks passed; Android packaging, signature and INTERNET/private-storage manifest assertions passed. This is CI build/package evidence, not a physical-device or native-window test.
+
+[Data run 38914253230](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38914253230) published [signed data-v1-stable-6](https://github.com/DavidHoenisch/fontes-v2/releases/tag/data-v1-stable-6) from the same source commit; [data contracts](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38914252849) and [resource-source publication checks](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38914252791) also passed. After data-v1-stable-6 became public, the live Reading wizard test passed again, including actual download/verification, open, Preferences return and managed offline restart (5.53 seconds in that local debug observation).
+
+The documentation-only follow-up records these results without changing the released binaries. Android still uses a fresh debug key per clean CI run; retain important private data and follow the [testing-install guidance](testing-builds.md#android-setup) before replacing an existing test install. Physical-device networking/lifecycle, stable app signing and the full installer/update lifecycle remain acceptance gates.
 
 ## Initial real-study timings
 
@@ -63,7 +71,7 @@ The smoke test required multiple Romans resources and real Greek tokens, real di
 
 ## Before a user release
 
-Exercise actual Windows/Linux/macOS native windows and test keyboard/focus, screen readers, text scaling, RTL/Hebrew shaping, narrow/large viewports, and mouse/touch flows on real devices. Exercise Android IME, pause/resume/process death, GPU behavior and private import. Resolve Android NativeActivity accessibility or validate a GameActivity bridge. Add verified first-run content acquisition and safe installation, app signing/distribution, note export/backup/recovery, unsaved-draft close protection, cancellation and large-annotation-library budgets. Complete optional catalog/installer, curated overviews/genealogies, package-native links and local AI separately. iOS remains deferred.
+Exercise actual Windows/Linux/macOS native windows and test keyboard/focus, screen readers, text scaling, RTL/Hebrew shaping, narrow/large viewports, and mouse/touch flows on real devices. Exercise Android IME, pause/resume/process death, GPU behavior and the verified first-run download/activation flow. Resolve Android NativeActivity accessibility or validate a GameActivity bridge. Complete app signing/distribution, note export/backup/recovery, unsaved-draft close protection, broader cancellation and large-annotation-library budgets. Complete optional catalog/installer, curated overviews/genealogies, package-native links and local AI separately. iOS remains deferred.
 
 ## Cross-platform Actions follow-up
 
@@ -71,7 +79,7 @@ The first pushed application run (`38863847754`, commit `31ee150`) caught Window
 
 Run `38863947932` verified the Windows asset fix and caught Android offline metadata resolving host crates outside a target-only fetch. CI now fetches the complete locked graph and sets both NDK environment variables to r28. The local archive round trip also caught resources staged after macOS signing; packaging now signs last and verifies the extracted bundle using ditto/codesign.
 
-## Verified GitHub testing release — 2026-10-16
+## Earlier verified GitHub testing release — 2026-10-16
 
 [Application run 38864239152](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38864239152), source commit `f548885ea0ff0004fe7375d99349ad81efc82c27`, completed successfully. [Release `app-v0.1.0-dev.3.1`](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.3.1) is public and marked prerelease. All five platform jobs and the separate publisher passed.
 
@@ -91,4 +99,4 @@ Independent local downloads of the GitHub-built artifacts confirmed their outer 
 
 The original data-release run `38863847726` completed reproducible builds but its stale workflow target received HTTP 403 during publication after workflow revisions advanced. [A fresh current-commit run, 38864673059](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38864673059), passed both build and signed publication and produced [data-v1-stable-4](https://github.com/DavidHoenisch/fontes-v2/releases/tag/data-v1-stable-4). No broader token/secret permission was added. The initial [data-contract run](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38863847784) and [resource-source publishing run](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38863847809) also passed. Superseded application runs were cancelled after their diagnosed failures to avoid redundant builds.
 
-The final documentation-only commit records these results; published binaries remain bound to the tested source commit above. Production signing, stable Android update identity, automatic verified content setup, installers and native-window/device acceptance remain future gates.
+The documentation-only follow-up recorded these results; published binaries remain bound to the tested source commit above. At that point, production signing, stable Android update identity, automatic verified content setup, installers and native-window/device acceptance remained future gates. The guided bootstrap described above supersedes that earlier content-setup limitation.
