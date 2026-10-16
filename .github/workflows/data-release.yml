@@ -1,0 +1,86 @@
+name: Reading data release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/data-release.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'crates/**'
+      - 'data/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reading-data-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.93.0 --profile minimal --component rustfmt --component clippy
+      - name: Check formatting and tests
+        run: |
+          cargo fmt --all -- --check
+          cargo test --workspace --locked
+          cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Compile the pipeline
+        run: cargo build --release --locked -p fontes-data-pipeline
+      - name: Compile real KJV and WEB source data
+        env:
+          FONTES_BUILDER_COMMIT: ${{ github.sha }}
+          FONTES_REPOSITORY: ${{ github.repository }}
+        run: |
+          target/release/fontes-data build --profile reading --output dist/reading --builder-commit "$FONTES_BUILDER_COMMIT" --mirror-repository "$FONTES_REPOSITORY"
+      - name: Prove reproducibility from the verified offline cache
+        env:
+          FONTES_BUILDER_COMMIT: ${{ github.sha }}
+        run: |
+          target/release/fontes-data build --profile reading --output dist/repro --builder-commit "$FONTES_BUILDER_COMMIT" --offline
+          cmp dist/reading/library.sqlite dist/repro/library.sqlite
+          cmp dist/reading/fontes-reading.sqlite.zst dist/repro/fontes-reading.sqlite.zst
+          cmp dist/reading/validation-report.json dist/repro/validation-report.json
+      - name: Retain checked outputs for the publisher
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: reading-build
+          path: |
+            target/release/fontes-data
+            dist/reading/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 1
+
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: reading-build
+          path: checked-build
+      - name: Sign, create draft, verify assets, and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FONTES_DATA_SIGNING_KEY: ${{ secrets.FONTES_DATA_SIGNING_KEY }}
+          FONTES_REPOSITORY: ${{ github.repository }}
+        run: |
+          chmod +x checked-build/target/release/fontes-data
+          checked-build/target/release/fontes-data publish --dir checked-build/dist/reading --trust data/trust/data-release-1.json --repository "$FONTES_REPOSITORY"

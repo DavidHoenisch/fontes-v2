@@ -1,0 +1,20 @@
+{
+  "mapping_version": 1,
+  "sources": {
+    "kjv-base": {
+      "reference_overrides": {},
+      "empty_verses": [],
+      "ignored_placeholders": []
+    },
+    "web-classic": {
+      "reference_overrides": {
+        "ROM.14.24": "ROM.16.25",
+        "ROM.14.25": "ROM.16.26",
+        "ROM.14.26": "ROM.16.27"
+      },
+      "empty_verses": ["LUK.17.36", "ACT.8.37", "ACT.15.34", "ACT.24.7"],
+      "ignored_placeholders": ["ROM.16.25"]
+    }
+  },
+  "review": "The locked WEB Classic XML places the Romans doxology at 14:24-26, leaves an empty 16:25 placeholder, and has no 16:26-27 source records. Map the actual text to KJV canonical anchors; retain the other four empty verses as explicit source omissions. Verified directly against the locked XML."
+}

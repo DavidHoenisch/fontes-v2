@@ -1,0 +1,43 @@
+{
+  "manifest_version": 1,
+  "update_protocol_version": 1,
+  "content_schema_version": 1,
+  "canonical_registry_version": 1,
+  "repository": "DavidHoenisch/fontes-v2",
+  "release_tag": "data-v1-stable-1",
+  "channel": "stable",
+  "sequence": 1,
+  "published_at": "2026-10-16T00:00:00Z",
+  "signing_key_id": "data-release-1",
+  "builder_commit": "0000000000000000000000000000000000000000",
+  "source_lock_sha256": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
+  "profiles": [
+    {
+      "profile": "reading",
+      "asset": "fontes-reading.sqlite.zst",
+      "compression": "zstd",
+      "compressed_bytes": 1024,
+      "compressed_sha256": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
+      "sqlite_bytes": 4096,
+      "sqlite_sha256": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
+      "content_id": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
+      "source_ids": [
+        "kjv-base"
+      ],
+      "canonical_ref_count": 31102,
+      "verse_text_count": 31102,
+      "resource_count": 0,
+      "capabilities": [
+        "reading"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "kjv-base",
+      "sha256": "863b964d8d8fa45ebd33b41ef4ff62b50cb297100aa3ed289120784d453cdff0",
+      "adapter_version": "ebible-vpl-v1",
+      "rights_review_id": "research-2026-10-15-kjv-base"
+    }
+  ]
+}

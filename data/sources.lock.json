@@ -1,0 +1,83 @@
+{
+  "lock_version": 1,
+  "canonical_registry_version": 1,
+  "sources": [
+    {
+      "source_id": "kjv-base",
+      "url": "https://ebible.org/Scriptures/eng-kjv_vpl.zip",
+      "sha256": "863b964d8d8fa45ebd33b41ef4ff62b50cb297100aa3ed289120784d453cdff0",
+      "bytes": 5226544,
+      "rights_class": "public_domain_with_regional_exception",
+      "rights_review_id": "research-2026-10-15-kjv-base",
+      "rights_evidence_url": "https://ebible.org/bible/details.php?id=eng-kjv&all=1",
+      "adapter": "ebible-vpl-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "web-classic",
+      "url": "https://ebible.org/Scriptures/eng-web_vpl.zip",
+      "sha256": "116f3c1a22e7e2ff316bfdae7c9b082782517d4fc1095bc5cc9a2b614308165c",
+      "bytes": 5344189,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-web-classic",
+      "rights_evidence_url": "https://ebible.org/bible/details.php?id=eng-web&all=1",
+      "adapter": "ebible-vpl-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "strongs-greek",
+      "url": "https://raw.githubusercontent.com/morphgnt/strongs-dictionary-xml/master/strongsgreek.xml",
+      "sha256": "91474213b208a4e487d35f85c10e5c90737acc69082dad15dec5431406003545",
+      "bytes": 2369537,
+      "rights_class": "CC0-1.0",
+      "rights_review_id": "research-2026-10-15-strongs-greek",
+      "rights_evidence_url": "https://github.com/morphgnt/strongs-dictionary-xml#license",
+      "adapter": "strongs-greek-xml-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "strongs-hebrew",
+      "url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/StrongHebrewG.xml",
+      "sha256": "1f9659ea208f4c498843a0280dacb1448627c33ca77712642d8705793ab66061",
+      "bytes": 6436400,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-strongs-hebrew",
+      "rights_evidence_url": "https://raw.githubusercontent.com/openscriptures/strongs/0acd2f251c2d35ff8db2dece4e0593979d3ac223/hebrew/StrongHebrewG.xml",
+      "adapter": "strongs-hebrew-osis-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "matthew-henry",
+      "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/MHC.zip",
+      "sha256": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+      "bytes": 15195123,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-matthew-henry",
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=MHC",
+      "adapter": "sword-commentary-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "nave",
+      "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Nave.zip",
+      "sha256": "52d9b7cde04c2abb5187ae804bcb97d93c7344a1358539f50ebc178ac0c945f0",
+      "bytes": 1300879,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-nave",
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=Nave",
+      "adapter": "sword-dictionary-v1",
+      "upstream_revision": null
+    },
+    {
+      "source_id": "tsk",
+      "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/TSK.zip",
+      "sha256": "6784c7099465995a8e66f02ead82b0bca66603c1bdeaf8332949774b7bfd4293",
+      "bytes": 2643739,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-tsk",
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=TSK",
+      "adapter": "sword-commentary-v1",
+      "upstream_revision": null
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+name: Data contracts
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/data-contracts.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'crates/**'
+      - 'data/**'
+      - 'docs/research/source-validation.json'
+  push:
+    branches: [main, master]
+    paths:
+      - '.github/workflows/data-contracts.yml'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'rust-toolchain.toml'
+      - 'crates/**'
+      - 'data/**'
+      - 'docs/research/source-validation.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup toolchain install 1.93.0 --profile minimal --component clippy --component rustfmt
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Check contracts
+        run: cargo test --workspace --locked
+      - name: Check lints
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings

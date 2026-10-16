@@ -1,0 +1,28 @@
+[package]
+name = "fontes-data-pipeline"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[[bin]]
+name = "fontes-data"
+path = "src/main.rs"
+
+[dependencies]
+fontes-data-contracts = { path = "../fontes-data-contracts" }
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+sha2 = "0.10"
+hex = "0.4"
+roxmltree = "0.21"
+zip = { version = "9.0.3", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+zstd = "0.13"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls", "json"] }
+ed25519-dalek = { version = "2.2", features = ["rand_core"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+time = { version = "0.3", features = ["formatting"] }
+tempfile = "3"
