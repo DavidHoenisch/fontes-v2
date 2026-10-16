@@ -144,7 +144,7 @@ jobs:
           python3 - <<'PY'
           import os, subprocess
           sdkmanager = os.path.join(os.environ['ANDROID_HOME'], 'cmdline-tools/latest/bin/sdkmanager')
-          subprocess.run([sdkmanager, 'emulator', 'system-images;android-28;default;x86_64', 'ndk;28.2.13676358'],
+          subprocess.run([sdkmanager, 'platform-tools', 'emulator', 'system-images;android-28;default;x86_64', 'ndk;28.2.13676358'],
                          input='y\n' * 20, text=True, check=True)
           PY
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> "$GITHUB_ENV"
@@ -152,7 +152,19 @@ jobs:
         shell: bash
         run: |
           sudo chmod a+rw /dev/kvm
-          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name fontes-tests --package 'system-images;android-28;default;x86_64'
+          export PATH="$ANDROID_HOME/platform-tools:$PATH"
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/fontes-avds"
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo no | "$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager" create avd --name fontes-tests --path "$ANDROID_AVD_HOME/fontes-tests.avd" --package 'system-images;android-28;default;x86_64'
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['ANDROID_AVD_HOME'])
+          assert (root / 'fontes-tests.avd/config.ini').is_file()
+          # Keep Java SDK tools and the emulator on the same explicit registry.
+          (root / 'fontes-tests.ini').write_text(f'avd.ini.encoding=UTF-8\npath={root / "fontes-tests.avd"}\ntarget=android-28\n')
+          PY
+          "$ANDROID_HOME/emulator/emulator" -list-avds
           "$ANDROID_HOME/emulator/emulator" -avd fontes-tests -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -feature -Vulkan > android-emulator.log 2>&1 &
           emulator_pid=$!
           trap 'adb emu kill || true' EXIT
