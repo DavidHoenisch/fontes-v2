@@ -9,7 +9,7 @@ Observed locally on 2026-10-15. These are development acceptance checks, not evi
 - Normal UI test: recoverable first-run Open Library behavior at 320×640, 390×844 and 1440×960. Real-data egui interaction/wgpu render test additionally opens the picker, saves a note, searches and opens study context at all three sizes. PNGs are generated under the caller's `FONTES_CAPTURE_DIR` for inspection, not checked-in golden screenshots.
 - 54 regular tests pass across the existing data/resource workspace and application, with Clippy/format checks; ordinary CI skips only the explicitly ignored real-corpus/GPU test.
 - Android aarch64 native library and debug APK built using NDK 28.2.13676358, platform 35, JDK from Android Studio, cargo-apk 0.10.0. APK alignment/signature and NativeActivity manifest checked. API minimum 28, target 35, private-storage bootstrap, arm64 ABI, no internet/external-storage permissions. Native debug symbols are stripped from the packaged development APK (approximately 52 MB in this local build).
-- New GitHub Actions define Windows/macOS/Linux application checks and Android APK validation. They have not been run remotely as part of this local implementation; actual runner/device results must be recorded after execution.
+- Cross-platform GitHub Actions have now passed on all four desktop targets and Android, with a verified public testing prerelease; see the run evidence below. Physical-device/native-window checks remain distinct.
 
 The Mac was locked, so computer-use could not inspect or operate the live desktop window. Rendering evidence comes from the actual egui/wgpu test harness; it is not claimed as a completed manual OS-window test. The real-data render flow was also run on the reading profile at all three sizes. No Android device or configured AVD was available. Android compilation does not verify keyboard, safe-area, lifecycle, accessibility or physical GPU behavior.
 
@@ -31,10 +31,32 @@ The smoke test required multiple Romans resources and real Greek tokens, real di
 
 ## Before a user release
 
-Validate Windows/Linux behavior on actual runners; test keyboard/focus, screen readers, text scaling, RTL/Hebrew shaping, narrow/large viewports, and mouse/touch flows on real devices. Exercise Android IME, pause/resume/process death, GPU behavior and private import. Resolve Android NativeActivity accessibility or validate a GameActivity bridge. Add verified first-run content acquisition and safe installation, app signing/distribution, note export/backup/recovery, unsaved-draft close protection, cancellation and large-annotation-library budgets. Complete optional catalog/installer, curated overviews/genealogies, package-native links and local AI separately. iOS remains deferred.
+Exercise actual Windows/Linux/macOS native windows and test keyboard/focus, screen readers, text scaling, RTL/Hebrew shaping, narrow/large viewports, and mouse/touch flows on real devices. Exercise Android IME, pause/resume/process death, GPU behavior and private import. Resolve Android NativeActivity accessibility or validate a GameActivity bridge. Add verified first-run content acquisition and safe installation, app signing/distribution, note export/backup/recovery, unsaved-draft close protection, cancellation and large-annotation-library budgets. Complete optional catalog/installer, curated overviews/genealogies, package-native links and local AI separately. iOS remains deferred.
 
 ## Cross-platform Actions follow-up
 
-The first pushed application run (`38863847754`, commit `31ee150`) caught Windows checkout CRLF conversion changing hashed UI assets. A repository `.gitattributes` policy preserves LF for text and automatic binary detection so every target sees the committed source/manifest bytes. This also stabilizes command-catalog comparisons and package manifests. Subsequent run results are recorded below once verified.
+The first pushed application run (`38863847754`, commit `31ee150`) caught Windows checkout CRLF conversion changing hashed UI assets. A repository `.gitattributes` policy preserves LF for text and automatic binary detection so every target sees the committed source/manifest bytes. This also stabilizes command-catalog comparisons and package manifests. The corrected run results are recorded below.
 
 Run `38863947932` verified the Windows asset fix and caught Android offline metadata resolving host crates outside a target-only fetch. CI now fetches the complete locked graph and sets both NDK environment variables to r28. The local archive round trip also caught resources staged after macOS signing; packaging now signs last and verifies the extracted bundle using ditto/codesign.
+
+## Verified GitHub testing release — 2026-10-16
+
+[Application run 38864239152](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38864239152), source commit `f548885ea0ff0004fe7375d99349ad81efc82c27`, completed successfully. [Release `app-v0.1.0-dev.3.1`](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.3.1) is public and marked prerelease. All five platform jobs and the separate publisher passed.
+
+| Target | Build artifact | CI validation |
+| --- | --- | --- |
+| Windows x64 / windows-2025 | `fontes-windows-x86_64.zip` | Format, engine/UI tests, Clippy, optimized GUI/CLI, command-contract/layer checks, executable smoke checks and archive CRC |
+| Linux x64 / ubuntu-24.04 | `fontes-linux-x86_64.tar.gz` | Same native desktop checks and tar packaging |
+| macOS Apple Silicon / macos-15 | `fontes-macos-aarch64.zip` | Same desktop checks; full app-bundle ad-hoc signing and verification after archive extraction |
+| macOS Intel / macos-15-intel | `fontes-macos-x86_64.zip` | Same desktop/signature/extraction checks on an Intel runner |
+| Android arm64 / ubuntu-24.04 + NDK r28 | `fontes-android-aarch64-debug.apk` | Native build/package, unchanged Cargo.lock, APK alignment/signature and manifest verification; not on-device execution |
+
+Each desktop job executed the resulting GUI/CLI `--help` and CLI command-catalog smoke checks before packaging. This tests native executable startup without opening a GUI window. The four desktop jobs also ran the toolkit-independent engine tests and recoverable first-run egui interaction test. The real-corpus wgpu render tests remain the separately recorded local checks, not a hidden CI/device claim.
+
+The publisher required the exact five platform manifests to match this source commit, run ID and attempt, verified every payload size/hash, created an immutable draft test release and downloaded/compared all eleven assets both before and after public publication. Release assets are four desktop archives, one APK, five build manifests and SHA256SUMS. Same-run Actions artifacts are also retained for 14 days.
+
+Independent local downloads of the GitHub-built artifacts confirmed their outer and internal hashes. Both extracted macOS bundles passed `codesign --verify --deep --strict`; the Apple Silicon packaged CLI navigated actual study data to John 3:16. Linux ELF headers/executable modes and Windows x64 PE headers were checked. The Android download's signature, arm64 shared library and included UI/font license assets were checked. Windows import inspection identified the v14 runtime dependency; the application guide now links the official x64 redistributable prerequisite. No Windows/Android GUI or physical-device result is inferred from these checks.
+
+The original data-release run `38863847726` completed reproducible builds but its stale workflow target received HTTP 403 during publication after workflow revisions advanced. [A fresh current-commit run, 38864673059](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38864673059), passed both build and signed publication and produced [data-v1-stable-4](https://github.com/DavidHoenisch/fontes-v2/releases/tag/data-v1-stable-4). No broader token/secret permission was added. The initial [data-contract run](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38863847784) and [resource-source publishing run](https://github.com/DavidHoenisch/fontes-v2/actions/runs/38863847809) also passed. Superseded application runs were cancelled after their diagnosed failures to avoid redundant builds.
+
+The final documentation-only commit records these results; published binaries remain bound to the tested source commit above. Production signing, stable Android update identity, automatic verified content setup, installers and native-window/device acceptance remain future gates.

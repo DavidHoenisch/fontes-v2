@@ -1,6 +1,6 @@
 # Fontes system specification
 
-Revision: **0.6**. Updated: **2026-10-15**. Status: **current working implementation baseline**.
+Revision: **0.6**. Updated: **2026-10-16**. Status: **current working implementation baseline**.
 
 Fontes is an offline-first Bible study application with a readable primary text, fast reference navigation, and an extensible library whose translations, paragraphs, word studies, topics, and user notes connect through stable identities. This specification consolidates the original Word specification, the data pipeline design, approved local UI references, the resource-library design, and the implemented authoring tools. Future implementation work must be understandable from this repository without the original chat or a file in someone's Downloads folder.
 
@@ -439,8 +439,8 @@ This register captures chosen directions and their reasons. Detailed contracts r
 | D021 | Engine-first stable command registry with toolkit-independent view models; thin `ui-egui`, shared CLI/JSON/MCP dispatch | Replace the presentation toolkit without rewriting domain behavior. Native UI uses a bounded serial background host. Existing data protocols/IDs remain unchanged; live GUI IPC is a later transport. |
 | D022 | egui/eframe 0.35.0, explicit wgpu renderer, existing Rust 1.93 toolchain | Latest checked compatible series; newer egui releases require Rust 1.95. Native SQLite remains the documented C dependency; app does not require publisher tooling. |
 | D023 | Read-only v1 snapshot bridge plus separate user-v1 app-session extension for the first app | Exercise real data now without mutating snapshots or presenting draft library-v2 schemas as migrations. Verified first-run downloads and resource-native composition remain separate gates. |
-| D025 | Cross-platform tested archives and Android debug APK, retained Actions artifacts and per-run immutable application prereleases | All platform jobs must pass before publication. Build manifests/checksums bind source/toolchain/payloads; development builds are distinct from production signing and the content-update trust protocol. |
 | D024 | Shared desktop/Android Rust UI; initial arm64 Android NativeActivity, minimum API 28 and target API 35; iOS deferred | Avoid an app-authored Java/Kotlin layer in the first slice. Android AccessKit requires GameActivity in eframe 0.35, so accessibility/IME/device validation remain explicit release gates. |
+| D025 | Cross-platform tested archives and Android debug APK, retained Actions artifacts and per-run immutable application prereleases | All platform jobs must pass before publication. Build manifests/checksums bind source/toolchain/payloads; development builds are distinct from production signing and the content-update trust protocol. |
 
 ## 14. Implementation phases and acceptance criteria
 
@@ -452,7 +452,7 @@ This register captures chosen directions and their reasons. Detailed contracts r
 | P3 Package-native data | Planned | Complete delivery exchange/v2 schema/anchor contracts, eight independently signed resources equivalent to current snapshots, reading/study bundles, legacy anchor migration |
 | P4 Registry/catalog operation | Partial source intake; catalog planned | Source repository policy/hash approval/source releases exist; production namespace/intake/trust lifecycle, signed taxonomy/catalog and client withdrawal still required |
 | P5 Shared installer | Planned | Cross-package context, staged update/uninstall, permissions/FTS/receipts, disk estimates, platform crash recovery, note preservation |
-| P6 Application | Partial: working v1 slice | Responsive egui/wgpu app, toolkit-independent commands, CLI/JSON/MCP, real reading/study queries and persistent notes exist. Local macOS/egui render checks and Android APK build recorded; cross-platform release verification, Android device/IME/accessibility, verified bootstrap, library flows and broader measurements remain. |
+| P6 Application | Partial: working v1 slice | Responsive egui/wgpu app, toolkit-independent commands, CLI/JSON/MCP, real reading/study queries and persistent notes exist. Local real-data egui/wgpu checks plus Windows/Linux/macOS arm64+x64 CI tests/builds and an Android APK are verified; versioned public test artifacts and download verification exist. Physical-device/native-window/IME/accessibility, verified bootstrap, library flows and broader measurements remain. |
 | P7 Curated/enriched/AI content | Planned | Evidenced genealogies, reviewed overviews, approved enrichment/embedding/model contracts, grounded local retrieval/answers |
 | P8 Paid publisher resources | Deferred | Separate agreements, entitlements/restoration, restricted delivery, platform rules, offline terms, and permitted export/AI design |
 
@@ -492,7 +492,7 @@ Required verification scenarios:
 | O013 | Stable API/versioning for converters, preview, semantic diff, and submission helpers; container image digest pinning | Expanded author tooling and CI hardening |
 | O014 | Expanded/localized natural-reference grammar and aliases | Initial English/OSIS/USFM/unique-prefix parsing, j/jn/psalm aliases, ambiguity errors and fixtures implemented; FR2 localization later |
 | O015 | Non-GitHub source-release storage backend and transport verification with equivalent immutable inventories | Later storage migration; current GitHub repositories are configurable |
-| O016 | Android device/IME/lifecycle/safe-area/accessibility validation, Windows/Linux runtime validation, app signing/distribution and verified first-run content import | P6 user release; APK compilation and responsive desktop renders are insufficient |
+| O016 | Android device/IME/lifecycle/safe-area/accessibility validation, Windows/Linux native-window validation, production app signing/installers and verified first-run content import | P6 user release; APK compilation and responsive desktop renders are insufficient |
 | O017 | User note backup/export, unsaved-draft close protection, large-annotation view-model budgets, cancellable jobs and optional authenticated live GUI control | P6 user release/expanded automation; independent stdio sessions exist |
 
 Do not fill these gaps by treating illustrative manifests as signed releases, pending design scripts as applied UI, provisional concepts as reviewed registry entries, or a source archive as an installable payload. Advance implementation with explicit contracts, status updates, and the relevant acceptance evidence.

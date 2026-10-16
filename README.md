@@ -14,7 +14,7 @@ cargo run --locked -p fontes -- --library dist/reading/library.sqlite
 cargo run --locked -p fontes -- --library dist/study/library.sqlite
 ```
 
-See the [application guide](docs/app/README.md) for first-run data, mobile preview, headless commands and Android APK builds, and the [architecture](docs/app/architecture.md) for crate boundaries and compatibility. The responsive UI uses the approved local assets. Android arm64 APK compilation is verified locally; device/IME/accessibility and Windows/Linux runtime checks remain. Automatic content installation, the add-on catalog, AI and curated genealogy/overview features are later milestones.
+See the [application guide](docs/app/README.md) for first-run data, mobile preview, headless commands and Android APK builds, and the [architecture](docs/app/architecture.md) for crate boundaries and compatibility. The responsive UI uses the approved local assets. [Download the development builds](https://github.com/DavidHoenisch/fontes-v2/releases/tag/app-v0.1.0-dev.3.1) for Windows x64, Linux x64, macOS Apple Silicon/Intel, and Android arm64, with [test setup instructions](docs/app/testing-builds.md). All platform Actions jobs passed; physical-device/native-window and accessibility checks remain. Automatic content installation, the add-on catalog, AI and curated genealogy/overview features are later milestones.
 
 ## Extensible library design
 
