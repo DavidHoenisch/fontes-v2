@@ -117,11 +117,187 @@ fn real_library_desktop_and_mobile() {
             .unwrap()
             .save(out.join(format!("{name}-search.png")))
             .unwrap();
-        h.state_mut().choose(Destination::Study);
+        h.get_by_label("Study").click();
+        h.run_ok();
         wait(&mut h);
         h.render()
             .unwrap()
             .save(out.join(format!("{name}-study.png")))
             .unwrap();
+        if name == "desktop" && h.state().state.as_ref().unwrap().has_study {
+            let verse = h
+                .state()
+                .state
+                .as_ref()
+                .unwrap()
+                .passage
+                .iter()
+                .find(|v| v.refs.contains(&43003016))
+                .unwrap()
+                .text
+                .clone();
+            assert!(
+                h.get_by_value(&verse).rect().right() < h.get_by_label("Commentary").rect().left(),
+                "Study must remain beside the reading surface"
+            );
+            h.get_by_value(&verse).focus();
+            h.run_ok();
+            h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
+            h.run_ok();
+            assert_eq!(h.state().selected_text.as_ref().unwrap().text, verse);
+            h.key_press(egui::Key::ArrowLeft);
+            h.run_ok();
+            let loved_start = verse[..verse.find("loved").unwrap()].chars().count();
+            for _ in 0..loved_start {
+                h.key_press(egui::Key::ArrowRight);
+            }
+            for _ in 0..5 {
+                h.key_press_modifiers(egui::Modifiers::SHIFT, egui::Key::ArrowRight);
+            }
+            h.run_ok();
+            assert_eq!(h.state().selected_text.as_ref().unwrap().text, "loved");
+            h.get_by_value(&verse).click_secondary();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join("desktop-word-menu.png"))
+                .unwrap();
+            h.get_by_label("Look up original word…").click();
+            h.run_ok();
+            wait(&mut h);
+            assert!(h.state().study_tab == StudyTab::Words);
+            h.render()
+                .unwrap()
+                .save(out.join("desktop-original-words.png"))
+                .unwrap();
+            h.get_by_label("G0025").click();
+            h.run_ok();
+            wait(&mut h);
+            assert!(
+                matches!(&h.state().word, Some(Data::Word { code, definitions, .. }) if code == "G0025" && !definitions.is_empty())
+            );
+            assert_eq!(
+                h.state().state.as_ref().unwrap().session.selected_ref,
+                43003016
+            );
+            assert!(h.query_by_value(&verse).is_some());
+            h.render()
+                .unwrap()
+                .save(out.join("desktop-word-definition.png"))
+                .unwrap();
+            // Synthetic alignment exercises the direct menu branch; the shipped corpus has none.
+            let selected = h
+                .state_mut()
+                .state
+                .as_mut()
+                .unwrap()
+                .passage
+                .iter_mut()
+                .find(|v| v.refs.contains(&43003016))
+                .unwrap();
+            let byte_start = selected.text.find("loved").unwrap();
+            let start = selected.text[..byte_start].chars().count();
+            selected.word_links.push(WordLink {
+                start,
+                end: start + 5,
+                surface: "ηγαπησεν".into(),
+                witness: "synthetic-ui-link".into(),
+                strongs: "G0025".into(),
+                method: "reviewed".into(),
+            });
+            h.run_ok();
+            h.get_by_value(&verse).focus();
+            h.run_ok();
+            h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
+            h.run_ok();
+            h.get_by_value(&verse).click_secondary();
+            h.run_ok();
+            h.get_by_label("Look up Strong’s G0025").click();
+            h.run_ok();
+            wait(&mut h);
+            assert!(matches!(&h.state().word, Some(Data::Word { code, .. }) if code == "G0025"));
+            h.state_mut().dispatch(Command::Select { ref_id: 41001004 });
+            wait(&mut h);
+            assert!(h.state().word.is_none());
+            assert!(h.state().selected_text.is_none());
+            assert!(matches!(
+                &h.state().context,
+                Some(Data::Context {
+                    ref_id: 41001004,
+                    ..
+                })
+            ));
+            h.get_by_label("Commentary").click();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join("desktop-mark-study.png"))
+                .unwrap();
+            h.get_by_label("Cross-references").click();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join("desktop-mark-references.png"))
+                .unwrap();
+            let text = h
+                .state()
+                .state
+                .as_ref()
+                .unwrap()
+                .passage
+                .iter()
+                .find(|v| v.refs.contains(&41001004))
+                .unwrap()
+                .text
+                .clone();
+            h.get_by_value(&text).focus();
+            h.run_ok();
+            h.key_press_modifiers(egui::Modifiers::COMMAND, egui::Key::A);
+            h.run_ok();
+            assert!(h.state().selected_text.is_some());
+            h.state_mut().dispatch(Command::Translation {
+                id: "translation:web".into(),
+            });
+            wait(&mut h);
+            assert!(
+                h.state().selected_text.is_none(),
+                "Translation changes must clear native selection state as well as its view model"
+            );
+            assert_eq!(
+                h.state().state.as_ref().unwrap().session.translation,
+                "translation:web"
+            );
+        }
+        if h.state().state.as_ref().unwrap().has_study {
+            h.get_by_label("Commentary").click();
+            h.run_ok();
+            h.state_mut().dispatch(Command::Resource {
+                id: "resource:matthew-henry:Mark.1.1".into(),
+            });
+            wait(&mut h);
+            let resource = h.state().resource.as_ref().unwrap();
+            assert!(resource.content.contains("Roma à fratribus"));
+            assert!(!resource.content.contains("&#224;"));
+            let paragraphs: Vec<_> = resource
+                .content
+                .lines()
+                .filter(|p| !p.trim().is_empty())
+                .map(str::to_owned)
+                .collect();
+            let first = h.get_by_label(&paragraphs[0]).rect();
+            let second = h.get_by_label(&paragraphs[1]).rect();
+            assert!(
+                second.top() >= first.bottom() + 12.0,
+                "Source paragraphs need visible spacing"
+            );
+            assert!(
+                second.right() <= size[0],
+                "Article prose must wrap inside the viewport"
+            );
+            h.render()
+                .unwrap()
+                .save(out.join(format!("{name}-matthew-henry.png")))
+                .unwrap();
+        }
     }
 }

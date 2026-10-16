@@ -222,7 +222,10 @@ fn context_keeps_typed_links_and_source_analyses() {
     let f = Fixture::new();
     let mut e = f.engine();
     let Data::Context {
-        resources, tokens, ..
+        resources,
+        tokens,
+        cross_references,
+        ..
     } = e
         .dispatch(Command::Context { ref_id: 43003016 })
         .unwrap()
@@ -239,6 +242,13 @@ fn context_keeps_typed_links_and_source_analyses() {
         resources
             .iter()
             .any(|r| r.id == "nave" && r.basis == "citation")
+    );
+    assert_eq!(cross_references.len(), 1);
+    assert_eq!(cross_references[0].start_ref, 45001003);
+    assert_eq!(cross_references[0].label, "Romans 1:3");
+    assert!(
+        cross_references[0].preview.is_none(),
+        "Unavailable verse text must not be inferred"
     );
     assert_eq!(tokens.len(), 2);
     assert!(tokens.iter().all(|t| t.lemma.is_none()));
@@ -409,4 +419,137 @@ fn content_and_user_identity_checks_prevent_wrong_file_writes() {
     drop(db);
     assert!(Engine::open(&path, &user).is_err());
     assert!(!user.exists());
+}
+
+#[test]
+fn word_links_use_explicit_edition_specific_unicode_spans_only() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    db.execute(
+        "UPDATE verse_texts SET text='ἦ God loved.' WHERE id='kjv16'",
+        [],
+    )
+    .unwrap();
+    db.execute("INSERT INTO word_alignments VALUES('reviewed-link','kjv16','token','source',6,11,'reviewed')", []).unwrap();
+    db.execute_batch("INSERT INTO original_tokens VALUES('foreign-token','web-witness','merged','δοκιμή',1,NULL); INSERT INTO token_analyses VALUES('foreign-token',0,NULL,NULL,NULL); INSERT INTO token_strongs VALUES('foreign-token',0,'G0025'); INSERT INTO word_alignments VALUES('bad-canonical-link','kjv16','foreign-token','source',2,5,'source');").unwrap();
+    let mut e = f.engine();
+    let verse = e.workspace().unwrap().passage.remove(0);
+    assert_eq!(
+        verse.word_links.len(),
+        1,
+        "Alternative source analyses must not duplicate the same code"
+    );
+    let link = &verse.word_links[0];
+    assert_eq!(
+        verse
+            .text
+            .chars()
+            .skip(link.start)
+            .take(link.end - link.start)
+            .collect::<String>(),
+        "loved"
+    );
+    assert_eq!(link.strongs, "G0025");
+    assert_eq!(link.method, "reviewed");
+    assert!(
+        e.dispatch(Command::Translation { id: "web".into() })
+            .unwrap()
+            .state
+            .passage
+            .iter()
+            .all(|v| v.word_links.is_empty()),
+        "Shared verse/token data cannot establish an English alignment"
+    );
+    e.dispatch(Command::Translation { id: "kjv".into() })
+        .unwrap();
+    drop(e);
+    db.execute("UPDATE word_alignments SET word_end=200", [])
+        .unwrap();
+    assert!(f.engine().workspace().is_err());
+}
+
+#[test]
+fn cross_reference_previews_use_active_edition_and_preserve_targets() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    db.execute("INSERT INTO resource_links VALUES('known-target','tsk','john16',NULL,NULL,'cross_reference')", []).unwrap();
+    let mut e = f.engine();
+    for (edition, expected) in [
+        ("kjv", "For God so loved the world."),
+        ("web", "For God so loved the world, WEB."),
+    ] {
+        e.dispatch(Command::Translation { id: edition.into() })
+            .unwrap();
+        let Data::Context {
+            cross_references, ..
+        } = e
+            .dispatch(Command::Context { ref_id: 43003016 })
+            .unwrap()
+            .data
+        else {
+            panic!()
+        };
+        assert_eq!(cross_references.len(), 2);
+        let target = cross_references
+            .iter()
+            .find(|r| r.start_ref == 43003016)
+            .unwrap();
+        assert_eq!(target.preview.as_deref(), Some(expected));
+        assert_eq!(target.resource_id, "tsk");
+        assert!(
+            cross_references
+                .iter()
+                .any(|r| r.start_ref == 45001003 && r.preview.is_none())
+        );
+    }
+}
+
+#[test]
+fn legacy_mhc_entity_display_repair_is_source_scoped_and_read_only() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    db.execute_batch("INSERT INTO source_snapshots VALUES('legacy-mhc','matthew-henry','hash','https://example.org',NULL,'review','adapter'); UPDATE resources SET source_snapshot_id='legacy-mhc',content='Mark
+Roma &#224; fratribus.
+I. Concerning this witness.' WHERE id='mh'; UPDATE resources SET content='Literal &#224; &amp; prose.' WHERE id='nave';").unwrap();
+    let mut e = f.engine();
+    let Data::Resource { resource } = e
+        .dispatch(Command::Resource { id: "mh".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(
+        resource.content,
+        "Mark\nRoma à fratribus.\nI. Concerning this witness."
+    );
+    let stored: String = db
+        .query_row("SELECT content FROM resources WHERE id='mh'", [], |r| {
+            r.get(0)
+        })
+        .unwrap();
+    assert!(
+        stored.contains("&#224;"),
+        "Opening an article must preserve the original database bytes"
+    );
+    let Data::Resource { resource } = e
+        .dispatch(Command::Resource { id: "nave".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(resource.content, "Literal &#224; &amp; prose.");
+    db.execute("UPDATE resources SET content='An intentional literal: &#224;', display_json=?1 WHERE id='mh'", [r#"{"text_normalization":"mhc-numeric-v1"}"#]).unwrap();
+    let Data::Resource { resource } = e
+        .dispatch(Command::Resource { id: "mh".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(
+        resource.content, "An intentional literal: &#224;",
+        "New normalized content must not receive a second repair"
+    );
 }

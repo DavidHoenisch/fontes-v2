@@ -13,6 +13,26 @@ Observed locally on 2026-10-15. These are development acceptance checks, not evi
 
 The Mac was locked, so computer-use could not inspect or operate the live desktop window. Rendering evidence comes from the actual egui/wgpu test harness; it is not claimed as a completed manual OS-window test. The real-data render flow was also run on the reading profile at all three sizes. No Android device or configured AVD was available. Android compilation does not verify keyboard, safe-area, lifecycle, accessibility or physical GPU behavior.
 
+## Desktop study correction · 2026-10-16
+
+Local source changes after the published testing release now keep desktop Scripture visible beside a resizable study panel. These observations do not claim that the earlier GitHub binaries include this correction.
+
+- All **56 regular workspace tests** pass. New engine checks exercise explicit edition-specific Unicode word spans, alternative-analysis code deduplication, canonical token compatibility, invalid spans, absence of inferred links in another translation, and active-edition cross-reference previews with missing text left absent. Format checks and targeted engine/UI Clippy checks pass.
+- The real study and reading snapshots were exercised through the egui/wgpu harness at 1440×960, 390×844 and 320×640. Existing picker, note, search and study flows pass. Desktop study additionally selects **loved** in John 3:16 using native text selection, opens its right-click menu, follows the explicit missing-alignment fallback, chooses source Greek G0025 and displays its real definition with Scripture still visible. Selection remains highlighted when study/menu controls own focus.
+- A **synthetic** alignment added only to the test view model exercises the direct **Look up Strong’s G0025** menu branch against the real dictionary command. The real corpus still contains no English alignments. This fixture is not an acquired/reviewed aligned edition and does not satisfy the complete FR4 data requirement.
+- The same flow changes to Mark 1:4, confirms old selection/dictionary context clears, renders narrower-coverage-first commentary and named cross-references with actual verse previews, then switches to WEB and verifies native/view-model text selection is invalidated. Both source readings/alternative analyses remain available through the original-word chooser.
+- Captures are regenerated under `dist/app-captures`, including `desktop-study.png`, `desktop-word-menu.png`, `desktop-original-words.png`, `desktop-word-definition.png`, `desktop-mark-study.png` and `desktop-mark-references.png`. Reading-only captures are under `dist/app-captures-reading`. These are actual wgpu renders, not new manual OS-window or Android-device evidence. The local desktop binary was rebuilt.
+
+The remaining mandatory English selection → exact Strong’s data work is tracked as **O018** in SPEC.md. No data compiler/source lock/schema migration or content release was changed for this UI correction. Mobile retains the initial Study destination; its future contextual sheet and real-device selection/accessibility checks remain open.
+
+## Matthew Henry paragraph and entity correction · 2026-10-16
+
+The locked MHC source record `Mark.1.1` contains real OSIS paragraph milestones and nested numeric encodings (`Roma &amp;#224; fratribus`). The older SQLite retains paragraph newlines but displays the residual `&#224;` literally. The article view now renders separate spaced paragraphs and a readable line height instead of one label for the whole article. Width is bounded to the viewport and 640 px. Each article opens at its beginning.
+
+All **58 regular workspace tests** pass, together with format and targeted Clippy checks. Pipeline regression checks verify decoded MHC text reaches both resource content and search documents while aliases and links survive. A shared-helper test covers Latin/Greek decimal/hex characters, malformed references, one-layer decoding and literal angle brackets. An engine test verifies legacy MHC display repair leaves the stored text unchanged and does not transform another source. Real-study wgpu captures at 1440×960, 390×844 and 320×640 open the actual `Mark.1.1` article, check `Roma à fratribus`, paragraph spacing and viewport wrapping, and save `desktop-matthew-henry.png`, `mobile-matthew-henry.png` and `small-mobile-matthew-henry.png` under `dist/app-captures`.
+
+This remains plain-paragraph display; original inline italics, typed headings and inline scripture links need structured source display metadata. No source prose or paragraph boundaries are inferred from punctuation. Existing release databases are repaired only in view models; no published data assets are rewritten. This local change is not a new GitHub release or a manual native-window/device test.
+
 ## Initial real-study timings
 
 One debug-build stdio smoke run, macOS 27.0.1, MacBookPro18,3, 584,884,224-byte study SQLite, content ID `ec35deccbcbcad0eb0d4b2cc07ef0f92ca4fa4f0e79266fe3ea7363dc43d92c9`. Measured from writing a JSON command to receiving its complete reply, including workspace serialization; startup also includes process/library/user-store initialization. Other compilation/test work was running on the machine.

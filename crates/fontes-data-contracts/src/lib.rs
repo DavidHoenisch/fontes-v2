@@ -1,5 +1,8 @@
 //! Shared build/client contracts. Signature verification and installation are separate layers.
 
+mod text;
+pub use text::decode_numeric_text_entities;
+
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 

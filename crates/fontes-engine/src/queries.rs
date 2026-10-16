@@ -24,7 +24,34 @@ impl Engine {
                     id,
                     refs: vec![reference],
                     text,
+                    word_links: vec![],
                 });
+            }
+        }
+        // Use only explicit alignment records, never a shared Strong's number or word order.
+        let mut links = self.content.prepare("SELECT DISTINCT wa.verse_text_id,wa.word_start,wa.word_end,t.surface,t.witness_id,ts.strongs,wa.alignment_method FROM word_alignments wa JOIN verse_texts v ON v.id=wa.verse_text_id JOIN segment_refs sr ON sr.segment_id=v.segment_id JOIN original_tokens t ON t.id=wa.original_token_id JOIN token_strongs ts ON ts.token_id=t.id WHERE v.translation_id=?1 AND sr.canonical_ref_id BETWEEN ?2 AND ?3 AND EXISTS (SELECT 1 FROM segment_refs tr WHERE tr.segment_id=t.segment_id AND tr.canonical_ref_id=sr.canonical_ref_id) ORDER BY wa.verse_text_id,wa.word_start,wa.word_end,t.witness_id,ts.strongs")?;
+        for row in links.query_map(params![self.session.translation, lower, upper], |r| {
+            Ok((
+                r.get::<_, String>(0)?,
+                WordLink {
+                    start: r.get(1)?,
+                    end: r.get(2)?,
+                    surface: r.get(3)?,
+                    witness: r.get(4)?,
+                    strongs: r.get(5)?,
+                    method: r.get(6)?,
+                },
+            ))
+        })? {
+            let (id, link) = row?;
+            if let Some(i) = indices.get(&id) {
+                let verse = &mut passage[*i];
+                if link.start >= link.end || link.end > verse.text.chars().count() {
+                    return Err(Error::invalid(
+                        "An installed word alignment is outside its verse text.",
+                    ));
+                }
+                verse.word_links.push(link);
             }
         }
         let annotations=self.user.prepare("SELECT a.id,r.start_ref_id,r.end_ref_id,a.type,a.color,a.content,a.updated_at FROM annotations a JOIN reference_ranges r ON r.id=a.range_id ORDER BY a.updated_at DESC,a.id")?.query_map([],|r|Ok(Annotation{id:r.get(0)?,start_ref:r.get(1)?,end_ref:r.get(2)?,kind:if r.get::<_,String>(3)?=="note"{AnnotationKind::Note}else{AnnotationKind::Highlight},color:r.get(4)?,content:r.get(5)?,updated_at:r.get(6)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
@@ -83,16 +110,33 @@ impl Engine {
         })
     }
     pub(crate) fn context(&self, reference: i64) -> Result<Data> {
-        let resources=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,substr(r.content,1,260) FROM resources r JOIN resource_links l ON l.resource_id=r.id JOIN reference_ranges rr ON rr.id=l.range_id WHERE rr.start_ref_id<=?1 AND rr.end_ref_id>=?1 GROUP BY r.id,l.link_type ORDER BY CASE l.link_type WHEN 'applies_to' THEN 0 ELSE 1 END,r.type,r.title,r.id LIMIT 100")?.query_map([reference],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let resources=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,substr(r.content,1,260) FROM resources r JOIN resource_links l ON l.resource_id=r.id JOIN reference_ranges rr ON rr.id=l.range_id WHERE rr.start_ref_id<=?1 AND rr.end_ref_id>=?1 GROUP BY r.id,l.link_type ORDER BY CASE l.link_type WHEN 'applies_to' THEN 0 ELSE 1 END,min(rr.end_ref_id-rr.start_ref_id),r.type,r.title,r.id LIMIT 100")?.query_map([reference],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
         let tokens=self.content.prepare("SELECT t.witness_id,t.position,t.surface,a.analysis_index,l.lemma,a.morph_system,a.morph_code,ts.strongs FROM original_tokens t JOIN segment_refs sr ON sr.segment_id=t.segment_id JOIN token_analyses a ON a.token_id=t.id LEFT JOIN lemmas l ON l.id=a.lemma_id LEFT JOIN token_strongs ts ON ts.token_id=a.token_id AND ts.analysis_index=a.analysis_index WHERE sr.canonical_ref_id=?1 ORDER BY t.witness_id,t.position,a.analysis_index,ts.strongs LIMIT 2000")?.query_map([reference],|r|Ok(TokenAnalysis{witness:r.get(0)?,position:r.get(1)?,surface:r.get(2)?,analysis_index:r.get(3)?,lemma:r.get(4)?,morph_system:r.get(5)?,morph_code:r.get(6)?,strongs:r.get(7)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let cross_references = self.content.prepare("SELECT target_range.start_ref_id,target_range.end_ref_id,min(target.resource_id),(SELECT text FROM verses_by_reference v WHERE v.canonical_ref_id=target_range.start_ref_id AND v.translation_id=?2 ORDER BY v.id LIMIT 1) FROM resource_links origin JOIN reference_ranges coverage ON coverage.id=origin.range_id JOIN resources r ON r.id=origin.resource_id JOIN resource_links target ON target.resource_id=r.id JOIN reference_ranges target_range ON target_range.id=target.range_id WHERE r.type='cross_reference' AND origin.link_type='applies_to' AND coverage.start_ref_id<=?1 AND coverage.end_ref_id>=?1 AND target.link_type='cross_reference' GROUP BY target_range.start_ref_id,target_range.end_ref_id ORDER BY min(coverage.end_ref_id-coverage.start_ref_id),target_range.start_ref_id,target_range.end_ref_id LIMIT 100")?.query_map(params![reference, self.session.translation], |r| {
+            let start_ref = r.get(0)?;
+            let end_ref = r.get(1)?;
+            let title = if start_ref == end_ref { label(&self.books, start_ref) } else { format!("{} – {}", label(&self.books, start_ref), label(&self.books, end_ref)) };
+            Ok(CrossReference { start_ref, end_ref, label: title, resource_id: r.get(2)?, preview: r.get(3)? })
+        })?.collect::<std::result::Result<Vec<_>, _>>()?;
         Ok(Data::Context {
             ref_id: reference,
             resources,
             tokens,
+            cross_references,
         })
     }
     pub(crate) fn resource(&self, id: &str) -> Result<ResourceDetail> {
-        let mut resource=self.content.query_row("SELECT r.id,r.title,r.author,r.content,s.source_id,s.rights_review_id FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id WHERE r.id=?1",[id],|r|Ok(ResourceDetail{id:r.get(0)?,title:r.get(1)?,author:r.get(2)?,content:r.get(3)?,source:r.get(4)?,rights_review:r.get(5)?,links:vec![]})).optional()?.ok_or_else(||Error::missing("This resource is not installed."))?;
+        let (mut resource, display)=self.content.query_row("SELECT r.id,r.title,r.author,r.content,s.source_id,s.rights_review_id,r.display_json FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id WHERE r.id=?1",[id],|r|Ok((ResourceDetail{id:r.get(0)?,title:r.get(1)?,author:r.get(2)?,content:r.get(3)?,source:r.get(4)?,rights_review:r.get(5)?,links:vec![]},r.get::<_,Option<String>>(6)?))).optional()?.ok_or_else(||Error::missing("This resource is not installed."))?;
+        // Compatibility display repair for previously compiled MHC snapshots;
+        // the read-only database and its signed bytes are never rewritten.
+        let normalized = display
+            .as_deref()
+            .and_then(|s| serde_json::from_str::<serde_json::Value>(s).ok())
+            .is_some_and(|v| v["text_normalization"] == "mhc-numeric-v1");
+        if resource.source == "matthew-henry" && !normalized {
+            resource.content =
+                fontes_data_contracts::decode_numeric_text_entities(&resource.content);
+        }
         resource.links=self.content.prepare("SELECT rr.start_ref_id,rr.end_ref_id,l.strongs,l.link_type FROM resource_links l LEFT JOIN reference_ranges rr ON rr.id=l.range_id WHERE l.resource_id=?1 ORDER BY l.link_type,rr.start_ref_id,l.strongs LIMIT 500")?.query_map([id],|r|Ok(ResourceLink{start_ref:r.get(0)?,end_ref:r.get(1)?,strongs:r.get(2)?,basis:r.get(3)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
         Ok(resource)
     }

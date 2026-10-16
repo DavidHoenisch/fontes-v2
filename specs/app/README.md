@@ -10,13 +10,17 @@ Initial implemented contract, separate from snapshot update-protocol v1 and draf
 | `reading.chapter` | `delta: -1 or 1`; chapter movement across books; refuse movement beyond canon |
 | `reading.translation` | installed translation `id`; retain canonical selection/annotations |
 | `search.query` | `query`, optional `limit` (default 30, 1–100), `offset` (default 0, 0–10000); literal AND terms |
-| `study.context` | `ref_id`; up to 100 typed article matches and 2,000 source analysis/Strong's rows |
+| `study.context` | `ref_id`; up to 100 typed article matches, 2,000 source analysis/Strong's rows and 100 distinct cross-reference ranges |
 | `study.resource` | article `id`; full plain text, source/rights-review and up to 500 typed links |
 | `study.word` | `code`, e.g. G25/G0025 or H7225; definitions and first 100 distinct canonical occurrence locations, total count |
 | `annotation.save` | optional existing `id`, `start_ref`, `end_ref`, `kind` (`note`/`highlight`), optional `color`, `content`; UUID on create, inclusive range |
 | `annotation.delete` | existing annotation `id`; durable local deletion |
 | `reference.favorite` | `ref_id`, `enabled: boolean`; idempotently add/remove favorite |
 | `preferences.set` | complete `preferences` object: `text_size`, `line_spacing`, `verse_numbers`, `scripture_serif` |
+
+Workspace `passage` entries now include additive `word_links` (default empty when reading older serialized models). Each link has `start`/`end` Unicode scalar offsets against that entry’s exact `text`, `surface`, `witness`, `strongs` and source/reviewed `method`. Codes come only from explicit existing alignment records, with canonical source-token compatibility and valid spans; they are not inferred. SQL/schema and command IDs are unchanged. The current released KJV/WEB corpus supplies no English links. UI lookup/panel support is not evidence of a completed aligned corpus.
+
+Context additionally includes `cross_references` (default empty in older serialized models), each with `start_ref`, `end_ref`, display `label`, optional active-edition first-verse `preview` and `resource_id`. These are explicit target links from directly applicable cross-reference articles; missing text remains null. More specific source coverage sorts first. Existing article/token fields, command IDs and SQL contracts are retained.
 
 Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Colors are `amber`, `sage`, `blue`, `rose`. Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
 

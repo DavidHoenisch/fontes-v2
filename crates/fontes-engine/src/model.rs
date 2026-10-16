@@ -24,6 +24,19 @@ pub struct Verse {
     /// All canonical anchors for this source segment, in display order.
     pub refs: Vec<i64>,
     pub text: String,
+    /// Source-provided/reviewed links against this exact edition's Unicode scalar offsets.
+    #[serde(default)]
+    pub word_links: Vec<WordLink>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct WordLink {
+    pub start: usize,
+    pub end: usize,
+    pub surface: String,
+    pub witness: String,
+    pub strongs: String,
+    pub method: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, PartialEq)]
@@ -164,6 +177,16 @@ pub struct TokenAnalysis {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct CrossReference {
+    pub start_ref: i64,
+    pub end_ref: i64,
+    pub label: String,
+    /// Text at the range's first anchor, from the active reading edition.
+    pub preview: Option<String>,
+    pub resource_id: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Data {
     Workspace,
@@ -176,6 +199,8 @@ pub enum Data {
         ref_id: i64,
         resources: Vec<ResourceSummary>,
         tokens: Vec<TokenAnalysis>,
+        #[serde(default)]
+        cross_references: Vec<CrossReference>,
     },
     Resource {
         resource: ResourceDetail,

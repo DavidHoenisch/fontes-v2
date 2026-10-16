@@ -118,6 +118,8 @@ pub fn nav(ui: &mut egui::Ui, role: &str, text: &str, selected: bool, size: egui
             icon(role, 20.0, selected),
             RichText::new(text).color(if selected { accent() } else { muted() }),
         )
+        // Reserve remaining width after the icon/label so sidebar rows align left.
+        .right_text(())
         .fill(if selected {
             tint()
         } else {

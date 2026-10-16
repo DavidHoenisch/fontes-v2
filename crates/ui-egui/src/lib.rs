@@ -2,7 +2,10 @@
 #[cfg(test)]
 mod tests;
 
+mod study;
 mod theme;
+
+use study::{SelectedText, StudyTab};
 
 use eframe::egui::{self, RichText};
 
@@ -53,6 +56,11 @@ pub struct FontesApp {
     search_more: bool,
     context: Option<Data>,
     resource: Option<ResourceDetail>,
+    study_tab: StudyTab,
+    include_mentions: bool,
+    witness: String,
+    selected_text: Option<SelectedText>,
+    selection_generation: u64,
     word_code: String,
     word: Option<Data>,
     note: Option<NoteDraft>,
@@ -108,6 +116,11 @@ impl FontesApp {
             search_more: false,
             context: None,
             resource: None,
+            study_tab: StudyTab::Commentary,
+            include_mentions: false,
+            witness: String::new(),
+            selected_text: None,
+            selection_generation: 0,
             word_code: String::new(),
             word: None,
             note: None,
@@ -187,6 +200,10 @@ impl FontesApp {
                         s.session.translation != response.state.session.translation
                     });
 
+                    if content_changed || translation_changed {
+                        self.selection_generation = self.selection_generation.wrapping_add(1);
+                        self.selected_text = None;
+                    }
                     if translation_changed {
                         self.scroll_to = Some(response.state.session.selected_ref);
                         self.hits.clear();
@@ -201,12 +218,28 @@ impl FontesApp {
                         }
                     }
                     if changed {
+                        self.word = None;
+                        if self
+                            .selected_text
+                            .as_ref()
+                            .is_some_and(|t| t.ref_id != response.state.session.selected_ref)
+                        {
+                            self.selected_text = None;
+                        }
                         self.scroll_to = Some(response.state.session.selected_ref);
 
                         self.context = None;
 
                         self.resource = None;
 
+                        if self.destination == Destination::Study {
+                            self.dispatch(Command::Context {
+                                ref_id: response.state.session.selected_ref,
+                            });
+                        }
+                    }
+                    if translation_changed && !changed {
+                        self.context = None;
                         if self.destination == Destination::Study {
                             self.dispatch(Command::Context {
                                 ref_id: response.state.session.selected_ref,
@@ -225,8 +258,6 @@ impl FontesApp {
                                 self.context = Some(d);
 
                                 self.resource = None;
-
-                                self.word = None;
                             }
                         }
                         d @ Data::Word { .. } => {
@@ -265,6 +296,11 @@ impl FontesApp {
         }
     }
     fn choose(&mut self, d: Destination) {
+        if (d == Destination::Study || self.destination == Destination::Study)
+            && let Some(s) = &self.state
+        {
+            self.scroll_to = Some(s.session.selected_ref);
+        }
         self.destination = d;
 
         if d == Destination::Study
@@ -278,7 +314,9 @@ impl FontesApp {
     fn select(&mut self, id: i64) {
         self.dispatch(Command::Select { ref_id: id });
 
-        self.destination = Destination::Read;
+        if self.destination != Destination::Study {
+            self.destination = Destination::Read;
+        }
 
         self.picker = false;
     }
@@ -370,6 +408,7 @@ impl FontesApp {
                         Destination::Read => self.reader(ui, mobile),
                         Destination::Search => self.search_ui(ui),
                         Destination::Notes => self.notes_ui(ui),
+                        Destination::Study if !mobile => self.reader(ui, false),
                         Destination::Study => self.study_ui(ui),
                         Destination::Preferences => self.preferences(ui),
                     }
@@ -445,7 +484,7 @@ caption(ui,"No library yet? Build the reading profile with fontes-data, or verif
                 if ui
                     .add_sized(
                         [ui.available_width(), 36.0],
-                        egui::Button::new(&r.label).frame(false),
+                        egui::Button::new(&r.label).right_text(()).frame(false),
                     )
                     .clicked()
                 {
@@ -536,30 +575,43 @@ caption(ui,"No library yet? Build the reading profile with fontes-data, or verif
     fn reader(&mut self, ui: &mut egui::Ui, mobile: bool) {
         let s = self.state.clone().expect("loaded");
 
-        if !mobile && ui.available_width() > 1050.0 {
-            egui::Panel::right("context-panel").exact_size(360.0).resizable(false).frame(egui::Frame::new().fill(theme::color(assets::COLOR_SURFACE)).inner_margin(24)).show(ui,|ui|{
-                caption(ui,"ALONGSIDE YOUR READING");
-ui.add_space(12.0);
-ui.heading(s.reference_label());
-ui.add_space(16.0);
-
-                ui.label("Follow the passage into your notes, dictionaries and linked resources.");
-ui.add_space(16.0);
-
-                if primary(ui,"Study this verse"){self.choose(Destination::Study);
-}
-                if ui.add_sized([ui.available_width(),48.0],egui::Button::image_and_text(icon("notes",20.0,false),"Add a note")).clicked(){self.new_note(s.session.selected_ref);
-}
-                ui.add_space(24.0);
-caption(ui,"YOUR NOTES HERE");
-
-                for note in s.annotations.iter().filter(|a|a.kind==AnnotationKind::Note && a.start_ref<=s.session.selected_ref && a.end_ref>=s.session.selected_ref){ui.label(note.content.as_deref().unwrap_or(""));
-ui.add_space(12.0);
-}
-                ui.add_space(24.0);
-caption(ui,if s.has_study{"Study resources are installed."}else{"Open a study profile for Strong’s, Greek morphology, Matthew Henry, Nave’s and TSK."});
-
-            });
+        if !mobile && self.destination == Destination::Study {
+            let panel_width = (ui.available_width() * 0.42).clamp(260.0, 420.0);
+            egui::Panel::right("study-panel")
+                .default_size(panel_width)
+                .min_size(240.0)
+                .max_size((ui.available_width() - 240.0).max(240.0))
+                .resizable(true)
+                .frame(
+                    egui::Frame::new()
+                        .fill(theme::color(assets::COLOR_SURFACE))
+                        .inner_margin(0),
+                )
+                .show(ui, |ui| self.study_ui(ui));
+        } else if !mobile && ui.available_width() > 1050.0 {
+            egui::Panel::right("context-panel")
+                .exact_size(320.0)
+                .resizable(false)
+                .frame(egui::Frame::new().fill(theme::color(assets::COLOR_SURFACE)).inner_margin(24))
+                .show(ui, |ui| {
+                    caption(ui, "ALONGSIDE YOUR READING");
+                    ui.add_space(12.0);
+                    ui.heading(s.reference_label());
+                    ui.add_space(16.0);
+                    ui.label("Select a word and right-click to study it, or explore this verse’s resources.");
+                    ui.add_space(16.0);
+                    if primary(ui, "Study this verse") {
+                        self.open_study(s.session.selected_ref, StudyTab::Commentary);
+                    }
+                    if ui.add_sized([ui.available_width(), 48.0], egui::Button::image_and_text(icon("notes", 20.0, false), "Add a note")).clicked() {
+                        self.new_note(s.session.selected_ref);
+                    }
+                    ui.add_space(24.0);
+                    for note in s.annotations.iter().filter(|a| a.kind == AnnotationKind::Note && a.start_ref <= s.session.selected_ref && a.end_ref >= s.session.selected_ref) {
+                        ui.label(note.content.as_deref().unwrap_or(""));
+                        ui.add_space(12.0);
+                    }
+                });
         }
         egui::ScrollArea::vertical().id_salt("passage-scroll").show(ui,|ui|{
             let width=ui.available_width().min(if mobile{600.0}else{720.0});
@@ -600,25 +652,7 @@ caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.n
 
                             job.append(text,0.0,egui::TextFormat{font_id:egui::FontId::new(s.session.preferences.text_size,if s.session.preferences.scripture_serif{egui::FontFamily::Name("scripture".into())}else{egui::FontFamily::Proportional}),color:theme::color(assets::COLOR_INK),line_height:Some(s.session.preferences.text_size*s.session.preferences.line_spacing),..Default::default()});
 
-                            let response=ui.add(egui::Label::new(job).wrap().sense(egui::Sense::click()));
-
-                            if response.clicked(){self.dispatch(Command::Select{ref_id:verse.refs[0]});
-}
-                            response.context_menu(|ui|{
-                                if ui.button("Study this verse").clicked(){self.dispatch(Command::Select{ref_id:verse.refs[0]});
-self.choose(Destination::Study);
-ui.close();
-}
-                                if ui.button("Add note").clicked(){self.new_note(verse.refs[0]);
-ui.close();
-}
-                                if ui.button("Highlight · amber").clicked(){self.dispatch(Command::SaveAnnotation{id:None,start_ref:verse.refs[0],end_ref:*verse.refs.last().unwrap(),kind:AnnotationKind::Highlight,color:Some("amber".into()),content:None});
-ui.close();
-}
-                                if ui.button("Copy verse").clicked(){ui.ctx().copy_text(format!("{} — {}",verse.text,label(&s.books,verse.refs[0])));
-ui.close();
-}
-                            });
+                            self.verse_text(ui, verse, job, mobile);
 
                         });
 
@@ -994,91 +1028,6 @@ ui.separator();
             }
         });
 });
-    }
-    fn study_ui(&mut self, ui: &mut egui::Ui) {
-        let s = self.state.clone().unwrap();
-
-        egui::ScrollArea::vertical().show(ui,|ui|{egui::Frame::new().inner_margin(24).show(ui,|ui|{
-            ui.heading("Alongside the passage");
-caption(ui,s.reference_label());
-ui.add_space(16.0);
-
-            ui.horizontal(|ui|{ui.add(egui::TextEdit::singleline(&mut self.word_code).hint_text("Strong’s code, e.g. G25").desired_width(160.0));
-if ui.button("Look up").clicked(){self.dispatch(Command::Word{code:self.word_code.clone()});
-}});
-
-            if !s.has_study{ui.add_space(24.0);
-ui.label("This reading library contains Scripture. Open a compiled study profile for dictionaries, Greek morphology, Matthew Henry, Nave’s and TSK.");
-}
-            if let Some(r)=self.resource.clone(){
-                ui.add_space(24.0);
-ui.heading(&r.title);
-caption(ui,format!("{} · {} · {}",r.author.as_deref().unwrap_or("Source edition"),r.source,r.rights_review));
-
-                ui.add_space(12.0);
-ui.label(r.content);
-
-                caption(ui,"LINKED REFERENCES · UP TO 500");
-
-                for link in r.links{if let Some(id)=link.start_ref&& ui.add_sized([ui.available_width(),44.0],egui::Button::new(format!("{} · {}",label(&s.books,id),link.basis))).clicked(){self.select(id);
-}}
-                if ui.button("Back to verse resources").clicked(){self.resource=None;
-}
-            }else if let Some(Data::Word{code,definitions,occurrences,total})=self.word.clone(){
-                ui.add_space(24.0);
-ui.heading(code);
-for d in definitions{self.resource_card(ui,&d);
-}
-                caption(ui,format!("{total} matches in installed token data · showing up to 100 · canonical verses deduplicated"));
-
-                for r in occurrences{if ui.add_sized([ui.available_width(),44.0],egui::Button::new(r.label)).clicked(){self.select(r.ref_id);
-}}
-                if ui.button("Back to verse resources").clicked(){self.word=None;
-}
-            }else if let Some(Data::Context{resources,tokens,..})=self.context.clone(){
-                ui.add_space(16.0);
-caption(ui,format!("LINKED RESOURCES · {} RESULTS · MAXIMUM 100",resources.len()));
-
-                for r in resources{self.resource_card(ui,&r);
-}
-                ui.add_space(24.0);
-caption(ui,"ORIGINAL GREEK · SOURCE ANALYSES");
-
-                caption(ui,"These are verse-level source tokens, not aligned English words. Missing lemmas and glosses are not inferred.");
-
-                for t in tokens{ui.horizontal_wrapped(|ui|{ui.label(scripture(&t.surface,22.0,true));
-if let Some(code)=&t.strongs&& ui.add_sized([70.0,44.0],egui::Button::new(code)).clicked(){self.dispatch(Command::Word{code:code.clone()});
-}});
-caption(ui,format!("{} · position {} · analysis {} · {} {} · lemma: {}",t.witness,t.position,t.analysis_index,t.morph_system.as_deref().unwrap_or(""),t.morph_code.as_deref().unwrap_or("not supplied"),t.lemma.as_deref().unwrap_or("not supplied")));
-ui.separator();
-}
-            }
-            ui.add_space(24.0);
-caption(ui,"Reviewed book overviews, genealogies, the add-on catalog and local AI are planned; their datasets/services are not available in this app yet.");
-
-        });
-});
-    }
-    fn resource_card(&mut self, ui: &mut egui::Ui, r: &ResourceSummary) {
-        ui.add_space(16.0);
-
-        caption(ui, format!("{} · {}", r.kind, r.basis));
-
-        if ui
-            .add_sized(
-                [ui.available_width(), 44.0],
-                egui::Button::new(RichText::new(&r.title).color(accent())).wrap(),
-            )
-            .clicked()
-        {
-            self.dispatch(Command::Resource { id: r.id.clone() });
-        }
-        if let Some(author) = &r.author {
-            caption(ui, author);
-        }
-        ui.label(&r.excerpt);
-
-        ui.separator();
     }
     fn preferences(&mut self, ui: &mut egui::Ui) {
         let s = self.state.clone().unwrap();

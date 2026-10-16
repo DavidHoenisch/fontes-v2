@@ -843,6 +843,13 @@ fn import_sword_records(
         report.source_records += 1;
         let plain = plain_markup(&entry.raw)
             .with_context(|| format!("plain text {source}:{}", entry.key))?;
+        // MHC's locked OSIS contains numeric references escaped a second time
+        // (e.g. &amp;#224;). Decode that documented layer after stripping markup.
+        let plain = if source == "matthew-henry" {
+            fontes_data_contracts::decode_numeric_text_entities(&plain)
+        } else {
+            plain
+        };
         let id = if let Some(first) = entry.same_as {
             report.linked_aliases += 1;
             aliases
@@ -908,6 +915,10 @@ fn import_sword_records(
             } else {
                 &entry.key
             };
+            let mut display = serde_json::json!({"type":"study_article","format":"plain_paragraphs","source_key":entry.key,"citations":entry.citations.iter().map(|c|serde_json::json!({"source":c.source,"kind":c.kind})).collect::<Vec<_>>(),"unmapped_citations":unresolved,"see_also":see_also,"raw_sha256":digest(entry.raw.as_bytes())});
+            if source == "matthew-henry" {
+                display["text_normalization"] = "mhc-numeric-v1".into();
+            }
             let id = resource(
                 tx,
                 snapshot,
@@ -917,7 +928,7 @@ fn import_sword_records(
                 &format!("{module}: {key}"),
                 author,
                 &plain,
-                serde_json::json!({"type":"study_article","format":"plain_paragraphs","source_key":entry.key,"citations":entry.citations.iter().map(|c|serde_json::json!({"source":c.source,"kind":c.kind})).collect::<Vec<_>>(),"unmapped_citations":unresolved,"see_also":see_also,"raw_sha256":digest(entry.raw.as_bytes())}),
+                display,
             )?;
             for (a, b) in accepted {
                 link(
@@ -1157,9 +1168,9 @@ mod tests {
     }
     #[test]
     fn commentary_aliases_keep_all_verses_and_preverse_prose() {
-        let raw = r#"<div type="x-milestone" subType="x-preverse" sID="pv1"/><title>Preface</title><div sID="p1" type="x-p"/>God &amp; love. <reference osisRef="John.3.18">John 3:18</reference><div eID="p1" type="x-p"/><div eID="pv1"/>"#;
+        let raw = r#"<div type="x-milestone" subType="x-preverse" sID="pv1"/><title>Preface</title><div sID="p1" type="x-p"/>God &amp; love. Roma &amp;#224;. <reference osisRef="John.3.18">John 3:18</reference><div eID="p1" type="x-p"/><div eID="pv1"/>"#;
         let plain = plain_markup(raw).unwrap();
-        assert_eq!(plain, "Preface\nGod & love. John 3:18");
+        assert_eq!(plain, "Preface\nGod & love. Roma &#224;. John 3:18");
         assert_eq!(
             plain_markup("<p>&lt;b&gt; &amp; &#x3b1; &#945;</p>").unwrap(),
             "<b> & α α"
@@ -1194,6 +1205,14 @@ mod tests {
             "Matthew Henry",
         )
         .unwrap();
+        let imported: String = tx
+            .query_row("SELECT content FROM resources", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(imported, "Preface\nGod & love. Roma à. John 3:18");
+        let indexed: String = tx
+            .query_row("SELECT text FROM search_documents", [], |r| r.get(0))
+            .unwrap();
+        assert!(indexed.contains("Roma à."));
         assert_eq!(report.resources, 1);
         assert_eq!(report.linked_aliases, 1);
         assert!(report.unmapped_citations.is_empty());
