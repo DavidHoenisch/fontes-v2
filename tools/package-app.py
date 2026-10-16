@@ -82,9 +82,6 @@ def main():
                 "CFBundleExecutable": "fontes", "CFBundlePackageType": "APPL", "CFBundleShortVersionString": "0.1.0",
                 "CFBundleVersion": "0.1.0", "NSHighResolutionCapable": True, "LSMinimumSystemVersion": "15.0",
             }))
-            # Signing the complete bundle repairs metadata after bundling the linked executable.
-            subprocess.run(["codesign", "--force", "--sign", "-", str(contents.parent)], check=True)
-            subprocess.run(["codesign", "--verify", "--deep", "--strict", str(contents.parent)], check=True)
             notices = contents / "Resources"
         else:
             shutil.copy2(binaries["fontes"], staging / ("fontes" + suffix))
@@ -94,6 +91,10 @@ def main():
         shutil.copytree(ROOT / "assets/ui/licenses", notices / "ui-licenses")
         shutil.copy2(ROOT / "Cargo.lock", notices / "Cargo.lock")
         shutil.copy2(ROOT / "docs/app/testing-builds.md", staging / "README.md")
+        if args.platform.startswith("macos"):
+            # Seal the complete bundle only after its Resources have been staged.
+            subprocess.run(["codesign", "--force", "--sign", "-", str(contents.parent)], check=True)
+            subprocess.run(["codesign", "--verify", "--deep", "--strict", str(contents.parent)], check=True)
         manifest["target"] = expected
         manifest["files"] = [{"path": str(p.relative_to(staging)).replace("\\", "/"), "bytes": p.stat().st_size, "sha256": sha(p)}
                              for p in sorted(staging.rglob("*")) if p.is_file()]
@@ -109,6 +110,11 @@ def main():
             with zipfile.ZipFile(target) as archive:
                 if archive.testzip() is not None:
                     raise SystemExit("Archive CRC validation failed")
+            if args.platform.startswith("macos"):
+                # Use the OS archive extractor to verify real permission/signature preservation.
+                extracted = Path(temporary) / "extracted"
+                subprocess.run(["ditto", "-x", "-k", str(target.resolve()), str(extracted)], check=True)
+                subprocess.run(["codesign", "--verify", "--deep", "--strict", str(extracted / name / "Fontes.app")], check=True)
         else:
             with tarfile.open(target, "w:gz") as archive:
                 archive.add(staging, arcname=name)

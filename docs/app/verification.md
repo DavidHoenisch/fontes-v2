@@ -36,3 +36,5 @@ Validate Windows/Linux behavior on actual runners; test keyboard/focus, screen r
 ## Cross-platform Actions follow-up
 
 The first pushed application run (`38863847754`, commit `31ee150`) caught Windows checkout CRLF conversion changing hashed UI assets. A repository `.gitattributes` policy preserves LF for text and automatic binary detection so every target sees the committed source/manifest bytes. This also stabilizes command-catalog comparisons and package manifests. Subsequent run results are recorded below once verified.
+
+Run `38863947932` verified the Windows asset fix and caught Android offline metadata resolving host crates outside a target-only fetch. CI now fetches the complete locked graph and sets both NDK environment variables to r28. The local archive round trip also caught resources staged after macOS signing; packaging now signs last and verifies the extracted bundle using ditto/codesign.

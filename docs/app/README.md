@@ -63,16 +63,16 @@ CLI, JSON and MCP use the same typed command dispatch as the UI. JSON and MCP ar
 
 The native arm64 library and debug APK have been built locally. Hardware/emulator execution, soft keyboard/IME, lifecycle recovery, safe areas, screen-reader support and Android storage import still require device validation. iOS is deferred. This first APK requires development sideloading of a local library; it has no first-run network installer or Storage Access Framework picker.
 
-Install Android SDK platform **35**, build-tools **35.0.0** (36.0.0 also used successfully locally), NDK **28.2.13676358**, a JDK, and the Rust target. Set `ANDROID_HOME`, `ANDROID_NDK_HOME`, and `JAVA_HOME` to the actual installations. NDK r28's `cargo-apk` platform discovery supports up to API 35; having only SDK platforms 36/37 produces the misleading “SDK has no platforms installed” error. The app has min API 28 and target API 35.
+Install Android SDK platform **35**, build-tools **35.0.0** (36.0.0 also used successfully locally), NDK **28.2.13676358**, a JDK, and the Rust target. Set `ANDROID_HOME`, `ANDROID_NDK_HOME`, `ANDROID_NDK_ROOT`, and `JAVA_HOME` to the actual installations. Both NDK variables must name the pinned NDK: cargo-apk gives an existing `ANDROID_NDK_ROOT` precedence. NDK r28's `cargo-apk` platform discovery supports up to API 35; having only SDK platforms 36/37 produces the misleading “SDK has no platforms installed” error. The app has min API 28 and target API 35.
 
 ```sh
 rustup target add aarch64-linux-android
 cargo install cargo-apk --version 0.10.0 --locked
-cargo fetch --locked --target aarch64-linux-android
+cargo fetch --locked
 CARGO_NET_OFFLINE=true cargo apk build -p fontes-android --lib
 ```
 
-`cargo-apk` 0.10.0 does not accept `--locked`. Fetch with the locked Cargo graph first, package offline, and verify Cargo.lock has not changed (CI checks its digest). The APK is `target/debug/apk/fontes-android.apk`, signed with the local Android **debug** key and with native debug symbols stripped from the package. This is not a production signing/release process.
+`cargo-apk` 0.10.0 does not accept `--locked`. Fetch the full locked workspace graph first (cargo-apk also resolves host/workspace metadata), package offline, and verify Cargo.lock has not changed (CI checks its digest). The APK is `target/debug/apk/fontes-android.apk`, signed with the local Android **debug** key and with native debug symbols stripped from the package. This is not a production signing/release process.
 
 The following device setup recipe is provided for development; it has not been executed here because no device/AVD was available:
 
