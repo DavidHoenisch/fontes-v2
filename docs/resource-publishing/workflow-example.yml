@@ -1,4 +1,4 @@
-# Documentation template: replace PINNED_TOOLING_COMMIT with a reviewed 40-hex SHA.
+# Portable caller pinned to the reviewed source-publishing tooling revision.
 name: Private resource source releases
 on:
   push:
@@ -9,10 +9,10 @@ permissions:
   contents: read
 jobs:
   build:
-    uses: DavidHoenisch/fontes-v2/.github/workflows/resource-pipeline.yml@PINNED_TOOLING_COMMIT
+    uses: DavidHoenisch/fontes-v2/.github/workflows/resource-pipeline.yml@884b90baa0280afa7a8159c1c9ee7b180eb35239
     with:
       tooling_repository: DavidHoenisch/fontes-v2
-      tooling_ref: PINNED_TOOLING_COMMIT
+      tooling_ref: 884b90baa0280afa7a8159c1c9ee7b180eb35239
       policy_repository: ${{ github.repository }}
       policy_ref: ${{ github.sha }}
       source_ref: ${{ github.sha }}
@@ -22,7 +22,7 @@ jobs:
     if: needs.build.outputs.ready_count != '0'
     permissions:
       contents: write
-    uses: DavidHoenisch/fontes-v2/.github/workflows/resource-publish.yml@PINNED_TOOLING_COMMIT
+    uses: DavidHoenisch/fontes-v2/.github/workflows/resource-publish.yml@884b90baa0280afa7a8159c1c9ee7b180eb35239
     with:
       policy_repository: ${{ github.repository }}
       policy_ref: ${{ needs.build.outputs.policy_sha }}
