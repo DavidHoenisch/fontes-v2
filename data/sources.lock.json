@@ -78,6 +78,17 @@
       "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=TSK",
       "adapter": "sword-commentary-v1",
       "upstream_revision": null
+    },
+    {
+      "source_id": "robinson-tr",
+      "url": "https://codeload.github.com/byztxt/greektext-textus-receptus/zip/7fd4d02c3e5adebd379ebfbc824040820dde10fc",
+      "sha256": "d34f55b55f93934b2c738f85ee1242edc90119002ff40f92df7bc27160b0a516",
+      "bytes": 747335,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-15-robinson-tr-full",
+      "rights_evidence_url": "https://github.com/byztxt/greektext-textus-receptus/blob/7fd4d02c3e5adebd379ebfbc824040820dde10fc/README.md",
+      "adapter": "robinson-utr-v1",
+      "upstream_revision": "7fd4d02c3e5adebd379ebfbc824040820dde10fc"
     }
   ]
 }

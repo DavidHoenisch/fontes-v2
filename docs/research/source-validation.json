@@ -324,6 +324,46 @@
       "sha256": "9c1b7cab88cdb79830a29e27f6a68b21c1c42a30ce740d07086440768ccfd29d",
       "url": "https://www.tanach.us/Books/Genesis.xml",
       "content_type": "text/xml"
+    },
+    {
+      "resource_id": "robinson-tr",
+      "downloaded_bytes": 747335,
+      "sha256": "d34f55b55f93934b2c738f85ee1242edc90119002ff40f92df7bc27160b0a516",
+      "source_download_url": "https://codeload.github.com/byztxt/greektext-textus-receptus/zip/7fd4d02c3e5adebd379ebfbc824040820dde10fc",
+      "archive_files": [
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/1CO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/1JO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/1PE.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/1TH.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/1TI.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/2CO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/2JO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/2PE.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/2TH.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/2TI.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/3JO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/AC.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/COL.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/EPH.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/GA.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/HEB.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/JAS.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/JOH.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/JUDE.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/LU.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/MR.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/MT.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/PHM.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/PHP.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/RE.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/RO.UTR",
+        "greektext-textus-receptus-7fd4d02c3e5adebd379ebfbc824040820dde10fc/parsed/TIT.UTR"
+      ],
+      "canonical_validation": {
+        "book_count": 27,
+        "verse_count": 7957,
+        "alternate_numbering_annotations": 22
+      }
     }
   ]
 }

@@ -4,7 +4,7 @@ Use a Rust compiler running in GitHub Actions to turn locked source files into v
 
 This preserves the reference-centric model in Specification v0.1 while making source refreshes, reproducible builds, app compatibility, and interrupted updates explicit. The initial transport is a complete snapshot for a selected content profile. Source imports are modular inside the build; clients do not need to merge resource databases or apply SQL patches.
 
-The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, seven locked inputs, and shared contracts. The reading workflow compiles KJV and WEB twice and verifies reproducibility before publication. Study adapters, scheduled source discovery, and client installation remain implementation work.
+The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, eight locked inputs, and shared contracts. The workflow compiles both reading and study twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, Matthew Henry, Nave’s, and TSK. Scheduled source discovery and client installation remain implementation work.
 
 ## End to end flow
 
@@ -31,15 +31,15 @@ Upstream discovery and release compilation are different operations. Discovery m
 | Component | Responsibility | Status |
 | --- | --- | --- |
 | `data/canonical/registry-v1.json` | Permanent book IDs and complete initial verse anchor catalog | Added and checked |
-| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Seven inspected inputs added |
+| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Eight inspected inputs added |
 | `data/profiles.json` | Required source membership and advertised capabilities | Reading and study profiles defined |
 | `data/schema/` | Immutable content and separate mutable user schemas | Added and exercised in SQLite |
 | `crates/fontes-data-contracts` | Shared identities, manifest types, structural checks, embedded schemas | Added with tests |
-| `crates/fontes-data-pipeline` | Fetch, normalize, assemble, validate, compare, sign, and publish reading data | Implemented for reading |
+| `crates/fontes-data-pipeline` | Fetch, normalize, assemble, validate, compare, sign, and publish reading and study data | Implemented for both profiles |
 | Future `crates/fontes-data-update` | Manifest verification, compatibility, download, staging, activation, recovery | To implement; shared by desktop and mobile |
 | Future `data/curated/` | Reviewed genealogies, overviews, and reference mapping exceptions | To author |
 | `.github/workflows/data-contracts.yml` | Run the existing contract tests, formatting, and Clippy | Added |
-| `.github/workflows/data-release.yml` | Build reading twice and publish checked signed releases | Implemented |
+| `.github/workflows/data-release.yml` | Build reading and study twice and publish checked signed releases | Implemented |
 
 Rust remains the application and pipeline language. A pinned SWORD utility toolchain can run in the build container as an ingestion dependency; published app data has no SWORD runtime requirement. Cache raw files outside Git under their SHA-256. Keep bulk datasets and generated SQLite files out of repository history.
 
@@ -84,7 +84,7 @@ At first install, seed that local registry from the bundled trusted registry. La
 
 ### Source registry and lockfile
 
-The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current seven locked inputs correspond to previously inspected downloads. The full Robinson TR archive still needs a lock entry; a checked John sample is not a full-corpus acquisition.
+The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current eight locked inputs correspond to previously inspected downloads. The full Robinson TR archive still needs a lock entry; a checked John sample is not a full-corpus acquisition.
 
 A separate source discovery configuration will describe the upstream branch/release or moving file, rights evidence URL, refresh cadence, expected coverage, and whether the source is enabled. For Git-hosted texts discover a commit and pin it. For moving download URLs compare actual hashes, using HTTP validators to reduce transfers. ETag, Last-Modified, and upstream version labels are hints; SHA-256 identifies the bytes.
 
@@ -94,7 +94,7 @@ Retain each accepted raw source in content-addressed storage and include an exac
 
 ### Adapter contracts
 
-Each adapter accepts verified source paths and a versioned configuration, then writes deterministic UTF-8 JSONL records and an import report. It does not query the network, write the final SQLite database, infer missing genealogies, or fetch unapproved secondary sources. Parsing and normalized-record versions are part of the build identity.
+Each adapter accepts verified source paths and a versioned configuration, then writes deterministic UTF-8 JSONL records and an import report. Acquisition is separate; adapters write normalized records and transactionally populate the content database. They do not query the network, infer missing genealogies, or fetch unapproved secondary sources. Parsing and normalized-record versions are part of the build identity.
 
 | Input | Adapter output | Essential checks |
 | --- | --- | --- |
@@ -110,7 +110,7 @@ Each adapter accepts verified source paths and a versioned configuration, then w
 
 SWORD exports require special care: a simple `mod2imp` dump may omit linked entries, as [CrossWire documents](https://wiki.crosswire.org/DevTools:Modules). The adapter must resolve every key against its content entry, then deduplicate article text while retaining the complete key-to-resource mapping. Tests must include a commentary spanning multiple verses and a dictionary alias.
 
-Extraction is bounded by file count and total bytes. XML parsers do not load external entities; archive paths cannot escape the extraction root. Retain source text faithfully; search normalization is a separate field. Render only a supported structured text/block vocabulary. Keep all adapter diagnostics and rejected records in a machine-readable report, and fail a required source on unresolved mappings rather than dropping rows silently.
+Extraction is bounded by file count and total bytes. XML parsers do not load external entities; archive paths cannot escape the extraction root. Retain source text faithfully; search normalization is a separate field. Render only a supported structured text/block vocabulary. Keep all adapter diagnostics and rejected records in a machine-readable report, and fail required coverage mappings. Known upstream citation defects are retained in article text and an explicit, digest-bound diagnostic baseline (`data/mappings/study-v1.json`); a changed baseline fails compilation. Valid targets in partially malformed citation lists remain linked.
 
 ## Compilation and validation
 
@@ -243,3 +243,14 @@ A shared updater library provides the same verification and recovery behavior on
 5. Add reviewed genealogies/overviews and any newly classified source layers. Measure package sizes, update costs, and storage on mobile before introducing incremental transport.
 
 When measurements justify deltas, add them as an optional future transport bound to exact base and target SQLite hashes. Apply a patch to a staging copy, perform the same full target validation, and fall back to the complete snapshot on any mismatch. Retain full snapshots for new installations and skipped releases. This keeps the permanent reference model and activation protocol intact.
+
+
+## Implemented study import details
+
+`tools/sword-export.cpp` uses SWORD 1.9.0 only for binary decoding, key enumeration, and ThML reference parsing. It disables skipping consecutive links, checks `hasEntry`, includes introductions, distinguishes testament headings, and numbers repeated dictionary keys. Article text is deduplicated while every commentary key retains an `applies_to` range. TSK entries retain their own reference context even when raw markup matches another verse. Its distinct `Jud`/`Jude` abbreviations are resolved before parsing. The Rust markup adapter preserves all prose, including preverse material that SWORD display filters can remove. Paragraphs are plain text with newline boundaries; source XML/ThML is never executable display content.
+
+Robinson ASCII is converted to unaccented Greek with a checked alphabet. Triple-pipe variants produce separate first/second source reading witnesses. Both have complete canonical NT coverage. Alternative analyses keep their own morphology and Strong’s associations; zero markers and extra numeric parsing IDs remain in original ASCII apparatus. Subscriptions and alternate numbering are preserved there as well. No KJV alignment, lexeme lemma, or Hebrew token morphology is fabricated.
+
+The initial study build has 14,298 Strong’s codes, 281,240 tokens, 281,307 analyses, 281,330 Strong’s associations, 15,914 Greek segments, and 64,090 resources. The citation audit retains 439 known source anomalies. These are corpus baseline counts, not guarantees about future source editions. The verifier checks source membership and profile capabilities, relational integrity, complete reading/Greek coverage, dictionary definition links, resource search coverage, and passage smoke queries. SQLite tables retain the v1 contracts; new/partial indexes are additive. The bounded verifier accepts at most 1 GiB SQLite and 256 MiB compressed per profile.
+
+A release contains both complete profile artifacts and their union of eight source snapshots. The publisher refuses to remove an existing profile, verifies older signed manifests (including the original reading-only release), compares semantic verse/resource changes per profile, and verifies every artifact in draft and public downloads. Client activation remains future work; signed package verification is implemented.

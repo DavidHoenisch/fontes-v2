@@ -180,7 +180,7 @@ CREATE TABLE resource_links (
     CHECK ((range_id IS NOT NULL) + (strongs IS NOT NULL) + (lemma_id IS NOT NULL) = 1)
 ) STRICT;
 CREATE INDEX resource_links_by_range ON resource_links(range_id, resource_id);
-CREATE INDEX resource_links_by_strongs ON resource_links(strongs, resource_id);
+CREATE INDEX resource_links_by_strongs ON resource_links(strongs, resource_id) WHERE strongs IS NOT NULL;
 CREATE INDEX reference_ranges_by_start ON reference_ranges(start_ref_id, end_ref_id);
 
 CREATE TABLE persons (
@@ -234,3 +234,7 @@ CREATE TABLE search_documents (
 CREATE VIRTUAL TABLE search_fts USING fts5(
     text, content='search_documents', content_rowid='id', tokenize='unicode61'
 );
+
+-- Additive indexes; the v1 table and identity contracts are unchanged.
+CREATE INDEX search_documents_by_resource ON search_documents(resource_id) WHERE resource_id IS NOT NULL;
+CREATE INDEX resource_links_by_resource ON resource_links(resource_id, link_type);

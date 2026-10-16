@@ -5,7 +5,7 @@ use std::path::PathBuf;
 #[derive(Parser)]
 #[command(
     name = "fontes-data",
-    about = "Reproducible Fontes reading data compiler"
+    about = "Reproducible Fontes reading and study data compiler"
 )]
 struct Cli {
     #[command(subcommand)]
@@ -55,6 +55,9 @@ enum Commands {
     },
     /// Sign and publish checked build outputs as a versioned GitHub Release.
     Publish {
+        /// Add the study build to the reading release bundle.
+        #[arg(long)]
+        additional_dir: Option<PathBuf>,
         #[arg(long)]
         dir: PathBuf,
         #[arg(long)]
@@ -107,11 +110,17 @@ fn main() -> Result<()> {
             fontes_data_pipeline::release::keygen(&secret_file, &public_file, &key_id)?;
         }
         Commands::Publish {
+            additional_dir,
             dir,
             trust,
             repository,
         } => {
-            fontes_data_pipeline::release::publish(&dir, &trust, &repository)?;
+            fontes_data_pipeline::release::publish(
+                &dir,
+                &trust,
+                &repository,
+                additional_dir.as_deref(),
+            )?;
         }
     }
     Ok(())

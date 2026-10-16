@@ -1,5 +1,6 @@
 pub mod release;
 mod source;
+pub mod study;
 
 use anyhow::{Context, Result, bail, ensure};
 use fontes_data_contracts::{
@@ -15,6 +16,37 @@ use std::{
     io::{BufWriter, Read, Write},
     path::Path,
 };
+
+pub fn profile_sources(profile: &str) -> Result<&'static [&'static str]> {
+    match profile {
+        "reading" => Ok(&["kjv-base", "web-classic"]),
+        "study" => Ok(&[
+            "kjv-base",
+            "web-classic",
+            "strongs-greek",
+            "strongs-hebrew",
+            "robinson-tr",
+            "matthew-henry",
+            "nave",
+            "tsk",
+        ]),
+        _ => bail!("unsupported profile {profile}"),
+    }
+}
+pub fn profile_capabilities(profile: &str) -> Result<&'static [Capability]> {
+    match profile {
+        "reading" => Ok(&[Capability::Reading]),
+        "study" => Ok(&[
+            Capability::Reading,
+            Capability::StrongsLexicon,
+            Capability::GreekMorphology,
+            Capability::Commentary,
+            Capability::Topics,
+            Capability::CrossReferences,
+        ]),
+        _ => bail!("unsupported profile {profile}"),
+    }
+}
 
 pub fn digest(bytes: &[u8]) -> String {
     hex::encode(Sha256::digest(bytes))
@@ -311,6 +343,8 @@ pub fn parse_archive(
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DatabaseReport {
+    #[serde(default)]
+    pub study: study::StudyCounts,
     pub canonical_ref_count: u32,
     pub verse_text_count: u64,
     pub resource_count: u64,
@@ -394,7 +428,14 @@ pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
         "incorrect source omission handling"
     );
     let documents: u64 = db.query_row("SELECT count(*) FROM search_documents", [], |r| r.get(0))?;
-    ensure!(documents == 62204, "search document coverage mismatch");
+    let resource_documents: u64 =
+        db.query_row("SELECT count(*) FROM resources", [], |r| r.get(0))?;
+    ensure!(
+        documents == 62204 + resource_documents,
+        "search document coverage mismatch"
+    );
+    let bad_documents: u64 = db.query_row("SELECT count(*) FROM resources r WHERE (SELECT count(*) FROM search_documents d WHERE d.resource_id=r.id)!=1",[],|r|r.get(0))?;
+    ensure!(bad_documents == 0, "resource search coverage mismatch");
     let hits: u64 = db.query_row("SELECT count(*) FROM search_fts f JOIN search_documents d ON d.id = f.rowid JOIN verses_by_reference v ON v.id = d.verse_text_id WHERE search_fts MATCH 'God AND world' AND v.canonical_ref_id = 43003016", [], |r| r.get(0))?;
     ensure!(hits == 2, "John 3:16 search smoke query failed");
     let doxology: String = db.query_row("SELECT text FROM verses_by_reference WHERE translation_id = 'translation:web' AND canonical_ref_id = 45016025", [], |r| r.get(0))?;
@@ -403,8 +444,30 @@ pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
         "WEB Romans doxology not mapped"
     );
     let resources: u64 = db.query_row("SELECT count(*) FROM resources", [], |r| r.get(0))?;
-    let (content_id, lock, commit, profile) = db.query_row("SELECT content_id, source_lock_sha256, builder_commit, profile FROM build_info WHERE singleton = 1", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?;
+    let (content_id, lock, commit, profile): (String,String,String,String) = db.query_row("SELECT content_id, source_lock_sha256, builder_commit, profile FROM build_info WHERE singleton = 1", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?;
+    let source_ids: BTreeSet<String> = db
+        .prepare("SELECT source_id FROM source_snapshots")?
+        .query_map([], |r| r.get(0))?
+        .collect::<rusqlite::Result<_>>()?;
+    ensure!(
+        source_ids
+            == profile_sources(&profile)?
+                .iter()
+                .map(|s| s.to_string())
+                .collect(),
+        "database source membership mismatch"
+    );
+    let study = study::StudyCounts::read(&db)?;
+    if profile == "study" {
+        study::validate_study(&db, &study)?;
+    } else {
+        ensure!(
+            profile == "reading" && study == study::StudyCounts::default(),
+            "unsupported profile or unexpected study rows"
+        );
+    }
     Ok(DatabaseReport {
+        study,
         canonical_ref_count: actual.len() as u32,
         verse_text_count: 62204,
         resource_count: resources,
@@ -419,6 +482,8 @@ pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
 
 #[derive(Serialize, Deserialize)]
 pub struct BuildReport {
+    #[serde(default)]
+    pub study_imports: Vec<study::StudyImport>,
     pub compiler_version: String,
     pub sqlite_version: String,
     pub builder_commit: String,
@@ -430,7 +495,16 @@ pub struct BuildReport {
 }
 
 pub fn source_asset(source: &LockedSource) -> String {
-    format!("source-{}-{}.zip", source.source_id, source.sha256)
+    format!(
+        "source-{}-{}.{}",
+        source.source_id,
+        source.sha256,
+        if source.adapter.starts_with("strongs-") {
+            "xml"
+        } else {
+            "zip"
+        }
+    )
 }
 
 pub fn build(
@@ -443,8 +517,8 @@ pub fn build(
     mirror_repository: Option<&str>,
 ) -> Result<BuildReport> {
     ensure!(
-        profile == "reading",
-        "only the reading profile has implemented adapters"
+        matches!(profile, "reading" | "study"),
+        "unsupported profile"
     );
     ensure!(
         commit.len() == 40 && commit.bytes().all(|c| c.is_ascii_hexdigit()),
@@ -469,9 +543,9 @@ pub fn build(
         .find(|p| p.id == profile)
         .context("profile not defined")?;
     ensure!(
-        config.required_sources == ["kjv-base", "web-classic"]
-            && config.capabilities == [Capability::Reading],
-        "reading profile membership changed without adapter support"
+        config.required_sources == profile_sources(profile)?
+            && config.capabilities == profile_capabilities(profile)?,
+        "profile membership changed without adapter support"
     );
     let mappings_bytes = fs::read(root.join("data/mappings/reading-v1.json"))?;
     let mappings: Mappings = serde_json::from_slice(&mappings_bytes)?;
@@ -486,18 +560,34 @@ pub fn build(
     );
     let registry = Registry::load()?;
     let mut acquired = Vec::new();
+    let mut study_acquired = Vec::new();
+    if profile == "study" {
+        study::check_exporter()?;
+    }
     for id in &config.required_sources {
         let source = lock
             .sources
             .iter()
             .find(|s| &s.source_id == id)
             .context("required source not locked")?;
+        let path = source::acquire(source, cache, offline, mirror_repository)?;
+        if !matches!(id.as_str(), "kjv-base" | "web-classic") {
+            let expected = match id.as_str() {
+                "strongs-greek" => "strongs-greek-xml-v1",
+                "strongs-hebrew" => "strongs-hebrew-osis-v1",
+                "robinson-tr" => "robinson-utr-v1",
+                "nave" => "sword-dictionary-v1",
+                "matthew-henry" | "tsk" => "sword-commentary-v1",
+                _ => bail!("unknown study source"),
+            };
+            ensure!(source.adapter == expected, "unsupported study adapter");
+            study_acquired.push((source, path));
+            continue;
+        }
         ensure!(
             source.adapter == "ebible-vpl-v1",
-            "unsupported adapter {}",
-            source.adapter
+            "unsupported reading adapter"
         );
-        let path = source::acquire(source, cache, offline, mirror_repository)?;
         let (verses, report) = parse_archive(
             &path,
             id,
@@ -509,7 +599,7 @@ pub fn build(
     }
     let lock_sha = digest(&lock_bytes);
     let content_id = digest(&serde_json::to_vec(&serde_json::json!({
-        "profile": profile, "lock": lock_sha, "mappings": digest(&mappings_bytes),
+        "study_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/study-v1.json"))?))} else {None}, "profile": profile, "sword_exporter": (profile=="study").then_some(study::SWORD_VERSION), "lock": lock_sha, "mappings": digest(&mappings_bytes),
         "profile_config": digest(&profile_bytes), "registry": digest(CANONICAL_REGISTRY_JSON.as_bytes()),
         "schema": digest(CONTENT_SCHEMA_SQL.as_bytes()), "cargo_lock": digest(&fs::read(root.join("Cargo.lock"))?),
         "toolchain": digest(&fs::read(root.join("rust-toolchain.toml"))?),
@@ -549,7 +639,7 @@ pub fn build(
     let mut snapshots = Vec::new();
     let mut reports = Vec::new();
     let mut notice = String::from(
-        "Fontes reading data\n\nBase verse text only; no modern KJV word annotations.\nCanonical registry: fontes-protestant-66-v1.\n\n",
+        "Fontes content data\n\nEnglish base verse text only; no modern KJV word annotations.\nCanonical registry: fontes-protestant-66-v1.\n\n",
     );
     for (source, path, verses, report) in acquired {
         let info = translation(&source.source_id)?;
@@ -629,6 +719,65 @@ pub fn build(
         });
         reports.push(report);
     }
+    let mut study_imports = Vec::new();
+    for (source, path) in study_acquired {
+        let snapshot = format!("source:{}@{}", source.source_id, source.sha256);
+        tx.execute(
+            "INSERT INTO source_snapshots VALUES (?1,?2,?3,?4,?5,?6,?7)",
+            params![
+                snapshot,
+                source.source_id,
+                source.sha256,
+                source.url,
+                source.upstream_revision,
+                source.rights_review_id,
+                source.adapter
+            ],
+        )?;
+        let normalized = output
+            .join("normalized")
+            .join(format!("{}.jsonl", source.source_id));
+        let report = match source.source_id.as_str() {
+            "strongs-greek" | "strongs-hebrew" => {
+                study::import_strongs(&tx, &source.source_id, &snapshot, &path)?
+            }
+            "robinson-tr" => study::import_greek(&tx, &snapshot, &path, &registry, &normalized)?,
+            _ => study::import_sword(
+                &tx,
+                &source.source_id,
+                &snapshot,
+                &path,
+                &registry,
+                &normalized,
+            )?,
+        };
+        println!(
+            "Imported {}: {} source records, {} resources, {} linked aliases, {} unresolved citations",
+            source.source_id,
+            report.source_records,
+            report.resources,
+            report.linked_aliases,
+            report.unmapped_citations.len()
+        );
+        notice.push_str(&format!("{}\nSource: {}\nRights evidence: {}\nReview: {}\nSHA-256: {}\nUnmapped citations retained for review: {}\n\n",source.source_id,source.url,source.rights_evidence_url,source.rights_review_id,source.sha256,report.unmapped_citations.len()));
+        fs::copy(path, output.join(source_asset(source)))?;
+        snapshots.push(SourceSnapshot {
+            source_id: source.source_id.clone(),
+            sha256: source.sha256.clone(),
+            adapter_version: source.adapter.clone(),
+            rights_review_id: source.rights_review_id.clone(),
+        });
+        study_imports.push(report);
+    }
+    if profile == "study" {
+        study::check_citation_policy(
+            &root.join("data/mappings/study-v1.json"),
+            &lock,
+            &study_imports,
+        )?;
+        study::write_audit(&output.join("study-imports.json"), &study_imports)?;
+        notice.push_str("Greek: Robinson's public-domain UTR, both source reading streams; unaccented Unicode surfaces, alternative analyses and numeric parsing IDs retained. Source subscriptions and alternate numbering remain in structured apparatus. No English word alignment or Hebrew morphology is inferred. Strong's Hebrew headwords retain supplied Unicode and transliteration; TWOT article text is not imported.\nSWORD 1.9.0 is a build-time extraction dependency only. Scripture links are registry checked; see study-imports.json for source citation anomalies.\n");
+    }
     tx.execute("INSERT INTO search_fts(search_fts) VALUES ('rebuild')", [])?;
     tx.execute(
         "INSERT INTO search_fts(search_fts, rank) VALUES ('integrity-check', 1)",
@@ -662,6 +811,7 @@ pub fn build(
     fs::write(output.join("NOTICE.txt"), notice)?;
     fs::write(output.join("sources.lock.json"), lock_bytes)?;
     let report = BuildReport {
+        study_imports,
         compiler_version: env!("CARGO_PKG_VERSION").into(),
         sqlite_version: rusqlite::version().into(),
         builder_commit: commit.into(),
@@ -673,8 +823,10 @@ pub fn build(
     };
     write_json(&output.join("validation-report.json"), &report)?;
     println!(
-        "Built reading profile: {} verse rows, {} bytes SQLite, {} bytes zstd",
+        "Built {} profile: {} verse rows, {} resources, {} bytes SQLite, {} bytes zstd",
+        profile,
         report.database.verse_text_count,
+        report.database.resource_count,
         report.profile_artifact.sqlite_bytes,
         report.profile_artifact.compressed_bytes
     );

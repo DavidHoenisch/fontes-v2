@@ -22,10 +22,11 @@
       "sqlite_sha256": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
       "content_id": "c7713783a31d4f3ab54a5080d93c3f760b784fcff81ca4fb69f5595dda6b7f38",
       "source_ids": [
-        "kjv-base"
+        "kjv-base",
+        "web-classic"
       ],
       "canonical_ref_count": 31102,
-      "verse_text_count": 31102,
+      "verse_text_count": 62204,
       "resource_count": 0,
       "capabilities": [
         "reading"
@@ -38,6 +39,12 @@
       "sha256": "863b964d8d8fa45ebd33b41ef4ff62b50cb297100aa3ed289120784d453cdff0",
       "adapter_version": "ebible-vpl-v1",
       "rights_review_id": "research-2026-10-15-kjv-base"
+    },
+    {
+      "source_id": "web-classic",
+      "sha256": "116f3c1a22e7e2ff316bfdae7c9b082782517d4fc1095bc5cc9a2b614308165c",
+      "adapter_version": "ebible-vpl-v1",
+      "rights_review_id": "research-2026-10-15-web-classic"
     }
   ]
 }

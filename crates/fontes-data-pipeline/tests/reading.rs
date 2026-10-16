@@ -263,3 +263,56 @@ fn full_reading_build_is_reproducible_and_signed_package_detects_tampering() {
         .is_err()
     );
 }
+
+#[test]
+fn signed_manifest_supports_both_profiles_and_checks_each_profiles_claims() {
+    let mut manifest: ReleaseManifest =
+        serde_json::from_str(include_str!("../../../data/examples/release-manifest.json")).unwrap();
+    let lock: SourceLock =
+        serde_json::from_str(include_str!("../../../data/sources.lock.json")).unwrap();
+    manifest.sources = lock
+        .sources
+        .iter()
+        .map(|s| fontes_data_contracts::SourceSnapshot {
+            source_id: s.source_id.clone(),
+            sha256: s.sha256.clone(),
+            adapter_version: s.adapter.clone(),
+            rights_review_id: s.rights_review_id.clone(),
+        })
+        .collect();
+    let mut study = manifest.profiles[0].clone();
+    study.profile = "study".into();
+    study.asset = "fontes-study.sqlite.zst".into();
+    study.capabilities = fontes_data_pipeline::profile_capabilities("study")
+        .unwrap()
+        .to_vec();
+    study.source_ids = fontes_data_pipeline::profile_sources("study")
+        .unwrap()
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    manifest.profiles.push(study);
+    let key = SigningKey::from_bytes(&[9; 32]);
+    let trust = TrustKey {
+        key_id: manifest.signing_key_id.clone(),
+        public_key_hex: hex::encode(key.verifying_key().to_bytes()),
+    };
+    let check = |manifest: &ReleaseManifest| {
+        let bytes = serde_json::to_vec(manifest).unwrap();
+        let signed = [DOMAIN, bytes.as_slice()].concat();
+        verify_manifest(
+            &bytes,
+            &key.sign(&signed).to_bytes(),
+            &trust,
+            &manifest.repository,
+        )
+    };
+    assert_eq!(check(&manifest).unwrap().profiles.len(), 2);
+    manifest.profiles[1].capabilities.pop();
+    assert!(check(&manifest).is_err());
+    manifest.profiles[1].capabilities = fontes_data_pipeline::profile_capabilities("study")
+        .unwrap()
+        .to_vec();
+    manifest.profiles[1].source_ids.pop();
+    assert!(check(&manifest).is_err());
+}

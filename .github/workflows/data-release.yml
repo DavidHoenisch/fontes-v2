@@ -1,4 +1,4 @@
-name: Reading data release
+name: Reading and study data release
 
 on:
   push:
@@ -9,6 +9,7 @@ on:
       - 'Cargo.lock'
       - 'rust-toolchain.toml'
       - 'crates/**'
+      - 'tools/sword-export.cpp'
       - 'data/**'
   workflow_dispatch:
 
@@ -16,7 +17,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: reading-data-release
+  group: fontes-data-release
   cancel-in-progress: false
 
 jobs:
@@ -29,6 +30,14 @@ jobs:
           persist-credentials: false
       - name: Install pinned Rust
         run: rustup toolchain install 1.93.0 --profile minimal --component rustfmt --component clippy
+      - name: Install SWORD build dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libsword-dev pkg-config
+          test "$(pkg-config --modversion sword)" = 1.9.0
+          mkdir -p target
+          c++ -std=c++17 -O2 -Wall -Wextra -Werror -Wno-unused-parameter $(pkg-config --cflags sword) tools/sword-export.cpp $(pkg-config --libs sword) -o target/fontes-sword-export
+          target/fontes-sword-export --version
       - name: Check formatting and tests
         run: |
           cargo fmt --all -- --check
@@ -36,27 +45,41 @@ jobs:
           cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Compile the pipeline
         run: cargo build --release --locked -p fontes-data-pipeline
-      - name: Compile real KJV and WEB source data
+      - name: Compile real reading and study sources
         env:
           FONTES_BUILDER_COMMIT: ${{ github.sha }}
           FONTES_REPOSITORY: ${{ github.repository }}
         run: |
-          target/release/fontes-data build --profile reading --output dist/reading --builder-commit "$FONTES_BUILDER_COMMIT" --mirror-repository "$FONTES_REPOSITORY"
+          for profile in reading study; do
+            target/release/fontes-data build --profile "$profile" --output "dist/$profile" --builder-commit "$FONTES_BUILDER_COMMIT" --mirror-repository "$FONTES_REPOSITORY"
+          done
       - name: Prove reproducibility from the verified offline cache
         env:
           FONTES_BUILDER_COMMIT: ${{ github.sha }}
         run: |
-          target/release/fontes-data build --profile reading --output dist/repro --builder-commit "$FONTES_BUILDER_COMMIT" --offline
-          cmp dist/reading/library.sqlite dist/repro/library.sqlite
-          cmp dist/reading/fontes-reading.sqlite.zst dist/repro/fontes-reading.sqlite.zst
-          cmp dist/reading/validation-report.json dist/repro/validation-report.json
+          for profile in reading study; do
+            target/release/fontes-data build --profile "$profile" --output "dist/repro-$profile" --builder-commit "$FONTES_BUILDER_COMMIT" --offline
+            cmp "dist/$profile/library.sqlite" "dist/repro-$profile/library.sqlite"
+            cmp "dist/$profile/fontes-$profile.sqlite.zst" "dist/repro-$profile/fontes-$profile.sqlite.zst"
+            cmp "dist/$profile/validation-report.json" "dist/repro-$profile/validation-report.json"
+          done
       - name: Retain checked outputs for the publisher
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: reading-build
+          name: content-build
           path: |
             target/release/fontes-data
-            dist/reading/
+            dist/reading/*.sqlite
+            dist/reading/*.zst
+            dist/reading/*.json
+            dist/reading/*.txt
+            dist/reading/source-*.zip
+            dist/study/*.sqlite
+            dist/study/*.zst
+            dist/study/*.json
+            dist/study/*.txt
+            dist/study/source-*.zip
+            dist/study/source-*.xml
           if-no-files-found: error
           retention-days: 7
           compression-level: 1
@@ -65,7 +88,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:
@@ -74,7 +97,7 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
-          name: reading-build
+          name: content-build
           path: checked-build
       - name: Sign, create draft, verify assets, and publish
         env:
@@ -83,4 +106,4 @@ jobs:
           FONTES_REPOSITORY: ${{ github.repository }}
         run: |
           chmod +x checked-build/target/release/fontes-data
-          checked-build/target/release/fontes-data publish --dir checked-build/dist/reading --trust data/trust/data-release-1.json --repository "$FONTES_REPOSITORY"
+          checked-build/target/release/fontes-data publish --dir checked-build/dist/reading --additional-dir checked-build/dist/study --trust data/trust/data-release-1.json --repository "$FONTES_REPOSITORY"

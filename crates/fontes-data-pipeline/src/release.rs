@@ -4,7 +4,7 @@ use crate::{
 };
 use anyhow::{Context, Result, bail, ensure};
 use ed25519_dalek::{Signature, Signer, SigningKey, VerifyingKey};
-use fontes_data_contracts::{Channel, ReleaseManifest, SourceLock};
+use fontes_data_contracts::{Channel, ProfileArtifact, ReleaseManifest, SourceLock};
 use rand_core::OsRng;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -17,7 +17,7 @@ use std::{
 };
 
 const DOMAIN: &[u8] = b"FONTES-DATA-MANIFEST-V1\n";
-const MAX_SQLITE: u64 = 512 * 1024 * 1024;
+const MAX_SQLITE: u64 = 1024 * 1024 * 1024;
 const MAX_COMPRESSED: u64 = 256 * 1024 * 1024;
 
 #[derive(Serialize, Deserialize)]
@@ -111,18 +111,45 @@ pub fn verify_manifest(
         "manifest trust identity mismatch"
     );
     ensure!(
-        manifest.profiles.len() == 1 && manifest.profiles[0].profile == "reading",
+        manifest
+            .profiles
+            .iter()
+            .all(|p| matches!(p.profile.as_str(), "reading" | "study")),
         "unsupported published profile"
     );
+    for artifact in &manifest.profiles {
+        ensure!(
+            artifact
+                .capabilities
+                .iter()
+                .collect::<std::collections::BTreeSet<_>>()
+                == crate::profile_capabilities(&artifact.profile)?
+                    .iter()
+                    .collect(),
+            "profile capability mismatch"
+        );
+        ensure!(
+            artifact
+                .source_ids
+                .iter()
+                .map(String::as_str)
+                .collect::<std::collections::BTreeSet<_>>()
+                == crate::profile_sources(&artifact.profile)?
+                    .iter()
+                    .copied()
+                    .collect(),
+            "profile source membership mismatch"
+        );
+    }
     Ok(manifest)
 }
 
 fn decompress_checked(
     dir: &Path,
     manifest: &ReleaseManifest,
+    artifact: &ProfileArtifact,
     dest: &Path,
 ) -> Result<DatabaseReport> {
-    let artifact = &manifest.profiles[0];
     ensure!(
         artifact.sqlite_bytes <= MAX_SQLITE && artifact.compressed_bytes <= MAX_COMPRESSED,
         "artifact exceeds client size limit"
@@ -189,7 +216,14 @@ pub fn verify_package(dir: &Path, trust_path: &Path, repository: &str) -> Result
         );
     }
     let tmp = tempfile::tempdir()?;
-    decompress_checked(dir, &manifest, &tmp.path().join("library.sqlite"))?;
+    for artifact in &manifest.profiles {
+        decompress_checked(
+            dir,
+            &manifest,
+            artifact,
+            &tmp.path().join(format!("{}.sqlite", artifact.profile)),
+        )?;
+    }
     Ok(manifest)
 }
 
@@ -235,7 +269,18 @@ fn texts(path: &Path) -> Result<BTreeMap<(String, i64), String>> {
         .collect::<rusqlite::Result<_>>()?)
 }
 
-pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
+fn resource_texts(path: &Path) -> Result<BTreeMap<String, String>> {
+    let db =
+        rusqlite::Connection::open_with_flags(path, rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)?;
+    Ok(db.prepare("SELECT id,title || char(10) || content || char(10) || coalesce(display_json,'') FROM resources")?.query_map([],|r|Ok((r.get(0)?,r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
+}
+
+pub fn publish(
+    dir: &Path,
+    trust_path: &Path,
+    repository: &str,
+    additional: Option<&Path>,
+) -> Result<()> {
     ensure!(valid_repository(repository), "invalid release repository");
     let trust: TrustKey = serde_json::from_slice(&read_limited(trust_path, 4096)?)?;
     let report: BuildReport = serde_json::from_slice(&read_limited(
@@ -252,6 +297,70 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
             && actual.source_lock_sha256 == report.source_lock_sha256,
         "report provenance mismatch"
     );
+    let mut profiles = vec![report.profile_artifact.clone()];
+    let mut snapshots: BTreeMap<_, _> = report
+        .sources
+        .iter()
+        .cloned()
+        .map(|s| (s.source_id.clone(), s))
+        .collect();
+    if let Some(other) = additional {
+        let study: BuildReport = serde_json::from_slice(&read_limited(
+            &other.join("validation-report.json"),
+            1024 * 1024,
+        )?)?;
+        let checked = validate_database(&other.join("library.sqlite"))?;
+        ensure!(
+            serde_json::to_value(&checked)? == serde_json::to_value(&study.database)?,
+            "additional report does not match database"
+        );
+        ensure!(
+            report.profile_artifact.profile == "reading"
+                && study.profile_artifact.profile == "study"
+                && study.builder_commit == report.builder_commit
+                && study.source_lock_sha256 == report.source_lock_sha256,
+            "incompatible profile bundle"
+        );
+        ensure!(
+            fs::read(dir.join("sources.lock.json"))? == fs::read(other.join("sources.lock.json"))?,
+            "different source locks in profile bundle"
+        );
+        profiles.push(study.profile_artifact.clone());
+        let lock: SourceLock = serde_json::from_slice(&fs::read(dir.join("sources.lock.json"))?)?;
+        for snapshot in &study.sources {
+            if let Some(existing) = snapshots.get(&snapshot.source_id) {
+                ensure!(
+                    serde_json::to_value(existing)? == serde_json::to_value(snapshot)?,
+                    "conflicting profile source"
+                );
+            }
+            snapshots.insert(snapshot.source_id.clone(), snapshot.clone());
+            let source = lock
+                .sources
+                .iter()
+                .find(|s| s.source_id == snapshot.source_id)
+                .context("bundle source not locked")?;
+            let asset = source_asset(source);
+            fs::copy(other.join(&asset), dir.join(&asset))?;
+        }
+        fs::copy(
+            other.join(&study.profile_artifact.asset),
+            dir.join(&study.profile_artifact.asset),
+        )?;
+        fs::copy(
+            other.join("validation-report.json"),
+            dir.join("validation-report-study.json"),
+        )?;
+        fs::copy(
+            other.join("study-imports.json"),
+            dir.join("study-imports.json"),
+        )?;
+        let mut notices = fs::read_to_string(dir.join("NOTICE.txt"))?;
+        notices.push_str("\n=== STUDY PROFILE ===\n");
+        notices.push_str(&fs::read_to_string(other.join("NOTICE.txt"))?);
+        fs::write(dir.join("NOTICE.txt"), notices)?;
+    }
+    let snapshots: Vec<_> = snapshots.into_values().collect();
     let releases: Vec<Value> = serde_json::from_str(&gh(&[
         "release",
         "list",
@@ -283,7 +392,8 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
         .max_by_key(|(seq, _)| *seq)
         .map(|(_, r)| r["tagName"].as_str().unwrap().to_owned());
     let old = tempfile::tempdir()?;
-    let mut changes = serde_json::json!({"previous_release": previous, "added_verse_rows": actual.verse_text_count, "changed_verse_rows": 0, "removed_verse_rows": 0, "source_changes": []});
+    let mut changes =
+        serde_json::json!({"previous_release":previous,"profiles":{},"source_changes":[]});
     if let Some(tag) = &previous {
         download_assets(
             repository,
@@ -301,38 +411,67 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
             prior.release_tag == *tag,
             "previous release identity mismatch"
         );
-        if prior.profiles[0].content_id == report.profile_artifact.content_id {
+        ensure!(
+            prior
+                .profiles
+                .iter()
+                .all(|p| profiles.iter().any(|n| n.profile == p.profile)),
+            "published profile would disappear"
+        );
+        if profiles.len() == prior.profiles.len()
+            && profiles.iter().all(|p| {
+                prior
+                    .profiles
+                    .iter()
+                    .any(|old| old.profile == p.profile && old.content_id == p.content_id)
+            })
+        {
             println!(
                 "No content changes; existing release https://github.com/{repository}/releases/tag/{tag}"
             );
             return Ok(());
         }
-        download_assets(repository, tag, old.path(), &[&prior.profiles[0].asset])?;
-        let old_database = old.path().join("library.sqlite");
-        decompress_checked(old.path(), &prior, &old_database)?;
-        let before = texts(&old_database)?;
-        let after = texts(&dir.join("library.sqlite"))?;
-        let added = after
-            .keys()
-            .filter(|key| !before.contains_key(*key))
-            .count();
-        let removed = before
-            .keys()
-            .filter(|key| !after.contains_key(*key))
-            .count();
-        let changed = after
-            .iter()
-            .filter(|(key, text)| before.get(*key).is_some_and(|old| old != *text))
-            .count();
-        ensure!(
-            added == 0 && removed == 0,
-            "unexpected reading coverage regression"
-        );
-        let source_changes: Vec<_> = report.sources.iter().filter_map(|new| {
-            let old = prior.sources.iter().find(|s| s.source_id == new.source_id);
-            (old.map(|s| &s.sha256) != Some(&new.sha256)).then(|| serde_json::json!({"source_id":new.source_id,"before":old.map(|s| &s.sha256),"after":new.sha256}))
-        }).collect();
-        changes = serde_json::json!({"previous_release": tag, "added_verse_rows": added, "changed_verse_rows": changed, "removed_verse_rows": removed, "source_changes": source_changes});
+        for profile in &profiles {
+            let current_dir = if profile.profile == report.profile_artifact.profile {
+                dir
+            } else {
+                additional.context("profile directory missing")?
+            };
+            if let Some(prior_profile) =
+                prior.profiles.iter().find(|p| p.profile == profile.profile)
+            {
+                download_assets(repository, tag, old.path(), &[&prior_profile.asset])?;
+                let old_database = old.path().join(format!("{}.sqlite", profile.profile));
+                decompress_checked(old.path(), &prior, prior_profile, &old_database)?;
+                let before = texts(&old_database)?;
+                let after = texts(&current_dir.join("library.sqlite"))?;
+                let added = after
+                    .keys()
+                    .filter(|key| !before.contains_key(*key))
+                    .count();
+                let removed = before
+                    .keys()
+                    .filter(|key| !after.contains_key(*key))
+                    .count();
+                let changed = after
+                    .iter()
+                    .filter(|(key, text)| before.get(*key).is_some_and(|old| old != *text))
+                    .count();
+                ensure!(
+                    added == 0 && removed == 0,
+                    "unexpected reading coverage regression"
+                );
+                let before = resource_texts(&old_database)?;
+                let after = resource_texts(&current_dir.join("library.sqlite"))?;
+                changes["profiles"][&profile.profile] = serde_json::json!({"added_verse_rows":added,"changed_verse_rows":changed,"removed_verse_rows":removed,"added_resources":after.keys().filter(|key|!before.contains_key(*key)).count(),"removed_resources":before.keys().filter(|key|!after.contains_key(*key)).count(),"changed_resources":after.iter().filter(|(key,text)|before.get(*key).is_some_and(|old|old!=*text)).count()});
+            } else {
+                changes["profiles"][&profile.profile] = serde_json::json!({"new_profile":true,"added_verse_rows":profile.verse_text_count,"added_resources":profile.resource_count});
+            }
+        }
+        changes["source_changes"]=serde_json::to_value(snapshots.iter().filter_map(|new| {
+            let old=prior.sources.iter().find(|s|s.source_id==new.source_id);
+            (old.map(|s|&s.sha256)!=Some(&new.sha256)).then(||serde_json::json!({"source_id":new.source_id,"before":old.map(|s|&s.sha256),"after":new.sha256}))
+        }).collect::<Vec<_>>())?;
     }
     let manifest = ReleaseManifest {
         manifest_version: 1,
@@ -348,8 +487,8 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
         signing_key_id: trust.key_id.clone(),
         builder_commit: report.builder_commit.clone(),
         source_lock_sha256: report.source_lock_sha256.clone(),
-        profiles: vec![report.profile_artifact],
-        sources: report.sources,
+        profiles,
+        sources: snapshots,
     };
     manifest.validate().map_err(anyhow::Error::msg)?;
     write_json(&dir.join("changes.json"), &changes)?;
@@ -379,8 +518,16 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
         "validation-report.json".into(),
         "changes.json".into(),
         "NOTICE.txt".into(),
-        manifest.profiles[0].asset.clone(),
     ];
+    for profile in &manifest.profiles {
+        assets.push(profile.asset.clone());
+    }
+    if additional.is_some() {
+        assets.extend([
+            "validation-report-study.json".into(),
+            "study-imports.json".into(),
+        ]);
+    }
     for snapshot in &manifest.sources {
         assets.push(source_asset(
             lock.sources
@@ -390,10 +537,17 @@ pub fn publish(dir: &Path, trust_path: &Path, repository: &str) -> Result<()> {
         ));
     }
     let notes = format!(
-        "Fontes reading data {}\n\n- KJV and World English Bible Classic: 31,102 canonical verses each\n- SQLite with full-text search and stable canonical references\n- Four WEB source omissions are explicit; Romans doxology is canonically mapped\n- Compressed database: {} bytes\n- Content ID: {}\n- Compiler commit: {}\n- Manifest: Ed25519 signed with {}\n\nSee NOTICE.txt, sources.lock.json, validation-report.json, and changes.json for provenance and validation. Applications must verify against the public key distributed with the app/source repository.\n",
+        "Fontes data {}\n\n{}\nCompiler commit: {}\nManifest: Ed25519 signed with {}\n\nReading contains KJV and WEB Classic with 31,102 canonical verses each. Study adds Strong's Greek/Hebrew dictionaries, Robinson TR Greek morphology in both source reading streams, Matthew Henry, Nave's, and TSK. See NOTICE.txt, source locks, validation reports, study-imports.json (study releases), and changes.json. Verify with the public key distributed with the application.\n",
         manifest.release_tag,
-        manifest.profiles[0].compressed_bytes,
-        manifest.profiles[0].content_id,
+        manifest
+            .profiles
+            .iter()
+            .map(|p| format!(
+                "- {}: {} resources, {} compressed bytes",
+                p.profile, p.resource_count, p.compressed_bytes
+            ))
+            .collect::<Vec<_>>()
+            .join("\n"),
         manifest.builder_commit,
         trust.key_id
     );

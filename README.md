@@ -1,6 +1,6 @@
 # Fontes
 
-Offline Bible study data and application foundations. The Rust reading pipeline compiles locked public domain KJV and World English Bible Classic inputs into a versioned SQLite database with full-text search and permanent canonical references.
+Offline Bible study data and application foundations. The Rust pipeline compiles locked public domain Bible texts, dictionaries, morphology, commentary, topics, and cross-references into a versioned SQLite database with full-text search and permanent canonical references.
 
 ## Build the reading data
 
@@ -23,34 +23,98 @@ The reading profile contains **31,102 canonical anchors and 62,204 verse rows**,
 
 The first adapter imports verse-per-line XML. It preserves verse text after trimming surrounding whitespace, including KJV paragraph symbols, but does not yet import USFM paragraph, poetry, or footnote structure. User notes and highlights belong in a separate database defined by `data/schema/user-v1.sql`.
 
+## Build the study data
+
+The study profile includes reading plus Strong’s Greek (5,624 entries), Strong’s Hebrew (8,674), Robinson TR Greek morphology (all 7,957 NT verses), Matthew Henry (5,360 articles), Nave’s (5,322 entries), and TSK (31,153 entries). It contains 64,090 resources, 281,240 Greek tokens across both source reading streams, 281,307 analyses, and 385,194 TSK target ranges. The initial study download is approximately 110 MB; SQLite occupies approximately 585 MB.
+
+Install **SWORD 1.9.0** as a build dependency and compile the small extraction bridge. Applications only need SQLite, zstd, and the shared update contracts.
+
+```sh
+# macOS
+brew install sword
+mkdir -p target
+c++ -std=c++17 -O2 -Wall -Wextra -Werror \
+  -isystem /opt/homebrew/include/sword tools/sword-export.cpp \
+  -L/opt/homebrew/lib -lsword -o target/fontes-sword-export
+
+# Ubuntu 24.04 alternative
+# sudo apt-get install libsword-dev pkg-config
+# c++ -std=c++17 -O2 -Wno-unused-parameter $(pkg-config --cflags sword) \
+#   tools/sword-export.cpp $(pkg-config --libs sword) -o target/fontes-sword-export
+
+target/release/fontes-data build \
+  --profile study --output dist/study \
+  --builder-commit "$(git rev-parse HEAD)" \
+  --mirror-repository DavidHoenisch/fontes-v2
+target/release/fontes-data validate dist/study/library.sqlite
+```
+
+Set `FONTES_SWORD_EXPORTER` to use another bridge path. Its protocol and SWORD version are checked before importing. Greek first/second reading witnesses preserve the source’s alternatives, spelling variants, multiple analyses, and compound Strong’s associations. Dictionary headwords remain distinct from supplied lemmas; absent lemmas, Hebrew morphology, and English word alignments are not inferred. Greek subscriptions and alternate verse-numbering notes remain in structured source apparatus.
+
+The SWORD adapter visits every key, retains linked commentary coverage, and preserves Nave’s duplicate headings with occurrence suffixes (`SIN#2`, `REVERENCE#2`). Rust extracts plain paragraphs directly from markup, retaining prose that SWORD’s display filters can suppress. TSK’s `Jud` means Judges; `Jude` means Jude. The bridge disambiguates those before parsing relative references.
+
+The locked sources contain **439 citation elements with invalid, ambiguous, reversed, or out-of-registry targets** (353 Matthew Henry, 26 Nave, 60 TSK). Their source text and diagnostics are retained; valid parts of those lists remain linked. The exact baseline in `data/mappings/study-v1.json` makes unexpected diagnostic changes fail the build. `study-imports.json` publishes the audit. These counts describe citation elements, some containing several targets. No textual correction is invented.
+
+## Query study content
+
+Use the canonical anchor as the entry point. This retrieves articles applying to John 3:16 and topics/commentary that cite it:
+
+```sql
+SELECT DISTINCT r.id, r.type, r.title, r.content, l.link_type
+FROM reference_ranges rr
+JOIN resource_links l ON l.range_id = rr.id
+JOIN resources r ON r.id = l.resource_id
+WHERE rr.start_ref_id <= 43003016 AND rr.end_ref_id >= 43003016;
+```
+
+Greek word study joins a specific reading stream to its own analyses and definitions:
+
+```sql
+SELECT t.position, t.surface, a.analysis_index, a.morph_code,
+       ts.strongs, d.title, d.content
+FROM segment_refs sr
+JOIN original_tokens t ON t.segment_id = sr.segment_id
+JOIN token_analyses a ON a.token_id = t.id
+JOIN token_strongs ts ON ts.token_id = a.token_id
+                         AND ts.analysis_index = a.analysis_index
+JOIN resource_links dl ON dl.strongs = ts.strongs
+                          AND dl.link_type = 'definition'
+JOIN resources d ON d.id = dl.resource_id
+WHERE sr.canonical_ref_id = 43001001
+  AND t.witness_id = 'witness:robinson-tr-first'
+ORDER BY t.position, a.analysis_index, ts.strongs;
+```
+
+For TSK, first select its resource through an `applies_to` link for the origin verse, then read that resource’s `cross_reference` links for target ranges. Keep these link types distinct. Resource search uses `search_fts` joined to `search_documents.resource_id`.
+
 ## GitHub releases
 
-[Reading data releases](https://github.com/DavidHoenisch/fontes-v2/releases) use tags such as `data-v1-stable-1`. Pushing a relevant compiler, source, schema, or workflow change to `main` runs `.github/workflows/data-release.yml`; the workflow can also be dispatched manually.
+[Data releases](https://github.com/DavidHoenisch/fontes-v2/releases) use tags such as `data-v1-stable-1`. Pushing a relevant compiler, source, schema, or workflow change to `main` runs `.github/workflows/data-release.yml`; the workflow can also be dispatched manually.
 
-The workflow tests the workspace, builds real source data twice, compares SQLite and compressed bytes, and passes checked outputs to a separate publishing job. Only that job receives the signing secret and repository write permission. The publisher allocates the next data sequence, signs the manifest, creates a draft release, verifies every uploaded asset, publishes, and downloads/verifies the published assets again. It never overwrites published releases and sets `make_latest=false` to keep data releases separate from app releases. Identical content from the same compiler commit is a no-op.
+The workflow tests the workspace, builds both real profiles twice, compares SQLite and compressed bytes, and passes checked outputs to a separate publishing job. Only that job receives the signing secret and repository write permission. The publisher allocates the next data sequence, signs the manifest, creates a draft release, verifies every uploaded asset, publishes, and downloads/verifies the published assets again. It never overwrites published releases and sets `make_latest=false` to keep data releases separate from app releases. Identical content from the same compiler commit is a no-op.
 
 Published assets include:
 
-- `fontes-reading.sqlite.zst`, ready to decompress into the content database.
+- `fontes-reading.sqlite.zst` and `fontes-study.sqlite.zst`, each a complete content snapshot.
 - `release-manifest.json` and its raw Ed25519 signature, covering the database hashes, lengths, versions, source identities, and capabilities.
-- `sources.lock.json`, `NOTICE.txt`, and `validation-report.json`.
-- `changes.json`, including verse additions, changes, and removals compared with the previous release.
-- The exact KJV and WEB source archives, named by their SHA-256, for future rebuilds.
+- `sources.lock.json`, `NOTICE.txt`, both profile validation reports, and `study-imports.json`.
+- `changes.json`, including per-profile verse/resource additions, changes, and removals.
+- All eight exact source inputs, named by SHA-256 (`.xml` dictionaries and `.zip` archives), for future rebuilds.
 
 Verify a downloaded release using the public key committed in this repository:
 
 ```sh
-gh release download data-v1-stable-1 --repo DavidHoenisch/fontes-v2 --dir dist/downloaded
+gh release download data-v1-stable-2 --repo DavidHoenisch/fontes-v2 --dir dist/downloaded
 target/release/fontes-data verify \
   --dir dist/downloaded \
   --trust data/trust/data-release-1.json \
   --repository DavidHoenisch/fontes-v2
 ```
 
-The verifier authenticates the original manifest bytes before parsing, checks source provenance, caps decompression, checks both artifact hashes, and validates SQLite references, coverage, integrity, and search. It does not install content or change user data. A future shared app updater will add atomic activation and recovery.
+The verifier authenticates the original manifest bytes before parsing, checks source provenance, caps decompression at 1 GiB per SQLite artifact and 256 MiB compressed, checks both artifact hashes, and validates SQLite references, coverage, integrity, and search. It does not install content or change user data. A future shared app updater will add atomic activation and recovery.
 
 The publisher expects the `FONTES_DATA_SIGNING_KEY` GitHub repository secret. Its value is a 32-byte Ed25519 seed encoded as hex, matching `data/trust/data-release-1.json`. Private keys belong outside Git. Key generation and repository-secret setup have been performed for the initial release; normal runs do not regenerate keys.
 
 ## Further development
 
-The study profile is defined but deliberately rejected by the compiler until its source adapters are implemented. Scheduled source discovery, reviewed update PRs, and mobile/desktop installation are specified in the [architecture](docs/architecture/data-pipeline.md). See [source research](docs/research/public-domain-data-sources.md) for content and rights decisions.
+Reading and study are published together so a new study release preserves the reading update channel. The publisher accepts `publish --dir dist/reading --additional-dir dist/study` with the usual trust and repository arguments. Scheduled source discovery, reviewed update PRs, and mobile/desktop installation are specified in the [architecture](docs/architecture/data-pipeline.md). See [source research](docs/research/public-domain-data-sources.md) for content and rights decisions.

@@ -3,25 +3,37 @@
   "profiles": [
     {
       "id": "reading",
-      "required_sources": ["kjv-base", "web-classic"],
-      "capabilities": ["reading"]
+      "required_sources": [
+        "kjv-base",
+        "web-classic"
+      ],
+      "capabilities": [
+        "reading"
+      ]
     },
     {
       "id": "study",
       "required_sources": [
-        "kjv-base", "web-classic", "strongs-greek", "strongs-hebrew",
-        "robinson-tr", "matthew-henry", "nave", "tsk"
+        "kjv-base",
+        "web-classic",
+        "strongs-greek",
+        "strongs-hebrew",
+        "robinson-tr",
+        "matthew-henry",
+        "nave",
+        "tsk"
       ],
       "capabilities": [
-        "reading", "strongs_lexicon", "greek_morphology", "commentary", "topics", "cross_references"
+        "reading",
+        "strongs_lexicon",
+        "greek_morphology",
+        "commentary",
+        "topics",
+        "cross_references"
       ]
     }
   ],
   "pending_sources": [
-    {
-      "id": "robinson-tr",
-      "reason": "Full-corpus archive needs a verified lock entry and tested adapter; only John was inspected in source research."
-    },
     {
       "id": "tidwell-overviews",
       "reason": "Editorial source is identified; reviewed structured book overviews must be committed before publishing this capability."

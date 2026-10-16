@@ -1,0 +1,2689 @@
+{
+  "mapping_version": 1,
+  "review": "Baseline inspected 2026-10-15 against exact locked source modules. Preserve malformed, ambiguous, reversed, and out-of-registry citations as source text and diagnostics without inventing corrections. Valid targets in partially malformed lists remain linked. Changes to this explicit baseline require an updated mapping review. Noncanonical books remain outside the initial 66-book registry.",
+  "source_sha256s": {
+    "matthew-henry": "6bcb936873ca144e317805e5c1677940fd86e2403f7c14517752e44f25c8882b",
+    "nave": "52d9b7cde04c2abb5187ae804bcb97d93c7344a1358539f50ebc178ac0c945f0",
+    "tsk": "6784c7099465995a8e66f02ead82b0bca66603c1bdeaf8332949774b7bfd4293"
+  },
+  "known_unmapped_citations": [
+    {
+      "citation": "2Esd.14.21",
+      "reason": "unknown OSIS book 2Esd.14.21",
+      "record": "1Chr.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.70.8",
+      "reason": "verse outside registry: Ps.70.8",
+      "record": "1Chr.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "PrAzar.1.9",
+      "reason": "unknown OSIS book PrAzar.1.9",
+      "record": "1Chr.2.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Zech.26",
+      "reason": "chapter outside registry: Zech.26",
+      "record": "1Chr.24.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.123.7",
+      "reason": "verse outside registry: Ps.123.7",
+      "record": "1Chr.28.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mic.35",
+      "reason": "chapter outside registry: Mic.35",
+      "record": "1Chr.8.33",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mic.41",
+      "reason": "chapter outside registry: Mic.41",
+      "record": "1Chr.9.35",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Esd.6.56-2Esd.6.57",
+      "reason": "unknown OSIS book 2Esd.6.56",
+      "record": "1Cor.1.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Esth.14.11",
+      "reason": "chapter outside registry: Esth.14.11",
+      "record": "1Cor.1.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.16.14",
+      "reason": "verse outside registry: Ps.16.14",
+      "record": "1Cor.10.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.14.34",
+      "reason": "verse outside registry: Rom.14.34",
+      "record": "1Cor.11.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.12-Rom.12.26",
+      "reason": "verse outside registry: Rom.12.26",
+      "record": "1Cor.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.27-Rom.12.30",
+      "reason": "verse outside registry: Rom.12.27",
+      "record": "1Cor.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.31",
+      "reason": "verse outside registry: Rom.12.31",
+      "record": "1Cor.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.28-Rom.12.30",
+      "reason": "verse outside registry: Rom.12.28",
+      "record": "1Cor.12.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.14.24",
+      "reason": "verse outside registry: Rom.14.24",
+      "record": "1Cor.12.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.21-Rom.12.22",
+      "reason": "verse outside registry: Rom.12.22",
+      "record": "1Cor.12.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.24",
+      "reason": "verse outside registry: Rom.12.24",
+      "record": "1Cor.12.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.25",
+      "reason": "verse outside registry: Rom.12.25",
+      "record": "1Cor.12.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.25-Rom.12.26",
+      "reason": "verse outside registry: Rom.12.25",
+      "record": "1Cor.12.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.27",
+      "reason": "verse outside registry: Rom.12.27",
+      "record": "1Cor.12.27",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.28",
+      "reason": "verse outside registry: Rom.12.28",
+      "record": "1Cor.12.27",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.12.29-Rom.12.30",
+      "reason": "verse outside registry: Rom.12.29",
+      "record": "1Cor.12.27",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Cor.2.26",
+      "reason": "verse outside registry: 1Cor.2.26",
+      "record": "1Cor.2.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1John.1.14",
+      "reason": "verse outside registry: 1John.1.14",
+      "record": "1John.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.30",
+      "reason": "chapter outside registry: Dan.30",
+      "record": "1Kgs.12.25",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.31",
+      "reason": "chapter outside registry: Dan.31",
+      "record": "1Kgs.12.25",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Kgs.12.24",
+      "reason": "verse outside registry: 2Kgs.12.24",
+      "record": "1Kgs.13.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Sam.18.51",
+      "reason": "verse outside registry: 1Sam.18.51",
+      "record": "1Sam.18.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Sam.27.13",
+      "reason": "verse outside registry: 1Sam.27.13",
+      "record": "1Sam.27.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Sam.11.1-1Sam.11.27",
+      "reason": "verse outside registry: 1Sam.11.27",
+      "record": "1Sam.31.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.18.10",
+      "reason": "verse outside registry: Isa.18.10",
+      "record": "1Thess.2.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Kgs.22.41-2Kgs.22.50",
+      "reason": "verse outside registry: 2Kgs.22.41",
+      "record": "2Chr.18",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.21.171",
+      "reason": "verse outside registry: Deut.21.171",
+      "record": "2Chr.21.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Chr.35.33",
+      "reason": "verse outside registry: 2Chr.35.33",
+      "record": "2Chr.35.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Chr.36.35",
+      "reason": "verse outside registry: 2Chr.36.35",
+      "record": "2Chr.36.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Kgs.8.1-1Kgs.9.66",
+      "reason": "verse outside registry: 1Kgs.9.66",
+      "record": "2Chr.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Kgs.17.38",
+      "reason": "verse outside registry: 1Kgs.17.38",
+      "record": "2Kgs.1.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.30",
+      "reason": "chapter outside registry: Dan.30",
+      "record": "2Kgs.10.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "PrAzar.1.1",
+      "reason": "unknown OSIS book PrAzar.1.1",
+      "record": "2Kgs.15.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.21.24-Deut.21.26",
+      "reason": "verse outside registry: Deut.21.24",
+      "record": "2Kgs.22.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.28.49-Deut.28.69",
+      "reason": "verse outside registry: Deut.28.69",
+      "record": "2Kgs.24.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.110.15",
+      "reason": "verse outside registry: Ps.110.15",
+      "record": "2Kgs.25.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.2.4-2Macc.2.5",
+      "reason": "unknown OSIS book 2Macc.2.4",
+      "record": "2Kgs.25.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Chr.21.1-2Chr.21.30",
+      "reason": "verse outside registry: 2Chr.21.30",
+      "record": "2Kgs.8.16",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Sam.14.1-2Sam.14.43",
+      "reason": "verse outside registry: 2Sam.14.43",
+      "record": "2Sam.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.12.20",
+      "reason": "verse outside registry: Judg.12.20",
+      "record": "2Sam.2.25",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.12.44",
+      "reason": "verse outside registry: Judg.12.44",
+      "record": "2Sam.2.25",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Sam.21.23",
+      "reason": "verse outside registry: 2Sam.21.23",
+      "record": "2Sam.21.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Gen.10.32-Gen.10.35",
+      "reason": "verse outside registry: Gen.10.35",
+      "record": "2Sam.5.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Gen.10.36",
+      "reason": "verse outside registry: Gen.10.36",
+      "record": "2Sam.5.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Matt.22.47-Matt.22.48",
+      "reason": "verse outside registry: Matt.22.47",
+      "record": "2Tim.3.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jas.14",
+      "reason": "chapter outside registry: Jas.14",
+      "record": "Acts.1.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ac.23.23 24 25.6",
+      "reason": "unknown OSIS book Ac.23.23",
+      "record": "Acts.10.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "De.7.7 8 9.5 6 Mt 20.10",
+      "reason": "unknown OSIS book De.7.7",
+      "record": "Acts.10.34",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Heb.9.9 10.1 4",
+      "reason": "unknown OSIS book 10.1",
+      "record": "Acts.13.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mark.38",
+      "reason": "chapter outside registry: Mark.38",
+      "record": "Acts.15.36",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.22",
+      "reason": "chapter outside registry: Rom.22",
+      "record": "Acts.16.16",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.39",
+      "reason": "chapter outside registry: Rom.39",
+      "record": "Acts.16.35",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.26",
+      "reason": "chapter outside registry: John.26",
+      "record": "Acts.18.24",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eph.29",
+      "reason": "chapter outside registry: Eph.29",
+      "record": "Acts.19.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eph.35",
+      "reason": "chapter outside registry: Eph.35",
+      "record": "Acts.19.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.18",
+      "reason": "chapter outside registry: Rom.18",
+      "record": "Acts.28.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Acts.11.32",
+      "reason": "verse outside registry: Acts.11.32",
+      "record": "Acts.3.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Acts.8.41",
+      "reason": "verse outside registry: Acts.8.41",
+      "record": "Acts.8.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Cor.12.1-2Cor.12.31",
+      "reason": "verse outside registry: 2Cor.12.31",
+      "record": "Acts.9.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Amos.1.1-Amos.2.32",
+      "reason": "verse outside registry: Amos.2.32",
+      "record": "Amos.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Mac.11.59",
+      "reason": "unknown OSIS book 1Mac.11.59",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.11-1Macc.1.15",
+      "reason": "unknown OSIS book 1Macc.1.11",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.21",
+      "reason": "unknown OSIS book 1Macc.1.21",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.41-1Macc.1.42",
+      "reason": "unknown OSIS book 1Macc.1.41",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.45",
+      "reason": "unknown OSIS book 1Macc.1.45",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.54",
+      "reason": "unknown OSIS book 1Macc.1.54",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.60-1Macc.1.61",
+      "reason": "unknown OSIS book 1Macc.1.60",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.2.45",
+      "reason": "unknown OSIS book 1Macc.2.45",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.3.27",
+      "reason": "unknown OSIS book 1Macc.3.27",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.3.2-2Macc.3.3",
+      "reason": "unknown OSIS book 2Macc.3.2",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.4.23",
+      "reason": "unknown OSIS book 2Macc.4.23",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.4.9",
+      "reason": "unknown OSIS book 2Macc.4.9",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.5.15",
+      "reason": "unknown OSIS book 2Macc.5.15",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.6.19",
+      "reason": "unknown OSIS book 2Macc.6.19",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.6.2",
+      "reason": "unknown OSIS book 2Macc.6.2",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.7",
+      "reason": "unknown OSIS book 2Macc.7",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.9.10",
+      "reason": "unknown OSIS book 2Macc.9.10",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.9.8",
+      "reason": "unknown OSIS book 2Macc.9.8",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.8.35",
+      "reason": "verse outside registry: Dan.8.35",
+      "record": "Dan.11.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.10.1",
+      "reason": "unknown OSIS book 1Macc.10.1",
+      "record": "Dan.12.5",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.9.28",
+      "reason": "unknown OSIS book 1Macc.9.28",
+      "record": "Dan.12.5",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.27.27-Job.27.28",
+      "reason": "verse outside registry: Job.27.27",
+      "record": "Dan.2.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.6.29",
+      "reason": "verse outside registry: Dan.6.29",
+      "record": "Dan.5.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.6.30",
+      "reason": "verse outside registry: Dan.6.30",
+      "record": "Dan.5.30",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.6.31",
+      "reason": "verse outside registry: Dan.6.31",
+      "record": "Dan.5.30",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.4.52",
+      "reason": "unknown OSIS book 1Macc.4.52",
+      "record": "Dan.8.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.6.7",
+      "reason": "unknown OSIS book 2Macc.6.7",
+      "record": "Dan.8.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Exod.17.25",
+      "reason": "verse outside registry: Exod.17.25",
+      "record": "Deut.16.18",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.33.42",
+      "reason": "verse outside registry: Deut.33.42",
+      "record": "Deut.33",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.33.32",
+      "reason": "verse outside registry: Deut.33.32",
+      "record": "Deut.33.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.33.33",
+      "reason": "verse outside registry: Deut.33.33",
+      "record": "Deut.33.18",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Amos.24.6",
+      "reason": "chapter outside registry: Amos.24.6",
+      "record": "Deut.33.26",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.8.17-Deut.8.26",
+      "reason": "verse outside registry: Deut.8.26",
+      "record": "Deut.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.8.24",
+      "reason": "verse outside registry: Deut.8.24",
+      "record": "Deut.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.8.25",
+      "reason": "verse outside registry: Deut.8.25",
+      "record": "Deut.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.8.26",
+      "reason": "verse outside registry: Deut.8.26",
+      "record": "Deut.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.23.33",
+      "reason": "verse outside registry: Job.23.33",
+      "record": "Eccl.5.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Esth.10.4",
+      "reason": "verse outside registry: Esth.10.4",
+      "record": "Esth.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Esth.13.12-Esth.13.14",
+      "reason": "chapter outside registry: Esth.13.12",
+      "record": "Esth.3.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Esth.14.16",
+      "reason": "chapter outside registry: Esth.14.16",
+      "record": "Esth.5.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Num.38.4",
+      "reason": "chapter outside registry: Num.38.4",
+      "record": "Exod.15.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Exod.17.19",
+      "reason": "verse outside registry: Exod.17.19",
+      "record": "Exod.17.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Kgs.1.39",
+      "reason": "verse outside registry: 2Kgs.1.39",
+      "record": "Exod.30.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "15.1",
+      "reason": "unknown OSIS book 15.1",
+      "record": "Exod.32.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eze.14.14",
+      "reason": "unknown OSIS book Eze.14.14",
+      "record": "Exod.32.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.35",
+      "reason": "chapter outside registry: Dan.35",
+      "record": "Exod.35.30",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Exod.7.26",
+      "reason": "verse outside registry: Exod.7.26",
+      "record": "Exod.7.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.23.23",
+      "reason": "verse outside registry: Job.23.23",
+      "record": "Ezek.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezek.13.24",
+      "reason": "verse outside registry: Ezek.13.24",
+      "record": "Ezek.13",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Le 18.19 20.18",
+      "reason": "unknown OSIS book Le",
+      "record": "Ezek.18.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.89.38-Isa.89.39",
+      "reason": "chapter outside registry: Isa.89.38",
+      "record": "Ezek.19.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.27.28",
+      "reason": "verse outside registry: Deut.27.28",
+      "record": "Ezek.20.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.5.3",
+      "reason": "unknown OSIS book 1Macc.5.3",
+      "record": "Ezek.25.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezek.25.15-Ezek.25.21",
+      "reason": "verse outside registry: Ezek.25.21",
+      "record": "Ezek.26",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezek.15.14",
+      "reason": "verse outside registry: Ezek.15.14",
+      "record": "Ezek.32",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.3.41",
+      "reason": "unknown OSIS book 1Macc.3.41",
+      "record": "Ezek.38.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "La 4.3 4 5.10",
+      "reason": "unknown OSIS book La",
+      "record": "Ezek.4.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezek.43.1-Ezek.43.31",
+      "reason": "verse outside registry: Ezek.43.31",
+      "record": "Ezek.44.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.33",
+      "reason": "chapter outside registry: Dan.33",
+      "record": "Ezek.48.31",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.15",
+      "reason": "chapter outside registry: Dan.15",
+      "record": "Gen.14.13",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "PrMan.1.24",
+      "reason": "unknown OSIS book PrMan.1.24",
+      "record": "Gen.2.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "21.13",
+      "reason": "unknown OSIS book 21.13",
+      "record": "Gen.25.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ge.17.20",
+      "reason": "unknown OSIS book Ge.17.20",
+      "record": "Gen.25.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jas.9.7",
+      "reason": "chapter outside registry: Jas.9.7",
+      "record": "Gen.9.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hab.2.20-Hab.2.23",
+      "reason": "verse outside registry: Hab.2.23",
+      "record": "Hag.2",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Mac.11.59",
+      "reason": "unknown OSIS book 1Mac.11.59",
+      "record": "Heb.11.32",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.7.5",
+      "reason": "unknown OSIS book 2Macc.7.5",
+      "record": "Heb.11.32",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.49.10",
+      "reason": "unknown OSIS book Sir.49.10",
+      "record": "Hos.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.10",
+      "reason": "verse outside registry: Hos.14.10",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.10",
+      "reason": "verse outside registry: Hos.14.10",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.12",
+      "reason": "verse outside registry: Hos.14.12",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.13",
+      "reason": "verse outside registry: Hos.14.13",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.15-Hos.14.16",
+      "reason": "verse outside registry: Hos.14.15",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hos.14.16",
+      "reason": "verse outside registry: Hos.14.16",
+      "record": "Hos.13.9",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.29.33",
+      "reason": "verse outside registry: Deut.29.33",
+      "record": "Hos.4.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Deut.31.32-Deut.31.33",
+      "reason": "verse outside registry: Deut.31.32",
+      "record": "Hos.4.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Chr.28.28",
+      "reason": "verse outside registry: 2Chr.28.28",
+      "record": "Hos.5.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.16.35",
+      "reason": "verse outside registry: Ps.16.35",
+      "record": "Hos.7.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.72.27",
+      "reason": "verse outside registry: Ps.72.27",
+      "record": "Hos.9.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ho 4.15 12.11 Am 4.4 5.5",
+      "reason": "unknown OSIS book Ho",
+      "record": "Hos.9.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Ki 2.3 4.1 38 5.22 6.1",
+      "reason": "unknown OSIS book 2Ki",
+      "record": "Isa.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Psa.51.105",
+      "reason": "unknown OSIS book Psa.51.105",
+      "record": "Isa.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Psa.51.12",
+      "reason": "unknown OSIS book Psa.51.12",
+      "record": "Isa.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.36.36",
+      "reason": "verse outside registry: Isa.36.36",
+      "record": "Isa.36.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.23.23",
+      "reason": "verse outside registry: Job.23.23",
+      "record": "Isa.4.2",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.23.26",
+      "reason": "verse outside registry: Job.23.26",
+      "record": "Isa.4.2",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.401",
+      "reason": "chapter outside registry: Isa.401",
+      "record": "Isa.40",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.47.16-Isa.47.19",
+      "reason": "verse outside registry: Isa.47.16",
+      "record": "Isa.48",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.47.20-Isa.47.22",
+      "reason": "verse outside registry: Isa.47.20",
+      "record": "Isa.48",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.131.4",
+      "reason": "verse outside registry: Ps.131.4",
+      "record": "Isa.5.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezr 1.7 8.23",
+      "reason": "unknown OSIS book Ezr",
+      "record": "Isa.52.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.53.19",
+      "reason": "verse outside registry: Isa.53.19",
+      "record": "Isa.53.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps 60.1 2Sa 8.13 14",
+      "reason": "unknown OSIS book 60.1",
+      "record": "Isa.63.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.2.4",
+      "reason": "unknown OSIS book 2Macc.2.4",
+      "record": "Jer.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.17.34",
+      "reason": "verse outside registry: Ps.17.34",
+      "record": "Jer.12.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.11.24",
+      "reason": "verse outside registry: Jer.11.24",
+      "record": "Jer.13.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.38.29",
+      "reason": "verse outside registry: Jer.38.29",
+      "record": "Jer.38.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.3.29-Jer.3.37 Jer.4.1-Jer.4.2",
+      "reason": "verse outside registry: Jer.3.29",
+      "record": "Jer.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "De 4.29 30.2",
+      "reason": "unknown OSIS book De",
+      "record": "Jer.4.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.16.46",
+      "reason": "verse outside registry: Ps.16.46",
+      "record": "Jer.42.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.48.48",
+      "reason": "verse outside registry: Jer.48.48",
+      "record": "Jer.48",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.15.16",
+      "reason": "verse outside registry: Isa.15.16",
+      "record": "Jer.48.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.17.26",
+      "reason": "verse outside registry: Ps.17.26",
+      "record": "Jer.49.23",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Sam.28.26",
+      "reason": "chapter outside registry: 2Sam.28.26",
+      "record": "Jer.7.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.26.5-Job.26.15",
+      "reason": "verse outside registry: Job.26.15",
+      "record": "Job.26",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.57.23",
+      "reason": "verse outside registry: Isa.57.23",
+      "record": "Job.3.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Job.33.33-Job.33.37",
+      "reason": "verse outside registry: Job.33.37",
+      "record": "Job.34",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.4.13",
+      "reason": "verse outside registry: Ps.4.13",
+      "record": "Job.4.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "18.24",
+      "reason": "unknown OSIS book 18.24",
+      "record": "Job.6.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Pr.17.17",
+      "reason": "unknown OSIS book Pr.17.17",
+      "record": "Job.6.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.14.29-Ps.14.30",
+      "reason": "verse outside registry: Ps.14.29",
+      "record": "Job.7.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.36.36",
+      "reason": "verse outside registry: Ps.36.36",
+      "record": "Job.8.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Zech.13.17",
+      "reason": "verse outside registry: Zech.13.17",
+      "record": "John.10.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.1.18",
+      "reason": "unknown OSIS book 2Macc.1.18",
+      "record": "John.10.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Zech.9.19",
+      "reason": "verse outside registry: Zech.9.19",
+      "record": "John.12.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.3.31-John.14.33",
+      "reason": "verse outside registry: John.14.33",
+      "record": "John.13.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.13.31-John.14.33",
+      "reason": "verse outside registry: John.14.33",
+      "record": "John.13.31",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.16.13-Ps.16.14",
+      "reason": "verse outside registry: Ps.16.13",
+      "record": "John.15.18",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.16-Jer.19.18",
+      "reason": "verse outside registry: Jer.19.16",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.19-Jer.19.22",
+      "reason": "verse outside registry: Jer.19.19",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.23-Jer.19.24",
+      "reason": "verse outside registry: Jer.19.23",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.25-Jer.19.27",
+      "reason": "verse outside registry: Jer.19.25",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.28-Jer.19.29",
+      "reason": "verse outside registry: Jer.19.28",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.30",
+      "reason": "verse outside registry: Jer.19.30",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.31-Jer.19.37",
+      "reason": "verse outside registry: Jer.19.31",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.19.38-Jer.19.42",
+      "reason": "verse outside registry: Jer.19.38",
+      "record": "John.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Jo.1.1 2Pe 1.16",
+      "reason": "unknown OSIS book 1Jo.1.1",
+      "record": "John.19.31",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.2.42",
+      "reason": "verse outside registry: John.2.42",
+      "record": "John.3.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.24.15",
+      "reason": "chapter outside registry: John.24.15",
+      "record": "John.4.43",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.17.23-Ps.17.24",
+      "reason": "verse outside registry: Ps.17.23",
+      "record": "John.6.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.19.20-Neh.19.21",
+      "reason": "chapter outside registry: Neh.19.20",
+      "record": "John.6.28",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Wis.16.20",
+      "reason": "unknown OSIS book Wis.16.20",
+      "record": "John.6.28",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Josh.25.15",
+      "reason": "chapter outside registry: Josh.25.15",
+      "record": "John.6.60",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jonah.8",
+      "reason": "chapter outside registry: Jonah.8",
+      "record": "Jonah.1.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.47.32",
+      "reason": "verse outside registry: Jer.47.32",
+      "record": "Josh.13.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Josh.16.1-Josh.16.12",
+      "reason": "verse outside registry: Josh.16.12",
+      "record": "Josh.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Josh.16.13-Josh.16.19",
+      "reason": "verse outside registry: Josh.16.13",
+      "record": "Josh.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Josh.16.20-Josh.16.63",
+      "reason": "verse outside registry: Josh.16.20",
+      "record": "Josh.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Exod.24.1-Exod.24.33",
+      "reason": "verse outside registry: Exod.24.33",
+      "record": "Josh.24.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Josh.28",
+      "reason": "chapter outside registry: Josh.28",
+      "record": "Josh.8.23",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Ti.4.1 2Ti 3.1 2Pe 3.3",
+      "reason": "unknown OSIS book 1Ti.4.1",
+      "record": "Jude.1.16",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ezra.7.35",
+      "reason": "verse outside registry: Ezra.7.35",
+      "record": "Judg.12.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mic.13",
+      "reason": "chapter outside registry: Mic.13",
+      "record": "Judg.17.7",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.23",
+      "reason": "chapter outside registry: Dan.23",
+      "record": "Judg.18.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.26",
+      "reason": "verse outside registry: Judg.7.26",
+      "record": "Judg.8.18",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.26",
+      "reason": "verse outside registry: Judg.7.26",
+      "record": "Judg.8.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.27",
+      "reason": "verse outside registry: Judg.7.27",
+      "record": "Judg.8.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.28",
+      "reason": "verse outside registry: Judg.7.28",
+      "record": "Judg.8.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.27",
+      "reason": "verse outside registry: Judg.7.27",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.29",
+      "reason": "verse outside registry: Judg.7.29",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.30",
+      "reason": "verse outside registry: Judg.7.30",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.31",
+      "reason": "verse outside registry: Judg.7.31",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.33",
+      "reason": "verse outside registry: Judg.7.33",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.34",
+      "reason": "verse outside registry: Judg.7.34",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Judg.7.35",
+      "reason": "verse outside registry: Judg.7.35",
+      "record": "Judg.8.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Lev.10.23",
+      "reason": "verse outside registry: Lev.10.23",
+      "record": "Lev.10.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Lev.1.23",
+      "reason": "verse outside registry: Lev.1.23",
+      "record": "Lev.17.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Lev.1.25",
+      "reason": "verse outside registry: Lev.1.25",
+      "record": "Lev.17.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.11.8",
+      "reason": "verse outside registry: Ps.11.8",
+      "record": "Lev.25.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.131.15",
+      "reason": "verse outside registry: Ps.131.15",
+      "record": "Lev.25.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.28.26",
+      "reason": "verse outside registry: Ps.28.26",
+      "record": "Lev.26.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Hab.7.21",
+      "reason": "chapter outside registry: Hab.7.21",
+      "record": "Lev.8.31",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.61",
+      "reason": "chapter outside registry: John.61",
+      "record": "Luke.1.57",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.11.8 Isa.11.19",
+      "reason": "verse outside registry: Isa.11.19",
+      "record": "Luke.10.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Kgs.19.46",
+      "reason": "verse outside registry: 1Kgs.19.46",
+      "record": "Luke.15.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.30",
+      "reason": "chapter outside registry: John.30",
+      "record": "Luke.7.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.70.19",
+      "reason": "verse outside registry: Ps.70.19",
+      "record": "Mal.3.13",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mal.4.10",
+      "reason": "verse outside registry: Mal.4.10",
+      "record": "Mal.4.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.30",
+      "reason": "chapter outside registry: John.30",
+      "record": "Mark.1.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.42",
+      "reason": "chapter outside registry: John.42",
+      "record": "Mark.10.32",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jas.38",
+      "reason": "chapter outside registry: Jas.38",
+      "record": "Mark.5.35",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Exod.34.40",
+      "reason": "verse outside registry: Exod.34.40",
+      "record": "Mark.9.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.73.9",
+      "reason": "chapter outside registry: Isa.73.9",
+      "record": "Matt.11.25",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Ti.4.1 2Ti 3.1 2 3.3",
+      "reason": "unknown OSIS book 1Ti.4.1",
+      "record": "Matt.15.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Mic.4.16",
+      "reason": "verse outside registry: Mic.4.16",
+      "record": "Matt.15.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.4.21",
+      "reason": "verse outside registry: Ps.4.21",
+      "record": "Matt.15.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.7.9",
+      "reason": "unknown OSIS book 2Macc.7.9",
+      "record": "Matt.16.13",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.77.38",
+      "reason": "verse outside registry: Ps.77.38",
+      "record": "Matt.18.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.77.40",
+      "reason": "verse outside registry: Ps.77.40",
+      "record": "Matt.18.21",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.43.10",
+      "reason": "verse outside registry: Ps.43.10",
+      "record": "Matt.20.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Esth.7.17",
+      "reason": "verse outside registry: Esth.7.17",
+      "record": "Matt.22.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "1Macc.1.54",
+      "reason": "unknown OSIS book 1Macc.1.54",
+      "record": "Matt.24.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.36.37",
+      "reason": "verse outside registry: Ps.36.37",
+      "record": "Matt.24.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.61.9",
+      "reason": "verse outside registry: Ps.61.9",
+      "record": "Matt.26.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.50.14",
+      "reason": "verse outside registry: Isa.50.14",
+      "record": "Matt.27.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.62.13-Isa.62.14",
+      "reason": "verse outside registry: Isa.62.13",
+      "record": "Matt.27.50",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Lu.24.6 7-44 Mk 16.7",
+      "reason": "unknown OSIS book Lu.24.6",
+      "record": "Matt.28.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eph.50.6",
+      "reason": "chapter outside registry: Eph.50.6",
+      "record": "Matt.3.13",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.2.1",
+      "reason": "unknown OSIS book Sir.2.1",
+      "record": "Matt.4.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Nah.1.9-Nah.1.16",
+      "reason": "verse outside registry: Nah.1.16",
+      "record": "Nah.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Macc.1.18",
+      "reason": "unknown OSIS book 2Macc.1.18",
+      "record": "Neh.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.15.15",
+      "reason": "chapter outside registry: Neh.15.15",
+      "record": "Neh.13.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.17.17",
+      "reason": "chapter outside registry: Neh.17.17",
+      "record": "Neh.13.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.1.13-Neh.1.14",
+      "reason": "verse outside registry: Neh.1.13",
+      "record": "Neh.3",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.1.15",
+      "reason": "verse outside registry: Neh.1.15",
+      "record": "Neh.3",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.1.16-Neh.1.26",
+      "reason": "verse outside registry: Neh.1.16",
+      "record": "Neh.3",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.1.27-Neh.1.32",
+      "reason": "verse outside registry: Neh.1.27",
+      "record": "Neh.3",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.1.6-Neh.1.12",
+      "reason": "verse outside registry: Neh.1.12",
+      "record": "Neh.3",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Neh.2.16-Neh.2.23",
+      "reason": "verse outside registry: Neh.2.23",
+      "record": "Neh.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.16.15",
+      "reason": "verse outside registry: Ps.16.15",
+      "record": "Num.11.31",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Wis.16.20",
+      "reason": "unknown OSIS book Wis.16.20",
+      "record": "Num.11.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Dan.1700",
+      "reason": "chapter outside registry: Dan.1700",
+      "record": "Num.26.5",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Num.27.33",
+      "reason": "verse outside registry: Num.27.33",
+      "record": "Num.27.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Lev.33.36",
+      "reason": "chapter outside registry: Lev.33.36",
+      "record": "Num.29.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Num.24.50-Num.24.51",
+      "reason": "verse outside registry: Num.24.50",
+      "record": "Num.6.22",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Col.3.1 2Pe 2.4",
+      "reason": "unknown OSIS book 2Pe",
+      "record": "Phlm.1.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.15 Rom.30 2Cor.1.11 Eph.6.18-Eph.6.19 1Thess.5.25",
+      "reason": "chapter outside registry: Rom.30",
+      "record": "Phlm.1.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "2Cor.9.20",
+      "reason": "verse outside registry: 2Cor.9.20",
+      "record": "Prov.11.24",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.110.11",
+      "reason": "verse outside registry: Ps.110.11",
+      "record": "Prov.11.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.6.35",
+      "reason": "unknown OSIS book Sir.6.35",
+      "record": "Prov.13.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.8.9",
+      "reason": "unknown OSIS book Sir.8.9",
+      "record": "Prov.13.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "5.7",
+      "reason": "unknown OSIS book 5.7",
+      "record": "Prov.15.28",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ne.2.4",
+      "reason": "unknown OSIS book Ne.2.4",
+      "record": "Prov.15.28",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Prov.18.27",
+      "reason": "verse outside registry: Prov.18.27",
+      "record": "Prov.19.28",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Prov.18.28",
+      "reason": "verse outside registry: Prov.18.28",
+      "record": "Prov.19.29",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.12.14",
+      "reason": "verse outside registry: Ps.12.14",
+      "record": "Prov.23.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eph.7",
+      "reason": "chapter outside registry: Eph.7",
+      "record": "Prov.29.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Pr.10.19 11.12 12.23 13.3 17.27 28 29.11 20",
+      "reason": "unknown OSIS book Pr.10.19",
+      "record": "Prov.31.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Pr.11.14 15.22 18.13 19.2 20.5 18 21.29 22.3 25.8-10",
+      "reason": "unknown OSIS book Pr.11.14",
+      "record": "Prov.31.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Pr.16.3 18.10 23.26 27.1 28.25 29.25",
+      "reason": "unknown OSIS book Pr.16.3",
+      "record": "Prov.31.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Pr.17.17 18.24 27.9 10 14 17",
+      "reason": "unknown OSIS book Pr.17.17",
+      "record": "Prov.31.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.8.13",
+      "reason": "unknown OSIS book Sir.8.13",
+      "record": "Prov.6.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.12",
+      "reason": "verse outside registry: Ps.6.12",
+      "record": "Prov.6.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.13",
+      "reason": "verse outside registry: Ps.6.13",
+      "record": "Prov.6.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.15",
+      "reason": "verse outside registry: Ps.6.15",
+      "record": "Prov.6.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.16",
+      "reason": "verse outside registry: Ps.6.16",
+      "record": "Prov.6.12",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.20",
+      "reason": "verse outside registry: Ps.6.20",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.20",
+      "reason": "verse outside registry: Ps.6.20",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.21",
+      "reason": "verse outside registry: Ps.6.21",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.22",
+      "reason": "verse outside registry: Ps.6.22",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.23",
+      "reason": "verse outside registry: Ps.6.23",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.23",
+      "reason": "verse outside registry: Ps.6.23",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.24",
+      "reason": "verse outside registry: Ps.6.24",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.25",
+      "reason": "verse outside registry: Ps.6.25",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.26",
+      "reason": "verse outside registry: Ps.6.26",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.29",
+      "reason": "verse outside registry: Ps.6.29",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.30-Ps.6.33",
+      "reason": "verse outside registry: Ps.6.30",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.31",
+      "reason": "verse outside registry: Ps.6.31",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.33",
+      "reason": "verse outside registry: Ps.6.33",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.34-Ps.6.35",
+      "reason": "verse outside registry: Ps.6.34",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Sir.3.2",
+      "reason": "unknown OSIS book Sir.3.2",
+      "record": "Prov.6.20",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.11",
+      "reason": "verse outside registry: Ps.6.11",
+      "record": "Prov.6.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.6.9-Ps.6.11",
+      "reason": "verse outside registry: Ps.6.11",
+      "record": "Prov.6.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.7.24",
+      "reason": "verse outside registry: Ps.7.24",
+      "record": "Prov.7.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Prov.21.38",
+      "reason": "verse outside registry: Prov.21.38",
+      "record": "Prov.8.32",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.1.23",
+      "reason": "verse outside registry: Ps.1.23",
+      "record": "Ps.1.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.113.78",
+      "reason": "verse outside registry: Ps.113.78",
+      "record": "Ps.113.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.72.23",
+      "reason": "verse outside registry: Ps.72.23",
+      "record": "Ps.116.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Col.8.5",
+      "reason": "chapter outside registry: Col.8.5",
+      "record": "Ps.116.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.132.118",
+      "reason": "verse outside registry: Ps.132.118",
+      "record": "Ps.120",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.76.68",
+      "reason": "verse outside registry: Ps.76.68",
+      "record": "Ps.132.11",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.68.28 Ps.68.80 Ps.68.17 Ps.68.18",
+      "reason": "verse outside registry: Ps.68.80",
+      "record": "Ps.28.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.36.36",
+      "reason": "verse outside registry: Jer.36.36",
+      "record": "Ps.31.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Jer.20.20",
+      "reason": "verse outside registry: Jer.20.20",
+      "record": "Ps.39.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.79.47",
+      "reason": "verse outside registry: Ps.79.47",
+      "record": "Ps.39.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "10.1-4",
+      "reason": "unknown OSIS book 10.1",
+      "record": "Ps.40.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.42.13 Ps.72.19 Ps.89.52 Ps.106.48",
+      "reason": "verse outside registry: Ps.42.13",
+      "record": "Ps.41.5",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.43.2-Ps.42.9",
+      "reason": "reversed OSIS reference",
+      "record": "Ps.43",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.43.2-Ps.42.9",
+      "reason": "reversed OSIS reference",
+      "record": "Ps.43",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.43.5-Ps.42.11",
+      "reason": "reversed OSIS reference",
+      "record": "Ps.43",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.43.5-Ps.42.11",
+      "reason": "reversed OSIS reference",
+      "record": "Ps.43",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.45.18",
+      "reason": "verse outside registry: Ps.45.18",
+      "record": "Ps.45.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.5.16",
+      "reason": "verse outside registry: Ps.5.16",
+      "record": "Ps.49.15",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.56.16-Ps.56.19 Ps.56.22 Ps.56.23",
+      "reason": "verse outside registry: Ps.56.16",
+      "record": "Ps.55",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.56.9-Ps.56.15 Ps.56.20 Ps.56.21",
+      "reason": "verse outside registry: Ps.56.15",
+      "record": "Ps.55",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.82.10",
+      "reason": "verse outside registry: Ps.82.10",
+      "record": "Ps.82",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Isa.126.1 Isa.126.4 Ps.126.1 Ps.126.4",
+      "reason": "chapter outside registry: Isa.126.1",
+      "record": "Ps.85.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "4.4",
+      "reason": "unknown OSIS book 4.4",
+      "record": "Ps.97.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Php.3.3",
+      "reason": "unknown OSIS book Php.3.3",
+      "record": "Ps.97.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.3.38",
+      "reason": "verse outside registry: Rom.3.38",
+      "record": "Rom.1.16",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eccl.11.15",
+      "reason": "verse outside registry: Eccl.11.15",
+      "record": "Rom.1.19",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Eph.1.29",
+      "reason": "verse outside registry: Eph.1.29",
+      "record": "Rom.11.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "John.14.34",
+      "reason": "verse outside registry: John.14.34",
+      "record": "Rom.12.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Col.1.31",
+      "reason": "verse outside registry: Col.1.31",
+      "record": "Rom.2.17",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.5.6-Rom.5.23",
+      "reason": "verse outside registry: Rom.5.23",
+      "record": "Rom.5",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.5.22",
+      "reason": "verse outside registry: Rom.5.22",
+      "record": "Rom.5.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Rom.9.35",
+      "reason": "verse outside registry: Rom.9.35",
+      "record": "Rom.9.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.84.19",
+      "reason": "verse outside registry: Ps.84.19",
+      "record": "Song.2.14",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.48.24",
+      "reason": "verse outside registry: Ps.48.24",
+      "record": "Song.2.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.59.26",
+      "reason": "verse outside registry: Ps.59.26",
+      "record": "Song.5.2",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Song.7.24",
+      "reason": "verse outside registry: Song.7.24",
+      "record": "Song.7.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Heb.14.13",
+      "reason": "chapter outside registry: Heb.14.13",
+      "record": "Song.7.10",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Titus.15 Titus.16",
+      "reason": "chapter outside registry: Titus.15",
+      "record": "Titus.1.6",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Titus.3.24",
+      "reason": "verse outside registry: Titus.3.24",
+      "record": "Titus.3.1",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Zech.2.11-Zech.2.14",
+      "reason": "verse outside registry: Zech.2.14",
+      "record": "Zech.4",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "Ps.67.18",
+      "reason": "verse outside registry: Ps.67.18",
+      "record": "Zeph.3.8",
+      "source_id": "matthew-henry"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "AHITUB",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.12.18",
+      "reason": "chapter outside registry: Col.12.18",
+      "record": "CORINTH",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.16",
+      "reason": "chapter outside registry: Col.8.16",
+      "record": "CORINTH",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.17",
+      "reason": "chapter outside registry: Col.8.17",
+      "record": "CORINTH",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.22",
+      "reason": "chapter outside registry: Col.8.22",
+      "record": "DILIGENCE",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Wis.2",
+      "reason": "unknown OSIS book Wis.2",
+      "record": "GIFTS FROM GOD",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "HOLY SPIRIT",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "INTOLERANCE, RELIGIOUS",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "JECHOLIAH",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "JEROHAM",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "LEPROSY",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.16",
+      "reason": "chapter outside registry: Col.8.16",
+      "record": "MINISTER, CHRISTIAN",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.17",
+      "reason": "chapter outside registry: Col.8.17",
+      "record": "MINISTER, CHRISTIAN",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.19",
+      "reason": "chapter outside registry: Col.8.19",
+      "record": "MINISTER, CHRISTIAN",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Col.8.23",
+      "reason": "chapter outside registry: Col.8.23",
+      "record": "MINISTER, CHRISTIAN",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "MINISTER, CHRISTIAN",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Exod.3.29",
+      "reason": "verse outside registry: Exod.3.29",
+      "record": "MIRACLES",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Mark.18.42",
+      "reason": "chapter outside registry: Mark.18.42",
+      "record": "MIRACLES",
+      "source_id": "nave"
+    },
+    {
+      "citation": "Mark.18.43",
+      "reason": "chapter outside registry: Mark.18.43",
+      "record": "MIRACLES",
+      "source_id": "nave"
+    },
+    {
+      "citation": "1Chr.22.27",
+      "reason": "verse outside registry: 1Chr.22.27",
+      "record": "MUSIC",
+      "source_id": "nave"
+    },
+    {
+      "citation": "1Chr.22.30",
+      "reason": "verse outside registry: 1Chr.22.30",
+      "record": "MUSIC",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "OBED",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "ODED",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "PRAYER",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "PREACHING",
+      "source_id": "nave"
+    },
+    {
+      "citation": "PrAzar.1.2",
+      "reason": "unknown OSIS book PrAzar.1.2",
+      "record": "REPENTANCE",
+      "source_id": "nave"
+    },
+    {
+      "citation": "21:34; Php 4:6,11; Heb 13:5; 1Pe 5:7",
+      "reason": "chapter outside registry: 1Cor.21.34",
+      "record": "1Cor.7.21",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "9,19; 1Sa 11:14,15; 1Ch 29:21-13",
+      "reason": "reversed reference",
+      "record": "1Kgs.1.25",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "21; 2Ki 25:16,17; 2Ch 3:15-17; 4:12-22; Jer 52:21-13",
+      "reason": "reversed reference",
+      "record": "1Kgs.7.15",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "22:17,18; Tit 3:1",
+      "reason": "verse outside registry: 2Chr.22.17",
+      "record": "2Chr.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "24:1-26:32",
+      "reason": "verse outside registry: 2Chr.26.32",
+      "record": "2Chr.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "14:11; 20:6; Jud 7:7; 1Sa 14:6; Job 5:18; 9:13; Ps 20:7; 33:16-10",
+      "reason": "reversed reference",
+      "record": "2Chr.25.8",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "16:10; Joh 6:28,29; Php 2:30; 1Th 1:3; Tit 2:14; Heb 13:21",
+      "reason": "chapter outside registry: 2Cor.16.10",
+      "record": "2Cor.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "11; 3:11,14,18,23; Le 19:18; Mt 22:37-39; Mr 12:29-33; Lu 10:37",
+      "reason": "chapter outside registry: 2John.3.11",
+      "record": "2John.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "21-23",
+      "reason": "verse outside registry: 2Kgs.1.21",
+      "record": "2Kgs.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Pr 30:20; Eze 33:31; Mt 26:15,16,21-15; Joh 13:2,26-30",
+      "reason": "reversed reference",
+      "record": "2Kgs.5.25",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "5:11,14; Isa 40:1,2; Lu 21:28; Heb 12:12",
+      "reason": "chapter outside registry: 2Thess.5.11",
+      "record": "2Thess.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "2:1",
+      "reason": "chapter outside registry: 3John.2.1",
+      "record": "3John.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "28; 1:49; 6:69,70; 9:35-38; Ps 2:7,12; Mt 16:16; 27:54; Lu 1:4",
+      "reason": "verse outside registry: Acts.1.28",
+      "record": "Acts.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "3:15,16,18,36; 5:24,39,40; 6:40; 10:10; Mr 16:16; 1Pe 1:9",
+      "reason": "verse outside registry: Acts.3.36",
+      "record": "Acts.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "9:5; 10:11; 11:9; 34:4; Ne 9:8; Ps 105:8-11",
+      "reason": "chapter outside registry: Acts.34.4",
+      "record": "Acts.7.5",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "23",
+      "reason": "verse outside registry: Dan.1.23",
+      "record": "Dan.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "2:2-11,21-13; 4:7,8-18; 5:7,8,17; Ge 41:8; Ex 7:11,12,22; 8:7,19",
+      "reason": "reversed reference",
+      "record": "Dan.1.20",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "1Sa 30:15; Ob 1:14; Phm 10:19",
+      "reason": "chapter outside registry: Phlm.10.19",
+      "record": "Deut.23.15",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "15:18; 16:28; 17:14; 26:21; 28:25; 29:22",
+      "reason": "chapter outside registry: Eccl.15.18",
+      "record": "Eccl.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "1,12,26",
+      "reason": "verse outside registry: Esth.1.26",
+      "record": "Esth.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "10:35-39; 13:10-12; 2Ch 31:5,6; Mal 3:8-10; Ga 6:6",
+      "reason": "verse outside registry: Esth.10.35",
+      "record": "Esth.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "1,24-26; Jos 24:27-29; Heb 11:22",
+      "reason": "verse outside registry: Exod.1.24",
+      "record": "Exod.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "29; 15:5; 25:8,17; 35:29; Job 5:26; 14:10; 30:23; Ec 12:7; Isa 57:1,2",
+      "reason": "verse outside registry: Exod.1.29",
+      "record": "Exod.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "45:18,19; Ex 40:29; Le 1:5-17; 8:18-21; 16:19; Heb 9:21-13; 10:4-12",
+      "reason": "reversed reference",
+      "record": "Ezek.43.18",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "20:34; 24:27; 25:26; 26:22; 32:32; 33:19; 2Ki 10:34; 16:19; 20:20",
+      "reason": "chapter outside registry: Ezra.20.34",
+      "record": "Ezra.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "13:2",
+      "reason": "chapter outside registry: Gal.13.2",
+      "record": "Gal.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "2:5-11; 7:9-11; 10:6; 1Co 6:9-11; Re 22:20",
+      "reason": "chapter outside registry: Gal.7.9",
+      "record": "Gal.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "7; 8:24; 9:3,4",
+      "reason": "chapter outside registry: Gal.8.24",
+      "record": "Gal.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Ps 18:40-43; 78:68-71; Isa 9:7; Phm 2:10,11; Heb 7:14; 10:13",
+      "reason": "chapter outside registry: Phlm.2.10",
+      "record": "Gen.49.8",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "16,41; Ps 48:2; Isa 2:2; 14:13; Mic 4:2; 2Th 2:4",
+      "reason": "verse outside registry: Hos.1.16",
+      "record": "Hos.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "2:35; 7:26; 8:25; Eze 38:22,23; 39:2; 2Th 2:8; Re 13:10; 14:14-20",
+      "reason": "verse outside registry: Hos.2.35",
+      "record": "Hos.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "4:16; 5:1; Joh 15:8; Ga 5:22,23; Eph 5:9; Php 1:11",
+      "reason": "verse outside registry: Isa.4.16",
+      "record": "Isa.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "10:27; Ex 24:17; Nu 11:1; 16:35; De 4:24; 9:3; Ps 50:3; 97:3",
+      "reason": "chapter outside registry: Jas.10.27",
+      "record": "Jas.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Ex 19:8; 24:3; De 5:27; 26:17; Jos 1:16; 24:26-24; 1Sa 12:10",
+      "reason": "reversed reference",
+      "record": "Jer.2.20",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "27:3; 47:4; Eze 26:1-28:1-19; 29:18; Am 1:9,10; Zec 9:2-4",
+      "reason": "reversed reference",
+      "record": "Jer.25.22",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "32",
+      "reason": "verse outside registry: Job.1.32",
+      "record": "Job.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "65:1",
+      "reason": "chapter outside registry: Job.65.1",
+      "record": "Job.38.35",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "10:14,15; 2Ki 8:12; 15:16; Ps 137:8,9; Isa 13:16; Am 1:13; Na 3:10",
+      "reason": "chapter outside registry: Joel.10.14",
+      "record": "Joel.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "24:1; 2Ch 16:14; Mr 16:1",
+      "reason": "chapter outside registry: John.24.1",
+      "record": "John.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "26:19; 1Co 9:16",
+      "reason": "chapter outside registry: Jonah.26.19",
+      "record": "Jonah.1.3",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "32:13; Jos 10:24,25; Hab 3:19",
+      "reason": "chapter outside registry: Josh.32.13",
+      "record": "Josh.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "42; 25:27; Na 1:8,9; Re 14:8; 18:2,21",
+      "reason": "verse outside registry: Lam.1.42",
+      "record": "Lam.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "58; Hab 2:13; Ps 76:12",
+      "reason": "verse outside registry: Lam.1.58",
+      "record": "Lam.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "40:25; Ge 1:31; Ps 104:31",
+      "reason": "chapter outside registry: Lev.40.25",
+      "record": "Lev.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "11:44; 19:2; Eph 1:4; Phm 2:12,13; Col 3:12; 1Th 4:3,7; Heb 12:14",
+      "reason": "chapter outside registry: Phlm.2.12",
+      "record": "Lev.20.7",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "8:15; 9:9; 16:18; Ex 30:1-10; Ps 118:27; Heb 9:21-15",
+      "reason": "reversed reference",
+      "record": "Lev.4.7",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Mt 26:6-5; Mr 14:3-9; Joh 11:2-16",
+      "reason": "reversed reference",
+      "record": "Luke.7.36",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "10:6; 12:10; Ps 34:15-19; 50:15; 91:15; Isa 58:9; 65:23,24",
+      "reason": "chapter outside registry: Mal.10.6",
+      "record": "Mal.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "8:8; Le 26:12,44,45; De 26:17-19; Ps 144:15; Isa 44:1-6; Jer 30:22",
+      "reason": "chapter outside registry: Mal.8.8",
+      "record": "Mal.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Mt 13:54-4; Lu 4:16-30",
+      "reason": "reversed reference",
+      "record": "Mark.6.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "27:34; De 6:1; 12:1; 13:4; Joh 1:17",
+      "reason": "verse outside registry: Num.27.34",
+      "record": "Num.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "8:36; Nu 4:37; Ps 77:20",
+      "reason": "verse outside registry: Num.8.36",
+      "record": "Num.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "Ne 10:37-29; 12:44; 13:12",
+      "reason": "reversed reference",
+      "record": "Num.18.21",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "137:8; De 7:1,2; 32:42,43; Isa 14:22,23; Re 17:14-16",
+      "reason": "chapter outside registry: Prov.137.8",
+      "record": "Prov.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "148:14; 1Co 6:2,3; Re 3:21",
+      "reason": "chapter outside registry: Prov.148.14",
+      "record": "Prov.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "5:30,31",
+      "reason": "verse outside registry: Ps.5.30",
+      "record": "Ps.109.31",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "15; 19:6,11-21; 20:1-3; Ps 21:13; 57:11; 64:9,10; 98:1-3; 102:13-8",
+      "reason": "reversed reference",
+      "record": "Rev.11.17",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "12:1; Job 13:26; Ps 25:7; 2Pe 3:11-14",
+      "reason": "chapter outside registry: Song.12.1",
+      "record": "Song.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "2:21; Ne 2:18; Ac 9:36; 2Co 9:8; Eph 2:10; Tit 2:14; 3:1; Heb 10:24",
+      "reason": "verse outside registry: Titus.2.21",
+      "record": "Titus.1",
+      "source_id": "tsk"
+    },
+    {
+      "citation": "1; 2:1,10,20",
+      "reason": "verse outside registry: Zech.2.20",
+      "record": "Zech.1",
+      "source_id": "tsk"
+    }
+  ],
+  "expected_imports": {
+    "strongs-greek": {
+      "citations": 0,
+      "linked_aliases": 0,
+      "non_scripture_links": 0,
+      "resources": 5624,
+      "source_records": 5624
+    },
+    "strongs-hebrew": {
+      "citations": 0,
+      "linked_aliases": 0,
+      "non_scripture_links": 0,
+      "resources": 8674,
+      "source_records": 8674
+    },
+    "robinson-tr": {
+      "citations": 0,
+      "linked_aliases": 0,
+      "non_scripture_links": 0,
+      "resources": 7957,
+      "source_records": 7957
+    },
+    "matthew-henry": {
+      "citations": 69084,
+      "linked_aliases": 26850,
+      "non_scripture_links": 0,
+      "resources": 5360,
+      "source_records": 32355
+    },
+    "nave": {
+      "citations": 77935,
+      "linked_aliases": 0,
+      "non_scripture_links": 4368,
+      "resources": 5322,
+      "source_records": 5322
+    },
+    "tsk": {
+      "citations": 85508,
+      "linked_aliases": 0,
+      "non_scripture_links": 0,
+      "resources": 31153,
+      "source_records": 31154
+    }
+  }
+}
