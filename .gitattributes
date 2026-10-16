@@ -1,0 +1,2 @@
+# Manifests and deterministic packages hash the committed bytes on every platform.
+* text=auto eol=lf

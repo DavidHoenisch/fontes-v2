@@ -2,10 +2,10 @@ name: Application
 
 on:
   pull_request:
-    paths: ['apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
   push:
     branches: [main]
-    paths: ['apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
+    paths: ['.gitattributes', 'apps/**', 'crates/fontes-engine/**', 'crates/ui-egui/**', 'crates/fontes-data-contracts/**', 'assets/ui/**', 'Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml', 'specs/app/**', 'tools/package-app.py', 'tools/publish-app.py', 'docs/app/testing-builds.md', '.github/workflows/application.yml']
   workflow_dispatch:
 
 permissions:
