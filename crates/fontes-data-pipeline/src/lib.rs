@@ -334,6 +334,39 @@ pub struct DatabaseReport {
     pub profile: String,
 }
 
+// Databases do not store manifest capability claims. Recognize only complete
+// source sets here, including immutable legacy sets needed for release diffs.
+fn supported_database_sources(profile: &str, actual: &BTreeSet<String>) -> Result<bool> {
+    let current = profile_sources(profile)?
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    if actual == &current {
+        return Ok(true);
+    }
+    if profile != "study" {
+        return Ok(false);
+    }
+    let mut legacy: BTreeSet<String> = [
+        "kjv-base",
+        "web-classic",
+        "strongs-greek",
+        "strongs-hebrew",
+        "robinson-tr",
+        "matthew-henry",
+        "nave",
+        "tsk",
+    ]
+    .into_iter()
+    .map(str::to_owned)
+    .collect();
+    if actual == &legacy {
+        return Ok(true);
+    }
+    legacy.insert("oshb-hebrew".into());
+    Ok(actual == &legacy)
+}
+
 pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
     let db = Connection::open_with_flags(
         path,
@@ -428,11 +461,7 @@ pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
         .query_map([], |r| r.get(0))?
         .collect::<rusqlite::Result<_>>()?;
     ensure!(
-        source_ids
-            == profile_sources(&profile)?
-                .iter()
-                .map(|s| s.to_string())
-                .collect(),
+        supported_database_sources(&profile, &source_ids)?,
         "database source membership mismatch"
     );
     let study = study::StudyCounts::read(&db)?;
@@ -833,4 +862,31 @@ pub fn build(
         report.profile_artifact.compressed_bytes
     );
     Ok(report)
+}
+
+#[cfg(test)]
+mod database_compatibility_tests {
+    use super::*;
+    #[test]
+    fn release_diff_verification_accepts_complete_legacy_study_sources_only() {
+        let mut sources: BTreeSet<String> = profile_sources("study")
+            .unwrap()
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        assert!(supported_database_sources("study", &sources).unwrap());
+        sources.remove("kjv-strongs");
+        assert!(supported_database_sources("study", &sources).unwrap());
+        sources.remove("oshb-hebrew");
+        assert!(supported_database_sources("study", &sources).unwrap());
+        sources.insert("kjv-strongs".into());
+        assert!(!supported_database_sources("study", &sources).unwrap());
+        sources.remove("kjv-strongs");
+        sources.remove("strongs-hebrew");
+        assert!(!supported_database_sources("study", &sources).unwrap());
+        sources.insert("strongs-hebrew".into());
+        sources.insert("unreviewed-source".into());
+        assert!(!supported_database_sources("study", &sources).unwrap());
+        assert!(!supported_database_sources("reading", &sources).unwrap());
+    }
 }
