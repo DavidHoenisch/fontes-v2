@@ -16,6 +16,11 @@ pub(super) struct SelectedText {
     pub range: Range<usize>,
     pub text: String,
 }
+pub(super) struct WordFocus {
+    code: String,
+    surface: String,
+    witness: String,
+}
 impl FontesApp {
     pub(super) fn open_study(&mut self, reference: i64, tab: StudyTab) {
         if self.destination != Destination::Study {
@@ -25,6 +30,7 @@ impl FontesApp {
         self.study_tab = tab;
         self.resource = None;
         self.word = None;
+        self.word_focus = None;
         if self
             .state
             .as_ref()
@@ -38,6 +44,7 @@ impl FontesApp {
         }
     }
     fn lookup_word(&mut self, code: &str) {
+        self.word_focus = None;
         self.study_tab = StudyTab::Words;
         self.word = None;
         self.resource = None;
@@ -75,7 +82,7 @@ impl FontesApp {
             job.sections.clear();
             job.append(&verse.text[..start], 0.0, format.clone());
             let mut selected_format = format.clone();
-            selected_format.background = accent().gamma_multiply(0.45);
+            selected_format.background = theme::color(assets::HIGHLIGHT_AMBER);
             job.append(&verse.text[start..end], 0.0, selected_format);
             job.append(&verse.text[end..], 0.0, format);
         }
@@ -130,54 +137,172 @@ impl FontesApp {
                     word_at(&verse.text, cursor.index.0).map(|range| selection(verse, range));
             }
         }
-        response.context_menu(|ui| {
-            ui.set_max_width(300.0);
-            let selected = self.selected_text.clone().filter(|t| t.verse_id == verse.id);
-            if let Some(selected) = &selected {
-                ui.label(RichText::new(format!("“{}”", selected.text)).strong());
-                let codes = aligned_codes(verse, &selected.range);
-                if codes.is_empty() {
-                    if ui.button("Look up original word…").clicked() {
-                        self.open_study(verse.refs[0], StudyTab::Words);
-                        ui.close();
-                    }
-                    caption(ui, "This edition has no Strong’s link for this selection. Choose a source word in the study panel.");
-                } else {
-                    for code in codes {
-                        if ui.button(format!("Look up Strong’s {code}")).clicked() {
-                            self.open_study(verse.refs[0], StudyTab::Words);
-                            self.lookup_word(&code);
-                            ui.close();
-                        }
-                    }
-                }
-                if ui.button("Copy selection").clicked() {
-                    ui.ctx().copy_text(selected.text.clone());
-                    ui.close();
-                }
-                ui.separator();
+        if mobile {
+            if response.secondary_clicked() {
+                self.verse_actions = Some(verse.clone());
             }
-            if ui.button("Study this verse").clicked() {
-                self.open_study(verse.refs[0], StudyTab::Commentary);
-                ui.close();
-            }
-            if ui.button("Add note").clicked() {
-                self.new_note(verse.refs[0]);
-                ui.close();
-            }
-            if ui.button("Highlight verse · amber").clicked() {
-                self.dispatch(Command::SaveAnnotation { id: None, start_ref: verse.refs[0], end_ref: *verse.refs.last().unwrap(), kind: AnnotationKind::Highlight, color: Some("amber".into()), content: None });
-                ui.close();
-            }
-            if ui.button("Copy verse").clicked() {
-                ui.ctx().copy_text(format!("{} — {}", verse.text, label(&self.state.as_ref().unwrap().books, verse.refs[0])));
-                ui.close();
-            }
-        });
+        } else {
+            response.context_menu(|ui| {
+                ui.set_width(300.0);
+                egui::Frame::new().inner_margin(8).show(ui, |ui| {
+                    self.verse_action_contents(ui, verse, false);
+                });
+            });
+        }
         if mobile && response.double_clicked() {
             self.open_study(verse.refs[0], StudyTab::Words);
         }
     }
+    pub(super) fn mobile_verse_actions(&mut self, ctx: &egui::Context) {
+        let Some(verse) = self.verse_actions.clone() else {
+            return;
+        };
+        let bounds = ctx.content_rect();
+        let width = bounds.width().min(480.0);
+        let has_selection = self
+            .selected_text
+            .as_ref()
+            .is_some_and(|t| t.verse_id == verse.id);
+        let height = (bounds.height() * 0.9).min(if has_selection { 600.0 } else { 344.0 });
+        let modal = egui::Modal::new(egui::Id::new("verse-action-sheet"))
+            .area(
+                egui::Modal::default_area(egui::Id::new("verse-action-sheet"))
+                    .anchor(egui::Align2::CENTER_BOTTOM, egui::Vec2::ZERO),
+            )
+            .frame(
+                egui::Frame::new()
+                    .fill(theme::color(assets::COLOR_SURFACE))
+                    .corner_radius(egui::CornerRadius {
+                        nw: 24,
+                        ne: 24,
+                        sw: 0,
+                        se: 0,
+                    })
+                    .inner_margin(16),
+            )
+            .backdrop_color(theme::color(assets::COLOR_SCRIM).gamma_multiply(0.24))
+            .show(ctx, |ui| {
+                ui.set_width(width - 32.0);
+                ui.set_height(height - 32.0);
+                ui.spacing_mut().item_spacing = egui::vec2(8.0, 4.0);
+                ui.horizontal(|ui| {
+                    caption(
+                        ui,
+                        label(&self.state.as_ref().unwrap().books, verse.refs[0]),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        let close = ui
+                            .add_sized(
+                                [44.0, 44.0],
+                                egui::Button::image(icon("close", 20.0, false)).frame(false),
+                            )
+                            .on_hover_text("Close actions");
+                        close.widget_info(|| {
+                            egui::WidgetInfo::labeled(
+                                egui::WidgetType::Button,
+                                true,
+                                "Close actions",
+                            )
+                        });
+                        if close.clicked() {
+                            ui.close();
+                        }
+                    });
+                });
+                egui::ScrollArea::vertical()
+                    .id_salt("verse-action-sheet-scroll")
+                    .max_height((height - 88.0).max(80.0))
+                    .show(ui, |ui| {
+                        self.verse_action_contents(ui, &verse, true);
+                    });
+            });
+        if modal.should_close() {
+            self.verse_actions = None;
+        }
+    }
+
+    fn verse_action_contents(&mut self, ui: &mut egui::Ui, verse: &Verse, mobile: bool) {
+        let selected = self
+            .selected_text
+            .clone()
+            .filter(|t| t.verse_id == verse.id);
+        if let Some(selected) = &selected {
+            caption(ui, "SELECTED TEXT");
+            let mut preview = egui::text::LayoutJob::simple(
+                format!("“{}”", selected.text),
+                egui::FontId::new(24.0, egui::FontFamily::Name("scripture".into())),
+                theme::color(assets::COLOR_INK),
+                ui.available_width(),
+            );
+            preview.wrap.max_rows = 2;
+            ui.add(egui::Label::new(preview).wrap().selectable(false));
+            ui.add_space(12.0);
+            let codes = lookup_codes(verse, &selected.range);
+            if codes.is_empty() {
+                if action_row(ui, "search", "Look up original word…", true, mobile).clicked() {
+                    self.open_study(verse.refs[0], StudyTab::Words);
+                    ui.close();
+                }
+                ui.add_space(4.0);
+                caption(
+                    ui,
+                    "No word link in this edition. Browse this verse’s original words.",
+                );
+            } else {
+                for code in codes {
+                    if action_row(
+                        ui,
+                        "search",
+                        &format!("Look up Strong’s {code}"),
+                        true,
+                        mobile,
+                    )
+                    .clicked()
+                    {
+                        self.open_study(verse.refs[0], StudyTab::Words);
+                        self.lookup_word(&code);
+                        ui.close();
+                    }
+                }
+            }
+            if action_row(ui, "copy", "Copy selection", false, mobile).clicked() {
+                ui.ctx().copy_text(selected.text.clone());
+                ui.close();
+            }
+            ui.add_space(8.0);
+            ui.separator();
+            ui.add_space(8.0);
+        }
+        caption(ui, "VERSE ACTIONS");
+        if action_row(ui, "book", "Study this verse", false, mobile).clicked() {
+            self.open_study(verse.refs[0], StudyTab::Commentary);
+            ui.close();
+        }
+        if action_row(ui, "notes", "Add note", false, mobile).clicked() {
+            self.new_note(verse.refs[0]);
+            ui.close();
+        }
+        if action_row(ui, "bookmark", "Highlight verse · amber", false, mobile).clicked() {
+            self.dispatch(Command::SaveAnnotation {
+                id: None,
+                start_ref: verse.refs[0],
+                end_ref: *verse.refs.last().unwrap(),
+                kind: AnnotationKind::Highlight,
+                color: Some("amber".into()),
+                content: None,
+            });
+            ui.close();
+        }
+        if action_row(ui, "copy", "Copy verse", false, mobile).clicked() {
+            ui.ctx().copy_text(format!(
+                "{} — {}",
+                verse.text,
+                label(&self.state.as_ref().unwrap().books, verse.refs[0])
+            ));
+            ui.close();
+        }
+    }
+
     pub(super) fn study_ui(&mut self, ui: &mut egui::Ui) {
         let s = self.state.clone().unwrap();
         // Each article opens at its beginning; returning restores the results scroll.
@@ -205,7 +330,7 @@ impl FontesApp {
                 ui.separator();
                 ui.add_space(12.0);
                 if !s.has_study {
-                    ui.label("Open a study library to add Strong’s dictionaries, original Greek, commentary, topics and cross-references.");
+                    ui.label("Open a study library to add Strong’s dictionaries, original Hebrew and Greek, commentary, topics and cross-references.");
                     return;
                 }
                 if let Some(r) = self.resource.clone() {
@@ -273,6 +398,7 @@ impl FontesApp {
     fn word_panel(&mut self, ui: &mut egui::Ui) {
         if let Some(Data::Word {
             code,
+            headwords,
             definitions,
             occurrences,
             total,
@@ -280,9 +406,56 @@ impl FontesApp {
         {
             if ui.button("← Words in this verse").clicked() {
                 self.word = None;
+                self.word_focus = None;
             }
             ui.add_space(12.0);
-            ui.heading(format!("Strong’s {code}"));
+            let linked = self.selected_text.as_ref().and_then(|selected| {
+                self.state
+                    .as_ref()?
+                    .passage
+                    .iter()
+                    .find(|v| v.id == selected.verse_id)?
+                    .word_links
+                    .iter()
+                    .find(|link| {
+                        link.strongs == code
+                            && link.start < selected.range.end
+                            && link.end > selected.range.start
+                    })
+            });
+            let focus = self.word_focus.as_ref().filter(|focus| focus.code == code);
+            if let Some(focus) = focus {
+                original_word_heading(ui, &focus.surface);
+                caption(
+                    ui,
+                    format!("Verse word · {}", witness_title(&focus.witness)),
+                );
+            } else if let Some(link) = linked {
+                original_word_heading(ui, &link.surface);
+                caption(ui, "Linked source word");
+            } else if headwords.is_empty() {
+                ui.heading(format!("Strong’s {code}"));
+            }
+            for headword in &headwords {
+                if focus.is_none() && linked.is_none() {
+                    original_word_heading(ui, &headword.text);
+                } else {
+                    ui.label(scripture(&headword.text, 24.0, true));
+                }
+                caption(ui, "Dictionary headword");
+                if let Some(transliteration) = &headword.transliteration {
+                    ui.label(RichText::new(transliteration).size(16.0).color(muted()));
+                }
+            }
+            if let Some(selected) = &self.selected_text {
+                caption(ui, format!("Reading selection: “{}”", selected.text));
+            }
+            if focus.is_some() || linked.is_some() || !headwords.is_empty() {
+                ui.add_space(8.0);
+                caption(ui, format!("Strong’s {code}"));
+            }
+            ui.add_space(12.0);
+            ui.separator();
             if definitions.is_empty() {
                 ui.label("No dictionary entry installed for this number.");
             }
@@ -309,7 +482,7 @@ impl FontesApp {
             });
         } else {
             if let Some(selected) = &self.selected_text {
-                ui.label(RichText::new(format!("“{}”", selected.text)).size(20.0));
+                caption(ui, format!("Reading selection: “{}”", selected.text));
                 let verse = self
                     .state
                     .as_ref()
@@ -318,11 +491,23 @@ impl FontesApp {
                     .iter()
                     .find(|v| v.id == selected.verse_id);
                 let codes = verse
-                    .map(|v| aligned_codes(v, &selected.range))
+                    .map(|v| lookup_codes(v, &selected.range))
                     .unwrap_or_default();
                 if codes.is_empty() {
                     ui.label("This edition has no word-level link for this selection. Choose the original word below; these words belong to the whole verse.");
                 } else {
+                    let surfaces: BTreeSet<_> = verse
+                        .into_iter()
+                        .flat_map(|v| &v.word_links)
+                        .filter(|link| {
+                            link.start < selected.range.end && link.end > selected.range.start
+                        })
+                        .map(|link| link.surface.as_str())
+                        .collect();
+                    for surface in surfaces {
+                        original_word_heading(ui, surface);
+                    }
+                    caption(ui, "Linked source word");
                     ui.horizontal_wrapped(|ui| {
                         for code in codes {
                             if ui.button(format!("Strong’s {code}")).clicked() {
@@ -336,7 +521,7 @@ impl FontesApp {
                 ui.label("Choose an original word to open its Strong’s definition.");
                 caption(
                     ui,
-                    "English word links appear when the edition supplies verified alignments.",
+                    "Direct lookup uses edition-specific dictionary tags or verified original-word alignments.",
                 );
                 ui.add_space(16.0);
             }
@@ -376,10 +561,15 @@ impl FontesApp {
                             .filter_map(|a| a.strongs.as_deref())
                             .collect();
                         ui.horizontal_wrapped(|ui| {
-                            ui.label(scripture(&t.surface, 22.0, true));
+                            ui.label(scripture(&t.surface, 28.0, true));
                             for code in codes {
                                 if ui.button(code).clicked() {
                                     self.lookup_word(code);
+                                    self.word_focus = Some(WordFocus {
+                                        code: code.into(),
+                                        surface: t.surface.clone(),
+                                        witness: t.witness.clone(),
+                                    });
                                 }
                             }
                         });
@@ -409,6 +599,31 @@ impl FontesApp {
             }
         }
         ui.add_space(16.0);
+        let hebrew_source = matches!(&self.context, Some(Data::Context { tokens, .. }) if tokens.iter().any(|t|t.witness == "witness:oshb-wlc"))
+            || matches!(&self.word,Some(Data::Word { code,total,.. }) if code.starts_with('H') && *total>0);
+        if hebrew_source {
+            ui.collapsing("Hebrew source and license", |ui| {
+                ui.label("Original work of the Open Scriptures Hebrew Bible available at https://github.com/openscriptures/morphhb");
+                ui.hyperlink_to("Open Scriptures Hebrew Bible", "https://github.com/openscriptures/morphhb");
+                ui.hyperlink_to("CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/");
+                caption(ui,"Word forms and analyses are retained from OSHB. Verse numbering is adapted to the reading edition; variants in source notes are not shown. No endorsement implied.");
+            });
+        }
+        if self
+            .state
+            .as_ref()
+            .is_some_and(|s| s.passage.iter().any(|v| !v.strongs_links.is_empty()))
+        {
+            ui.collapsing("KJV annotation source and license", |ui| {
+                ui.label("Strong’s tags: Bible Foundation (OT), KJV2003/CrossWire and Maurice Robinson (NT). Formatting: Michael Paul Johnson/eBible.org. Copyright © 2003–2023 CrossWire Bible Society. Distributed under GNU GPL version 3.");
+                ui.hyperlink_to("Source and credits", "https://wiki.crosswire.org/CrossWire_KJV");
+                ui.hyperlink_to("Editable USFM source", "https://ebible.org/Scriptures/eng-kjv_usfm.zip?x=1");
+                caption(ui, "Tags are checked against this KJV text; mismatched verses are withheld. A dictionary tag does not identify a Hebrew or Greek verse token.");
+                ui.collapsing("GNU General Public License", |ui| {
+                    ui.label(include_str!("../../../data/rights/GPL-3.0.txt"));
+                });
+            });
+        }
         ui.collapsing("Look up a Strong’s number", |ui| {
             let response = ui.add(
                 egui::TextEdit::singleline(&mut self.word_code)
@@ -464,12 +679,19 @@ fn selection(verse: &Verse, range: Range<usize>) -> SelectedText {
         range,
     }
 }
-fn aligned_codes(verse: &Verse, range: &Range<usize>) -> BTreeSet<String> {
+fn lookup_codes(verse: &Verse, range: &Range<usize>) -> BTreeSet<String> {
     verse
         .word_links
         .iter()
         .filter(|l| l.start < range.end && l.end > range.start)
         .map(|l| l.strongs.clone())
+        .chain(
+            verse
+                .strongs_links
+                .iter()
+                .filter(|l| l.start < range.end && l.end > range.start)
+                .map(|l| l.strongs.clone()),
+        )
         .collect()
 }
 fn word_at(text: &str, cursor: usize) -> Option<Range<usize>> {
@@ -514,6 +736,7 @@ fn witness_title(witness: &str) -> String {
     match witness {
         "witness:robinson-tr-first" => "Greek Textus Receptus · first reading".into(),
         "witness:robinson-tr-second" => "Greek Textus Receptus · second reading".into(),
+        "witness:oshb-wlc" => "Hebrew / Aramaic · OSHB".into(),
         _ => witness.into(),
     }
 }
@@ -539,4 +762,43 @@ fn article_body(ui: &mut egui::Ui, text: &str) {
             ui.add_space(12.0);
         }
     });
+}
+
+/// Full-width, left-aligned actions share a stable icon column and touch-sized rows.
+fn action_row(
+    ui: &mut egui::Ui,
+    role: &str,
+    title: &str,
+    emphasized: bool,
+    mobile: bool,
+) -> egui::Response {
+    let text = RichText::new(title)
+        .size(if mobile { 16.0 } else { 14.0 })
+        .color(if emphasized {
+            accent()
+        } else {
+            theme::color(assets::COLOR_INK)
+        });
+    ui.add_sized(
+        [ui.available_width(), 48.0],
+        egui::Button::image_and_text(icon(role, 20.0, emphasized || role == "bookmark"), text)
+            .right_text(())
+            .wrap()
+            .frame(emphasized)
+            .fill(if emphasized {
+                theme::tint()
+            } else {
+                egui::Color32::TRANSPARENT
+            })
+            .corner_radius(8),
+    )
+}
+
+/// Keep each original-language word in its own shaping run, separate from Latin labels.
+fn original_word_heading(ui: &mut egui::Ui, text: &str) {
+    let font = egui::FontId::new(40.0, egui::FontFamily::Name("original".into()));
+    let mut job =
+        egui::text::LayoutJob::simple(text.to_owned(), font, accent(), ui.available_width());
+    job.wrap.max_rows = 3;
+    ui.add(egui::Label::new(job).wrap().selectable(false));
 }

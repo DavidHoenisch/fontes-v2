@@ -313,6 +313,8 @@ fn signed_manifest_supports_both_profiles_and_checks_each_profiles_claims() {
     manifest.profiles[1].capabilities = fontes_data_pipeline::profile_capabilities("study")
         .unwrap()
         .to_vec();
-    manifest.profiles[1].source_ids.pop();
+    manifest.profiles[1]
+        .source_ids
+        .retain(|s| s != "strongs-hebrew");
     assert!(check(&manifest).is_err());
 }

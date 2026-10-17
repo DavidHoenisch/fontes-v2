@@ -119,26 +119,8 @@ pub fn verify_manifest(
     );
     for artifact in &manifest.profiles {
         ensure!(
-            artifact
-                .capabilities
-                .iter()
-                .collect::<std::collections::BTreeSet<_>>()
-                == crate::profile_capabilities(&artifact.profile)?
-                    .iter()
-                    .collect(),
-            "profile capability mismatch"
-        );
-        ensure!(
-            artifact
-                .source_ids
-                .iter()
-                .map(String::as_str)
-                .collect::<std::collections::BTreeSet<_>>()
-                == crate::profile_sources(&artifact.profile)?
-                    .iter()
-                    .copied()
-                    .collect(),
-            "profile source membership mismatch"
+            fontes_data_contracts::supported_profile(artifact),
+            "profile source/capability mismatch"
         );
     }
     Ok(manifest)
@@ -213,6 +195,22 @@ pub fn verify_package(dir: &Path, trust_path: &Path, repository: &str) -> Result
         ensure!(
             file.metadata()?.len() == source.bytes && file_digest(&file)? == source.sha256,
             "retained source digest mismatch"
+        );
+    }
+    if manifest
+        .sources
+        .iter()
+        .any(|s| s.source_id == "kjv-strongs")
+    {
+        ensure!(
+            fs::read(dir.join("GPL-3.0.txt"))?
+                == include_bytes!("../../../data/rights/GPL-3.0.txt"),
+            "KJV annotation GPL text missing or changed"
+        );
+        ensure!(
+            fs::read(dir.join("KJV-ANNOTATIONS-NOTICE.md"))?
+                == include_bytes!("../../../data/rights/kjv-strongs-2026-10-16.md"),
+            "KJV annotation provenance notice missing or changed"
         );
     }
     let tmp = tempfile::tempdir()?;
@@ -355,6 +353,11 @@ pub fn publish(
             other.join("study-imports.json"),
             dir.join("study-imports.json"),
         )?;
+        if study.sources.iter().any(|s| s.source_id == "kjv-strongs") {
+            for name in ["GPL-3.0.txt", "KJV-ANNOTATIONS-NOTICE.md"] {
+                fs::copy(other.join(name), dir.join(name))?;
+            }
+        }
         let mut notices = fs::read_to_string(dir.join("NOTICE.txt"))?;
         notices.push_str("\n=== STUDY PROFILE ===\n");
         notices.push_str(&fs::read_to_string(other.join("NOTICE.txt"))?);
@@ -528,6 +531,13 @@ pub fn publish(
             "study-imports.json".into(),
         ]);
     }
+    if manifest
+        .sources
+        .iter()
+        .any(|s| s.source_id == "kjv-strongs")
+    {
+        assets.extend(["GPL-3.0.txt".into(), "KJV-ANNOTATIONS-NOTICE.md".into()]);
+    }
     for snapshot in &manifest.sources {
         assets.push(source_asset(
             lock.sources
@@ -537,7 +547,7 @@ pub fn publish(
         ));
     }
     let notes = format!(
-        "Fontes data {}\n\n{}\nCompiler commit: {}\nManifest: Ed25519 signed with {}\n\nReading contains KJV and WEB Classic with 31,102 canonical verses each. Study adds Strong's Greek/Hebrew dictionaries, Robinson TR Greek morphology in both source reading streams, Matthew Henry, Nave's, and TSK. See NOTICE.txt, source locks, validation reports, study-imports.json (study releases), and changes.json. Verify with the public key distributed with the application.\n",
+        "Fontes data {}\n\n{}\nCompiler commit: {}\nManifest: Ed25519 signed with {}\n\nReading contains KJV and WEB Classic with 31,102 canonical verses each. Study adds Strong's Greek/Hebrew dictionaries, Robinson TR Greek morphology in both source reading streams, OSHB Hebrew words/morphology (CC BY 4.0), edition-bound KJV dictionary tags (GPL), Matthew Henry, Nave's, and TSK. See NOTICE.txt, source locks, validation reports, study-imports.json (study releases), and changes.json. Verify with the public key distributed with the application.\n",
         manifest.release_tag,
         manifest
             .profiles

@@ -60,6 +60,10 @@ pub fn install(ctx: &egui::Context) {
         ],
     );
     fonts.families.insert(
+        FontFamily::Name("original".into()),
+        vec!["greek_fallback".into(), "hebrew_fallback".into()],
+    );
+    fonts.families.insert(
         FontFamily::Name("medium".into()),
         vec![
             "ui_label".into(),
@@ -69,20 +73,41 @@ pub fn install(ctx: &egui::Context) {
     );
     ctx.set_fonts(fonts);
     let mut style = egui::Style {
-        visuals: egui::Visuals::dark(),
+        visuals: egui::Visuals::light(),
         ..Default::default()
     };
     style.visuals.panel_fill = desk();
     style.visuals.window_fill = color(assets::COLOR_SURFACE);
-    style.visuals.extreme_bg_color = color(assets::COLOR_SIDEBAR);
+    style.visuals.extreme_bg_color = color(assets::COLOR_SURFACE);
     style.visuals.faint_bg_color = color(assets::COLOR_SURFACE);
     style.visuals.override_text_color = Some(color(assets::COLOR_INK));
+    style.visuals.hyperlink_color = accent();
+    style.visuals.error_fg_color = color(assets::COLOR_ERROR);
+    style.visuals.window_stroke = egui::Stroke::new(1.0, color(assets::COLOR_BORDER));
+    style.visuals.window_corner_radius = egui::CornerRadius::same(16);
+    style.visuals.menu_corner_radius = egui::CornerRadius::same(16);
     style.visuals.selection.bg_fill = tint();
     style.visuals.selection.stroke = egui::Stroke::new(1.0, accent());
     style.visuals.widgets.inactive.weak_bg_fill = color(assets::COLOR_RAISED);
     style.visuals.widgets.inactive.bg_fill = color(assets::COLOR_RAISED);
     style.visuals.widgets.hovered.bg_fill = tint();
+    style.visuals.widgets.hovered.weak_bg_fill = tint();
     style.visuals.widgets.active.bg_fill = tint();
+    style.visuals.widgets.active.weak_bg_fill = tint();
+    style.visuals.widgets.open.bg_fill = tint();
+    style.visuals.widgets.open.weak_bg_fill = tint();
+    for widget in [
+        &mut style.visuals.widgets.inactive,
+        &mut style.visuals.widgets.hovered,
+        &mut style.visuals.widgets.active,
+        &mut style.visuals.widgets.open,
+    ] {
+        widget.corner_radius = egui::CornerRadius::same(12);
+        widget.bg_stroke = egui::Stroke::NONE;
+        widget.fg_stroke = egui::Stroke::new(1.5, accent());
+        widget.expansion = 0.0;
+    }
+    style.visuals.widgets.noninteractive.fg_stroke = egui::Stroke::new(1.0, muted());
     style.visuals.widgets.noninteractive.bg_stroke =
         egui::Stroke::new(1.0, color(assets::COLOR_BORDER));
     style.spacing.item_spacing = egui::vec2(8.0, 8.0);
@@ -99,7 +124,7 @@ pub fn install(ctx: &egui::Context) {
         FontId::new(24.0, FontFamily::Name("medium".into())),
     );
     ctx.set_global_style(style);
-    ctx.set_theme(egui::Theme::Dark);
+    ctx.set_theme(egui::Theme::Light);
     egui_extras::install_image_loaders(ctx);
 }
 pub fn icon(role: &str, size: f32, selected: bool) -> egui::Image<'static> {
@@ -131,21 +156,29 @@ pub fn nav(ui: &mut egui::Ui, role: &str, text: &str, selected: bool, size: egui
 pub fn primary(ui: &mut egui::Ui, text: &str) -> bool {
     ui.add_sized(
         [ui.available_width(), 48.0],
-        egui::Button::new(RichText::new(text).color(color(assets::COLOR_INVERSE))).fill(accent()),
+        egui::Button::new(RichText::new(text).color(color(assets::COLOR_INVERSE)))
+            .fill(accent())
+            .corner_radius(16),
     )
     .clicked()
 }
 pub fn mobile_nav(ui: &mut egui::Ui, role: &str, text: &str, selected: bool) -> bool {
     let response = ui.add_sized(
         [ui.available_width(), 64.0],
-        egui::Button::new("").fill(if selected {
-            tint()
-        } else {
-            Color32::TRANSPARENT
-        }),
+        egui::Button::new("").frame(false),
     );
     response.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, text));
     let center = response.rect.center().x;
+    if selected || response.hovered() {
+        ui.painter().rect_filled(
+            egui::Rect::from_center_size(
+                egui::pos2(center, response.rect.top() + 20.0),
+                egui::vec2(56.0, 32.0),
+            ),
+            16,
+            tint(),
+        );
+    }
     icon(role, 24.0, selected).paint_at(
         ui,
         egui::Rect::from_center_size(

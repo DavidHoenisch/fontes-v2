@@ -180,21 +180,9 @@ fn verify(bytes: &[u8], signature: &[u8], trust: &Trust) -> Result<ReleaseManife
         "This release is not trusted by this version of Fontes."
     );
     for p in &m.profiles {
-        let sources = fontes_data_contracts::profile_sources(&p.profile)
-            .context("Unsupported library profile. Update Fontes to continue.")?;
-        let caps = fontes_data_contracts::profile_capabilities(&p.profile)
-            .context("Unsupported library profile.")?;
         ensure!(
-            p.source_ids
-                .iter()
-                .map(String::as_str)
-                .collect::<BTreeSet<_>>()
-                == sources.iter().copied().collect(),
-            "Unexpected library sources."
-        );
-        ensure!(
-            p.capabilities.iter().collect::<BTreeSet<_>>() == caps.iter().collect(),
-            "Unsupported library capabilities."
+            fontes_data_contracts::supported_profile(p),
+            "Unexpected library sources or capabilities. Update Fontes to continue."
         );
         ensure!(
             p.compressed_bytes <= MAX_COMPRESSED && p.sqlite_bytes <= MAX_SQLITE,

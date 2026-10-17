@@ -1,6 +1,8 @@
+pub mod hebrew;
 pub mod release;
 mod source;
 pub mod study;
+pub mod word_tags;
 
 use anyhow::{Context, Result, bail, ensure};
 use fontes_data_contracts::{
@@ -552,6 +554,8 @@ pub fn build(
                 "strongs-greek" => "strongs-greek-xml-v1",
                 "strongs-hebrew" => "strongs-hebrew-osis-v1",
                 "robinson-tr" => "robinson-utr-v1",
+                "oshb-hebrew" => "oshb-osis-v1",
+                "kjv-strongs" => "kjv-usfm-strongs-v1",
                 "nave" => "sword-dictionary-v1",
                 "matthew-henry" | "tsk" => "sword-commentary-v1",
                 _ => bail!("unknown study source"),
@@ -575,7 +579,7 @@ pub fn build(
     }
     let lock_sha = digest(&lock_bytes);
     let content_id = digest(&serde_json::to_vec(&serde_json::json!({
-        "study_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/study-v1.json"))?))} else {None}, "profile": profile, "sword_exporter": (profile=="study").then_some(study::SWORD_VERSION), "lock": lock_sha, "mappings": digest(&mappings_bytes),
+        "word_tags_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/kjv-strongs-v1.json"))?))} else {None}, "hebrew_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/hebrew-oshb-v1.json"))?))} else {None}, "study_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/study-v1.json"))?))} else {None}, "profile": profile, "sword_exporter": (profile=="study").then_some(study::SWORD_VERSION), "lock": lock_sha, "mappings": digest(&mappings_bytes),
         "profile_config": digest(&profile_bytes), "registry": digest(CANONICAL_REGISTRY_JSON.as_bytes()),
         "schema": digest(CONTENT_SCHEMA_SQL.as_bytes()), "cargo_lock": digest(&fs::read(root.join("Cargo.lock"))?),
         "toolchain": digest(&fs::read(root.join("rust-toolchain.toml"))?),
@@ -615,7 +619,7 @@ pub fn build(
     let mut snapshots = Vec::new();
     let mut reports = Vec::new();
     let mut notice = String::from(
-        "Fontes content data\n\nEnglish base verse text only; no modern KJV word annotations.\nCanonical registry: fontes-protestant-66-v1.\n\n",
+        "Fontes content data\n\nEnglish base verse text preserved; Study adds separately attributed KJV dictionary annotations.\nCanonical registry: fontes-protestant-66-v1.\n\n",
     );
     for (source, path, verses, report) in acquired {
         let info = translation(&source.source_id)?;
@@ -718,6 +722,18 @@ pub fn build(
                 study::import_strongs(&tx, &source.source_id, &snapshot, &path)?
             }
             "robinson-tr" => study::import_greek(&tx, &snapshot, &path, &registry, &normalized)?,
+            "kjv-strongs" => {
+                let mapping: word_tags::Mapping = serde_json::from_slice(&fs::read(
+                    root.join("data/mappings/kjv-strongs-v1.json"),
+                )?)?;
+                word_tags::import(&tx, &snapshot, &path, &registry, &mapping, &normalized)?
+            }
+            "oshb-hebrew" => {
+                let mapping: hebrew::Mapping = serde_json::from_slice(&fs::read(
+                    root.join("data/mappings/hebrew-oshb-v1.json"),
+                )?)?;
+                hebrew::import(&tx, &snapshot, &path, &registry, &mapping, &normalized)?
+            }
             _ => study::import_sword(
                 &tx,
                 &source.source_id,
@@ -752,7 +768,17 @@ pub fn build(
             &study_imports,
         )?;
         study::write_audit(&output.join("study-imports.json"), &study_imports)?;
-        notice.push_str("Greek: Robinson's public-domain UTR, both source reading streams; unaccented Unicode surfaces, alternative analyses and numeric parsing IDs retained. Source subscriptions and alternate numbering remain in structured apparatus. No English word alignment or Hebrew morphology is inferred. Strong's Hebrew headwords retain supplied Unicode and transliteration; TWOT article text is not imported.\nSWORD 1.9.0 is a build-time extraction dependency only. Scripture links are registry checked; see study-imports.json for source citation anomalies.\n");
+        fs::copy(
+            root.join("data/rights/GPL-3.0.txt"),
+            output.join("GPL-3.0.txt"),
+        )?;
+        fs::copy(
+            root.join("data/rights/kjv-strongs-2026-10-16.md"),
+            output.join("KJV-ANNOTATIONS-NOTICE.md"),
+        )?;
+        notice.push_str("KJV dictionary annotations: GPL (upstream specifies no version); supplied under GPL version 3. Copyright 2003–2023 CrossWire Bible Society. OT tagging: Bible Foundation; NT tagging: KJV2003/CrossWire and Maurice Robinson; USFM formatting: Michael Paul Johnson/eBible.org. Exact editable USFM source archive accompanies this build. Changes: converted tags into edition-bound scalar spans; excluded mismatched 1 John 2:23. See GPL-3.0.txt and KJV-ANNOTATIONS-NOTICE.md.\n");
+        notice.push_str(&format!("{}\nCC BY 4.0: https://creativecommons.org/licenses/by/4.0/\nChanges: converted OSIS to SQLite; retained primary source words without Unicode normalization; mapped verse boundaries and retained source Strong’s codes. No endorsement implied.\n",hebrew::ATTRIBUTION));
+        notice.push_str("Greek: Robinson's public-domain UTR, both source reading streams; unaccented Unicode surfaces, alternative analyses and numeric parsing IDs retained. Source subscriptions and alternate numbering remain in structured apparatus. No English word alignment is inferred. Hebrew words and supplied OSHM codes come from the pinned OSHB source, with explicit MT-to-canonical verse mapping; Psalm superscriptions retain source IDs while mapping to canonical verse 1; the Nehemiah 7:68 omission remains explicit. Strong's Hebrew headwords retain supplied Unicode and transliteration; TWOT article text is not imported.\nSWORD 1.9.0 is a build-time extraction dependency only. Scripture links are registry checked; see study-imports.json for source citation anomalies.\n");
     }
     tx.execute("INSERT INTO search_fts(search_fts) VALUES ('rebuild')", [])?;
     tx.execute(

@@ -1,0 +1,143 @@
+{
+  "partial_word_boundaries": {
+    "1Kgs.18.34": [
+      [
+        0,
+        10,
+        "1Kgs.18.33"
+      ],
+      [
+        10,
+        null,
+        "1Kgs.18.34"
+      ]
+    ],
+    "1Kgs.20.3": [
+      [
+        0,
+        6,
+        "1Kgs.20.2"
+      ],
+      [
+        6,
+        null,
+        "1Kgs.20.3"
+      ]
+    ],
+    "1Kgs.22.21": [
+      [
+        0,
+        8,
+        "1Kgs.22.21"
+      ],
+      [
+        8,
+        null,
+        "1Kgs.22.22"
+      ]
+    ],
+    "1Kgs.22.44": [
+      [
+        0,
+        null,
+        "1Kgs.22.43"
+      ]
+    ],
+    "Isa.63.19": [
+      [
+        0,
+        8,
+        "Isa.63.19"
+      ],
+      [
+        8,
+        null,
+        "Isa.64.1"
+      ]
+    ],
+    "Ps.13.6": [
+      [
+        0,
+        6,
+        "Ps.13.5"
+      ],
+      [
+        6,
+        null,
+        "Ps.13.6"
+      ]
+    ]
+  },
+  "expected_canonical_verses": 23145,
+  "mapping_version": 1,
+  "source_sha256": "f56c150708b5d74719ecb709c712c31eae9855bca7b111fd82ec91b5d177b4c7",
+  "review": "OSHB VerseMap.xml at 3d15126fb1ef74867fc1434be1942e837932691f supplies full reference remaps. These six partial-verse word boundaries follow the pinned upstream morphhbXML-to-JSON.pl, checked against direct verse words. Psalm superscriptions are retained as separate source segments mapped to canonical verse 1, where the locked KJV VPL embeds the titles; source verse IDs remain distinct. Neh.7.68 has no word-bearing source verse; retain the omission without invented Hebrew.",
+  "source_omissions": [
+    "Neh.7.68"
+  ],
+  "psalm_superscriptions": [
+    "Ps.3.1",
+    "Ps.4.1",
+    "Ps.5.1",
+    "Ps.6.1",
+    "Ps.7.1",
+    "Ps.8.1",
+    "Ps.9.1",
+    "Ps.12.1",
+    "Ps.13.1",
+    "Ps.18.1",
+    "Ps.19.1",
+    "Ps.20.1",
+    "Ps.21.1",
+    "Ps.22.1",
+    "Ps.30.1",
+    "Ps.31.1",
+    "Ps.34.1",
+    "Ps.36.1",
+    "Ps.38.1",
+    "Ps.39.1",
+    "Ps.40.1",
+    "Ps.41.1",
+    "Ps.42.1",
+    "Ps.44.1",
+    "Ps.45.1",
+    "Ps.46.1",
+    "Ps.47.1",
+    "Ps.48.1",
+    "Ps.49.1",
+    "Ps.51.1",
+    "Ps.52.1",
+    "Ps.53.1",
+    "Ps.54.1",
+    "Ps.55.1",
+    "Ps.56.1",
+    "Ps.57.1",
+    "Ps.58.1",
+    "Ps.59.1",
+    "Ps.60.1",
+    "Ps.61.1",
+    "Ps.62.1",
+    "Ps.63.1",
+    "Ps.64.1",
+    "Ps.65.1",
+    "Ps.67.1",
+    "Ps.68.1",
+    "Ps.69.1",
+    "Ps.70.1",
+    "Ps.75.1",
+    "Ps.76.1",
+    "Ps.77.1",
+    "Ps.80.1",
+    "Ps.81.1",
+    "Ps.83.1",
+    "Ps.84.1",
+    "Ps.85.1",
+    "Ps.88.1",
+    "Ps.89.1",
+    "Ps.92.1",
+    "Ps.102.1",
+    "Ps.108.1",
+    "Ps.140.1",
+    "Ps.142.1"
+  ]
+}

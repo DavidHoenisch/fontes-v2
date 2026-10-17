@@ -1,7 +1,9 @@
 //! Shared build/client contracts. Signature verification and installation are separate layers.
 
 mod text;
+mod word_tags;
 pub use text::decode_numeric_text_entities;
+pub use word_tags::{StrongsSpan, VerseStrongs};
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
@@ -67,9 +69,11 @@ pub fn profile_sources(profile: &str) -> Option<&'static [&'static str]> {
             "strongs-greek",
             "strongs-hebrew",
             "robinson-tr",
+            "oshb-hebrew",
             "matthew-henry",
             "nave",
             "tsk",
+            "kjv-strongs",
         ]),
         _ => None,
     }
@@ -81,6 +85,7 @@ pub fn profile_capabilities(profile: &str) -> Option<&'static [Capability]> {
             Capability::Reading,
             Capability::StrongsLexicon,
             Capability::GreekMorphology,
+            Capability::HebrewMorphology,
             Capability::Commentary,
             Capability::Topics,
             Capability::CrossReferences,
@@ -114,6 +119,10 @@ pub enum AllowedRights {
     PublicDomainWithRegionalException,
     #[serde(rename = "CC0-1.0")]
     Cc0,
+    #[serde(rename = "CC-BY-4.0")]
+    CcBy4,
+    #[serde(rename = "GPL")]
+    Gpl,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -178,6 +187,57 @@ pub struct ProfileArtifact {
     pub canonical_ref_count: u32,
     pub verse_text_count: u64,
     pub resource_count: u64,
+}
+
+/// Recognize current and previously published complete profiles. Never accept
+/// arbitrary extra source IDs or a capability without its corresponding source.
+pub fn supported_profile(artifact: &ProfileArtifact) -> bool {
+    let Some(sources) = profile_sources(&artifact.profile) else {
+        return false;
+    };
+    let Some(capabilities) = profile_capabilities(&artifact.profile) else {
+        return false;
+    };
+    let actual: BTreeSet<_> = artifact.source_ids.iter().map(String::as_str).collect();
+    let caps: BTreeSet<_> = artifact.capabilities.iter().collect();
+    if actual.len() != artifact.source_ids.len() || caps.len() != artifact.capabilities.len() {
+        return false;
+    }
+    if actual == sources.iter().copied().collect() && caps == capabilities.iter().collect() {
+        return true;
+    }
+    let hebrew_sources: BTreeSet<_> = sources
+        .iter()
+        .copied()
+        .filter(|s| *s != "kjv-strongs")
+        .collect();
+    if artifact.profile == "study"
+        && actual == hebrew_sources
+        && caps == capabilities.iter().collect()
+    {
+        return true;
+    }
+    let legacy_sources = [
+        "kjv-base",
+        "web-classic",
+        "strongs-greek",
+        "strongs-hebrew",
+        "robinson-tr",
+        "matthew-henry",
+        "nave",
+        "tsk",
+    ];
+    let legacy_caps = [
+        Capability::Reading,
+        Capability::StrongsLexicon,
+        Capability::GreekMorphology,
+        Capability::Commentary,
+        Capability::Topics,
+        Capability::CrossReferences,
+    ];
+    artifact.profile == "study"
+        && actual == legacy_sources.into_iter().collect()
+        && caps == legacy_caps.iter().collect()
 }
 
 /// This describes the bytes being signed, not a trusted object by itself.

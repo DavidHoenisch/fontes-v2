@@ -967,11 +967,13 @@ pub fn validate_study(db: &Connection, counts: &StudyCounts) -> Result<()> {
         counts.greek_segments == 15914,
         "Greek reading streams incomplete"
     );
+    let greek_tokens: u64 = db.query_row(
+        "SELECT count(*) FROM original_tokens WHERE witness_id LIKE 'witness:robinson-tr-%'",
+        [],
+        |r| r.get(0),
+    )?;
     ensure!(
-        counts.original_tokens > 280000
-            && counts.original_tokens < 300000
-            && counts.token_analyses >= counts.original_tokens
-            && counts.token_strongs >= counts.token_analyses,
+        greek_tokens > 280000 && greek_tokens < 300000,
         "Greek analysis coverage mismatch"
     );
     for (source, min) in [
@@ -990,8 +992,36 @@ pub fn validate_study(db: &Connection, counts: &StudyCounts) -> Result<()> {
             "missing study resource coverage: {source}"
         );
     }
-    let empty:u64=db.query_row("SELECT count(*) FROM original_tokens t WHERE NOT EXISTS(SELECT 1 FROM token_analyses a WHERE a.token_id=t.id) OR NOT EXISTS(SELECT 1 FROM token_strongs s WHERE s.token_id=t.id)",[],|r|r.get(0))?;
+    let empty:u64=db.query_row("SELECT count(*) FROM original_tokens t WHERE t.witness_id LIKE 'witness:robinson-tr-%' AND (NOT EXISTS(SELECT 1 FROM token_analyses a WHERE a.token_id=t.id) OR NOT EXISTS(SELECT 1 FROM token_strongs s WHERE s.token_id=t.id))",[],|r|r.get(0))?;
     ensure!(empty == 0, "unanalyzed Greek tokens");
+    let hebrew: u64 = db.query_row(
+        "SELECT count(*) FROM original_tokens WHERE witness_id='witness:oshb-wlc'",
+        [],
+        |r| r.get(0),
+    )?;
+    if hebrew > 0 {
+        ensure!(hebrew == 305507, "Hebrew word coverage mismatch");
+        let verses:u64=db.query_row("SELECT count(DISTINCT sr.canonical_ref_id) FROM source_segments s JOIN segment_refs sr ON sr.segment_id=s.id WHERE s.witness_id='witness:oshb-wlc'",[],|r|r.get(0))?;
+        ensure!(verses == 23144, "Hebrew canonical coverage mismatch");
+        let missing:u64=db.query_row("SELECT count(*) FROM original_tokens t WHERE t.witness_id='witness:oshb-wlc' AND NOT EXISTS(SELECT 1 FROM token_analyses a WHERE a.token_id=t.id AND a.morph_system='oshm' AND a.morph_code IS NOT NULL)",[],|r|r.get(0))?;
+        ensure!(missing == 0, "Hebrew morphology missing");
+        let lord:u64=db.query_row("SELECT count(*) FROM original_tokens t JOIN token_strongs ts ON ts.token_id=t.id JOIN segment_refs sr ON sr.segment_id=t.segment_id WHERE sr.canonical_ref_id=20016001 AND ts.strongs='H3068'",[],|r|r.get(0))?;
+        ensure!(lord == 1, "Proverbs 16:1 Hebrew lookup failed");
+    }
+    let tagged_source: bool = db.query_row(
+        "SELECT EXISTS(SELECT 1 FROM source_snapshots WHERE source_id='kjv-strongs')",
+        [],
+        |r| r.get(0),
+    )?;
+    if tagged_source {
+        let tagged: u64 = db.query_row("SELECT count(*) FROM verse_texts WHERE translation_id='translation:kjv' AND json_type(display_json,'$.source_strongs')='object'", [], |r| r.get(0))?;
+        ensure!(tagged == 31101, "KJV dictionary tag coverage mismatch");
+        let wrong_edition: u64 = db.query_row("SELECT count(*) FROM verse_texts WHERE translation_id!='translation:kjv' AND json_type(display_json,'$.source_strongs')='object'", [], |r| r.get(0))?;
+        ensure!(
+            wrong_edition == 0,
+            "KJV dictionary tags leaked to another edition"
+        );
+    }
     let covered:u64=db.query_row("SELECT count(*) FROM (SELECT s.witness_id,r.canonical_ref_id FROM source_segments s JOIN segment_refs r ON r.segment_id=s.id WHERE s.witness_id LIKE 'witness:robinson-tr-%' GROUP BY 1,2)",[],|r|r.get(0))?;
     ensure!(covered == 15914, "Greek canonical coverage mismatch");
     let definitions:u64=db.query_row("SELECT count(*) FROM strongs_codes c WHERE NOT EXISTS(SELECT 1 FROM resource_links l WHERE l.strongs=c.id AND l.link_type='definition')",[],|r|r.get(0))?;
@@ -1269,9 +1299,10 @@ mod tests {
         let path = temp.path().join("policy.json");
         fs::write(&path, policy_bytes).unwrap();
         check_citation_policy(&path, &lock, &reports).unwrap();
-        reports[0].resources -= 1;
+        let resource_index = reports.iter().position(|r| r.resources > 0).unwrap();
+        reports[resource_index].resources -= 1;
         assert!(check_citation_policy(&path, &lock, &reports).is_err());
-        reports[0].resources += 1;
+        reports[resource_index].resources += 1;
         let index = reports
             .iter()
             .position(|r| !r.unmapped_citations.is_empty())

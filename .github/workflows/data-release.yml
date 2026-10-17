@@ -79,6 +79,7 @@ jobs:
             dist/study/*.zst
             dist/study/*.json
             dist/study/*.txt
+            dist/study/KJV-ANNOTATIONS-NOTICE.md
             dist/study/source-*.zip
             dist/study/source-*.xml
           if-no-files-found: error

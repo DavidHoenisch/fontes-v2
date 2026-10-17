@@ -22,6 +22,8 @@ Workspace `passage` entries now include additive `word_links` (default empty whe
 
 Context additionally includes `cross_references` (default empty in older serialized models), each with `start_ref`, `end_ref`, display `label`, optional active-edition first-verse `preview` and `resource_id`. These are explicit target links from directly applicable cross-reference articles; missing text remains null. More specific source coverage sorts first. Existing article/token fields, command IDs and SQL contracts are retained.
 
+Word results additionally include `headwords` (default empty when reading older responses), with `resource_id`, exact source-supplied `text` and optional `transliteration`. These come only from a definition-linked resource's structured `dictionary_entry` display metadata. Missing, blank, malformed or differently typed metadata yields no headword and does not hide definitions. A dictionary headword is not an inferred verse lemma or English alignment. Existing command inputs, IDs, SQL and protocol version are unchanged.
+
 Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Colors are `amber`, `sage`, `blue`, `rose`. Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
 
 ## First-run bootstrap
@@ -53,3 +55,9 @@ Launch the explicit `fontes-cli ... mcp` mode. It implements JSON-RPC 2.0 line f
 ```
 
 The client chooses which user database to expose. Tools can read private notes and persist mutations; user-facing host confirmation/access policy belongs to that client. Stdout is reserved for protocol messages. A future authenticated GUI control or remote transport needs a separate explicit capability/security contract; do not publish this process on a network port as a shortcut.
+
+## Source word-to-dictionary tags
+
+`passage.strongs_links` is additive (default empty when deserializing older replies). Each item contains exact Unicode-scalar `start`/`end`, a Strong’s code and `source_snapshot_id`. This is a dictionary association, without a claimed original-token identity, surface, lemma or morphology. `word_links` retains its distinct source/reviewed original-token alignment meaning. The context menu can use both to open dictionary definitions; an original-language surface is promoted only from a known token alignment or chosen source word, otherwise the dictionary headword is labeled as such.
+
+Optional stored metadata uses the new [verse Strong’s tags v1 schema](verse-strongs-v1.schema.json) inside existing `verse_texts.display_json.source_strongs`; published SQL is unchanged. The engine checks the exact edition/verse ID, SHA-256 of UTF-8 verse text, valid non-overlapping scalar offsets, source snapshot existence and installed dictionary codes. Corrupt metadata fails closed. The pinned GPL KJV source is owner-approved and enabled in the ten-source Study build. One reviewed text mismatch (1 John 2:23) is withheld; WEB receives no KJV tags. Eight- and nine-source complete Study profiles remain accepted explicitly. Source code/credits and full license accompany builds; existing installations need both a compatible client and the updated published Study library.

@@ -52,7 +52,7 @@ The first adapter imports verse-per-line XML. It preserves verse text after trim
 
 ## Build the study data
 
-The study profile includes reading plus Strong’s Greek (5,624 entries), Strong’s Hebrew (8,674), Robinson TR Greek morphology (all 7,957 NT verses), Matthew Henry (5,360 articles), Nave’s (5,322 entries), and TSK (31,153 entries). It contains 64,090 resources, 281,240 Greek tokens across both source reading streams, 281,307 analyses, and 385,194 TSK target ranges. The initial study download is approximately 110 MB; SQLite occupies approximately 585 MB.
+The study profile includes reading plus Strong’s Greek (5,624 entries), Strong’s Hebrew (8,674), Robinson TR Greek morphology (all 7,957 NT verses), Matthew Henry (5,360 articles), Nave’s (5,322 entries), and TSK (31,153 entries). It contains 64,090 resources, 281,240 Greek tokens across both source reading streams, 281,307 analyses, and 385,194 TSK target ranges. The updated Study profile additionally includes 305,507 OSHB Hebrew words and 349,297 edition-bound KJV dictionary-tag spans. The locally verified download is approximately 136 MB; SQLite occupies approximately 733 MB (publication builds record their exact sizes).
 
 Install **SWORD 1.9.0** as a build dependency and compile the small extraction bridge. Applications only need SQLite, zstd, and the shared update contracts.
 
@@ -124,9 +124,9 @@ Published assets include:
 
 - `fontes-reading.sqlite.zst` and `fontes-study.sqlite.zst`, each a complete content snapshot.
 - `release-manifest.json` and its raw Ed25519 signature, covering the database hashes, lengths, versions, source identities, and capabilities.
-- `sources.lock.json`, `NOTICE.txt`, both profile validation reports, and `study-imports.json`.
+- `sources.lock.json`, `NOTICE.txt`, both profile validation reports, and `study-imports.json`. Study also retains `GPL-3.0.txt` and `KJV-ANNOTATIONS-NOTICE.md`.
 - `changes.json`, including per-profile verse/resource additions, changes, and removals.
-- All eight exact source inputs, named by SHA-256 (`.xml` dictionaries and `.zip` archives), for future rebuilds.
+- All ten exact source inputs, named by SHA-256 (`.xml` dictionaries and `.zip` archives), for future rebuilds.
 
 Verify a downloaded release using the public key committed in this repository:
 

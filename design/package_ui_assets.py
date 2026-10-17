@@ -1,4 +1,4 @@
-"""Collect the approved Fontes UI assets for offline native implementation."""
+"""Collect the current Fontes UI assets for offline native implementation."""
 from pathlib import Path
 import hashlib, json, re, shutil, subprocess, urllib.request
 
@@ -47,19 +47,19 @@ for filename,family,weight,role,license_name in font_specs:
 shutil.copy2(MOBILE/'PHOSPHOR-LICENSE.txt', DEST/'licenses/PHOSPHOR-LICENSE.txt')
 
 tokens = {
-    'name':'Fontes study desk','version':1,
-    'colors':dict(desk='#1C201E',sidebar='#151917',surface='#252A27',raised='#2C322E',border='#3C443E',ink='#ECEDE5',muted='#ABB3AA',quiet='#828E83',accent='#DCBC83',tint='#38372B',inverse='#1C211B',green='#B2C5AB'),
-    'highlightColors':dict(amber='#DCBC83',sage='#B2C5AB',blue='#9EBAC8',rose='#C6A5A0'),
+    'name':'Fontes paper and sea glass','version':1,
+    'colors':dict(desk='#FAF8F3',sidebar='#F1F3EF',surface='#FFFFFF',raised='#EFF2EE',border='#D8E0DB',ink='#202F30',muted='#526768',quiet='#627678',accent='#24676B',tint='#E0EEEA',inverse='#FFFFFF',green='#46715C',error='#A43D37',scrim='#203234'),
+    'highlightColors':dict(amber='#F7E8BA',sage='#DFEBDD',blue='#DEEAF5',rose='#F6E1DE'),
     'spacing':[2,4,6,8,12,16,20,24,32,40,48,64],
-    'radii':dict(control=6,card=10,dialog=16,mobileSheet=24),
+    'radii':dict(control=12,card=16,dialog=16,mobileSheet=24),
     'desktop':dict(viewport=[1440,960],sidebarWidth=208,navigationRowHeight=36,sidebarItemGap=4,navigationIconGap=8,navigationPaddingVertical=8,savedPassagePaddingVertical=6,savedPassageContentGap=2,navigationSectionSpacer=16,smallSectionSpacer=4,toolbarHeight=72,windowBarHeight=64,readerWidth=800,studyPanelWidth=432,iconSize=20),
     'mobile':dict(viewport=[390,844],horizontalPadding=24,contentWidth=342,tapTargetMinimum=44,actionHeight=48,navigationRowHeight=84,iconSize=24,referenceCellSize=44,referenceCellGap=5),
     'typography':{
-        'desktop':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=15,lineHeight=22),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=14,lineHeight=20),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=24,lineHeight=32),'passage':dict(family='Lora',weight=400,size=22,lineHeight=37),'readingHeading':dict(family='Lora',weight=400,size=38,lineHeight=48)},
-        'mobile':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=16,lineHeight=24),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=16,lineHeight=24),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=20,lineHeight=28),'passage':dict(family='Lora',weight=400,size=20,lineHeight=28),'readingHeading':dict(family='Lora',weight=400,size=28,lineHeight=36)},
+        'desktop':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=15,lineHeight=22),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=14,lineHeight=20),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=24,lineHeight=32),'passage':dict(family='Lora',weight=400,size=22,lineHeight=37),'readingHeading':dict(family='Lora',weight=400,size=38,lineHeight=48),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=40,lineHeight=52)},
+        'mobile':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=16,lineHeight=24),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=16,lineHeight=24),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=20,lineHeight=28),'passage':dict(family='Lora',weight=400,size=20,lineHeight=28),'readingHeading':dict(family='Lora',weight=400,size=44,lineHeight=56),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=40,lineHeight=52)},
         'originalLanguageFallback':['Noto Serif','Noto Serif Hebrew'],
     },
-    'status':{'sidebarSpacing':'Approved locally; Figma changes pending tool quota','mobileMockups':'Local SVG and PNG mockups','desktopMockups':'Figma only; desktop frame export blocked by tool quota'},
+    'status':{'palette':'Working light direction for owner review; supersedes dark study-desk default','sidebarSpacing':'Approved locally; Figma changes pending tool quota','mobileMockups':'Local SVG and PNG mockups','desktopMockups':'Figma only; desktop frame export blocked by tool quota'},
 }
 (DEST/'tokens.json').write_text(json.dumps(tokens,indent=2)+'\n')
 
@@ -67,6 +67,9 @@ rs=['//! Embedded Fontes UI assets and design constants. No network access requi
 for name,h in tokens['colors'].items():
     rgb=[int(h[i:i+2],16) for i in (1,3,5)]+[255]
     rs.append(f'pub const COLOR_{name.upper()}: [u8; 4] = {rgb};')
+for name,h in tokens['highlightColors'].items():
+    rgb=[int(h[i:i+2],16) for i in (1,3,5)]+[255]
+    rs.append(f'pub const HIGHLIGHT_{name.upper()}: [u8; 4] = {rgb};')
 for name,n in tokens['desktop'].items():
     if isinstance(n,(int,float)):rs.append(f'pub const DESKTOP_{re.sub(r"([A-Z])",r"_\1",name).upper()}: f32 = {float(n)};')
 for name,n in tokens['mobile'].items():

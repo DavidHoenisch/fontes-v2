@@ -248,3 +248,34 @@ fn fts_index_returns_canonical_evidence_and_resources_require_a_target() {
     assert!(db.execute("INSERT INTO resource_links VALUES ('link-1', 'resource-1', NULL, NULL, NULL, 'commentary')", []).is_err());
     db.execute("INSERT INTO resource_links VALUES ('link-1', 'resource-1', 'gen-1-1', NULL, NULL, 'commentary')", []).unwrap();
 }
+
+#[test]
+fn study_profiles_accept_exact_legacy_and_hebrew_sets_but_reject_mixed_claims() {
+    let mut artifact = manifest().profiles.remove(0);
+    artifact.profile = "study".into();
+    artifact.source_ids = fontes_data_contracts::profile_sources("study")
+        .unwrap()
+        .iter()
+        .map(|s| s.to_string())
+        .collect();
+    artifact.capabilities = fontes_data_contracts::profile_capabilities("study")
+        .unwrap()
+        .to_vec();
+    assert!(fontes_data_contracts::supported_profile(&artifact));
+    artifact.source_ids.retain(|s| s != "kjv-strongs");
+    assert!(fontes_data_contracts::supported_profile(&artifact));
+    artifact.source_ids.retain(|s| s != "oshb-hebrew");
+    assert!(
+        !fontes_data_contracts::supported_profile(&artifact),
+        "A Hebrew capability needs actual Hebrew data"
+    );
+    artifact
+        .capabilities
+        .retain(|c| *c != fontes_data_contracts::Capability::HebrewMorphology);
+    assert!(
+        fontes_data_contracts::supported_profile(&artifact),
+        "Published legacy Study remains supported"
+    );
+    artifact.source_ids.push("unreviewed-extra-source".into());
+    assert!(!fontes_data_contracts::supported_profile(&artifact));
+}

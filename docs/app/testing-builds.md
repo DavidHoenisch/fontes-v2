@@ -52,3 +52,9 @@ Each clean CI run has a fresh Android debug signing key. Installing a differentl
 Compilation, command smoke checks and packaging checks do not establish device support. Android IME, touch, lifecycle recovery, safe areas/accessibility and actual GPU behavior still require device testing; desktop native-window/accessibility tests also remain. iOS is deferred.
 
 Publication now additionally requires native engine/bootstrap tests to execute on an Android API 28 emulator. This catches platform runtime failures such as Android's unsupported standard-library file-lock API, which APK compilation alone missed. It is a headless service check; it does not establish GUI or physical-device acceptance. See the [setup verification guide](first-run-setup.md#verification-and-release-limits) for the local test command.
+
+## Updating for OT Strong’s lookup
+
+Use an app release containing D034/D035 and its corresponding ten-source Study release. The app accepts older complete Study libraries too, so an app update alone does not add Hebrew words or KJV tags. In the updated app, open Reading Preferences → Library settings → **Download a different library**, choose **Study**, then Continue → Download and open. The setup preserves the separate user database and retains the existing library if transfer or validation fails. Reading contains no new study resources.
+
+The new Study data includes OSHB Hebrew/Aramaic words and supplied morphology, plus source-provided KJV dictionary tags for direct word lookup. Source omissions remain explicit: no OSHB words for Nehemiah 7:68; KJV tags for 1 John 2:23 are withheld for an exact-text mismatch. WEB uses the verse-word chooser. KJV dictionary tags do not identify a particular Hebrew/Greek verse token. Source archives, attribution and license notices accompany the data release.

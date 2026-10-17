@@ -2684,6 +2684,20 @@
       "non_scripture_links": 0,
       "resources": 31153,
       "source_records": 31154
+    },
+    "oshb-hebrew": {
+      "source_records": 23213,
+      "linked_aliases": 0,
+      "resources": 0,
+      "citations": 0,
+      "non_scripture_links": 0
+    },
+    "kjv-strongs": {
+      "source_records": 31102,
+      "linked_aliases": 0,
+      "resources": 0,
+      "citations": 0,
+      "non_scripture_links": 0
     }
   }
 }

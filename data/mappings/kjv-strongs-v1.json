@@ -1,0 +1,8 @@
+{
+  "mapping_version": 1,
+  "source_sha256": "05b021ab465bd283e7df02409c78436487d582276b3a0b60d6fcf5d967a0af14",
+  "review": "Owner-approved GPL annotations, 2026-10-16. Exact normalized edition text required. Withhold 1 John 2:23 because source [but] differs from installed but; never infer original-token alignment.",
+  "text_mismatches": [
+    "1JN.2.23"
+  ]
+}

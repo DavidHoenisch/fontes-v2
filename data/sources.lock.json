@@ -89,6 +89,28 @@
       "rights_evidence_url": "https://github.com/byztxt/greektext-textus-receptus/blob/7fd4d02c3e5adebd379ebfbc824040820dde10fc/README.md",
       "adapter": "robinson-utr-v1",
       "upstream_revision": "7fd4d02c3e5adebd379ebfbc824040820dde10fc"
+    },
+    {
+      "source_id": "oshb-hebrew",
+      "url": "https://codeload.github.com/openscriptures/morphhb/zip/3d15126fb1ef74867fc1434be1942e837932691f",
+      "sha256": "f56c150708b5d74719ecb709c712c31eae9855bca7b111fd82ec91b5d177b4c7",
+      "bytes": 20870584,
+      "rights_class": "CC-BY-4.0",
+      "rights_review_id": "owner-approved-2026-10-16-oshb-hebrew",
+      "rights_evidence_url": "https://github.com/openscriptures/morphhb/blob/3d15126fb1ef74867fc1434be1942e837932691f/LICENSE.md",
+      "adapter": "oshb-osis-v1",
+      "upstream_revision": "3d15126fb1ef74867fc1434be1942e837932691f"
+    },
+    {
+      "source_id": "kjv-strongs",
+      "url": "https://ebible.org/Scriptures/eng-kjv_usfm.zip?x=1",
+      "sha256": "05b021ab465bd283e7df02409c78436487d582276b3a0b60d6fcf5d967a0af14",
+      "bytes": 2766294,
+      "rights_class": "GPL",
+      "rights_review_id": "owner-approved-2026-10-16-kjv-strongs",
+      "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=KJV",
+      "adapter": "kjv-usfm-strongs-v1",
+      "upstream_revision": null
     }
   ]
 }

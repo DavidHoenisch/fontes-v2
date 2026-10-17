@@ -27,6 +27,17 @@ pub struct Verse {
     /// Source-provided/reviewed links against this exact edition's Unicode scalar offsets.
     #[serde(default)]
     pub word_links: Vec<WordLink>,
+    /// Source English-to-dictionary tags. These do not identify an original token.
+    #[serde(default)]
+    pub strongs_links: Vec<StrongsLink>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct StrongsLink {
+    pub start: usize,
+    pub end: usize,
+    pub strongs: String,
+    pub source_snapshot_id: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -165,6 +176,12 @@ pub struct ResourceLink {
     pub basis: String,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct DictionaryHeadword {
+    pub resource_id: String,
+    pub text: String,
+    pub transliteration: Option<String>,
+}
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TokenAnalysis {
     pub witness: String,
     pub position: u32,
@@ -207,6 +224,8 @@ pub enum Data {
     },
     Word {
         code: String,
+        #[serde(default)]
+        headwords: Vec<DictionaryHeadword>,
         definitions: Vec<ResourceSummary>,
         occurrences: Vec<SavedReference>,
         total: u32,

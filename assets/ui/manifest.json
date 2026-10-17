@@ -223,13 +223,13 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 2955,
-      "sha256": "e3dfcfb599c8e264fdb15565922a2b1065cf11953814d6133ee5473b99d7b243"
+      "bytes": 3846,
+      "sha256": "bbbd9ce8ddfd4a6b2199db3036c4a28fe582fc659d1e33fb14bcd9108a3b1478"
     },
     {
       "path": "assets.rs",
-      "bytes": 4809,
-      "sha256": "55e638957ce1068f6c6787eb8879d4a1bfe9dd8e0a0552b3767349fbc95ef27f"
+      "bytes": 5160,
+      "sha256": "af4998545a140e1c60284e7d4879445c52ef3f6fadc4a180a2bd2dd07c0ee8ad"
     },
     {
       "path": "fonts/IBMPlexSans-Medium.ttf",
@@ -573,8 +573,8 @@
     },
     {
       "path": "tokens.json",
-      "bytes": 3353,
-      "sha256": "f35e5ab72c5fbf993a27c775d5601729c5d52e34e2e4d6096b2627f5fe362b03"
+      "bytes": 3868,
+      "sha256": "748e874acbc888811135595c18eaeca81bfa649b9a423927ad8042866e634a06"
     }
   ]
 }

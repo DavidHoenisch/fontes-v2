@@ -7,24 +7,70 @@ impl Engine {
         // Each source segment appears once even when mapped to multiple canonical anchors.
         let mut passage = Vec::<Verse>::new();
         let mut indices = std::collections::HashMap::<String, usize>::new();
-        let mut stmt=self.content.prepare("SELECT id,canonical_ref_id,text FROM verses_by_reference WHERE translation_id=?1 AND canonical_ref_id BETWEEN ?2 AND ?3 ORDER BY canonical_ref_id,id")?;
+        let mut stmt=self.content.prepare("SELECT id,canonical_ref_id,text,display_json FROM verses_by_reference WHERE translation_id=?1 AND canonical_ref_id BETWEEN ?2 AND ?3 ORDER BY canonical_ref_id,id")?;
         for row in stmt.query_map(params![self.session.translation, lower, upper], |r| {
             Ok((
                 r.get::<_, String>(0)?,
                 r.get::<_, i64>(1)?,
                 r.get::<_, String>(2)?,
+                r.get::<_, Option<String>>(3)?,
             ))
         })? {
-            let (id, reference, text) = row?;
+            let (id, reference, text, display) = row?;
             if let Some(i) = indices.get(&id) {
                 passage[*i].refs.push(reference);
             } else {
+                let mut strongs_links = Vec::new();
+                if let Some(display) = display {
+                    let display: serde_json::Value = serde_json::from_str(&display)
+                        .map_err(|_| Error::invalid("Invalid verse display metadata."))?;
+                    if let Some(tags) = display.get("source_strongs") {
+                        let tags: fontes_data_contracts::VerseStrongs =
+                            serde_json::from_value(tags.clone())
+                                .map_err(|_| Error::invalid("Invalid source word tags."))?;
+                        let hash = hex::encode(
+                            ring::digest::digest(&ring::digest::SHA256, text.as_bytes()).as_ref(),
+                        );
+                        tags.validate(&id, &text, &hash).map_err(Error::invalid)?;
+                        let source_exists: bool = self.content.query_row(
+                            "SELECT EXISTS(SELECT 1 FROM source_snapshots WHERE id=?1)",
+                            [&tags.source_snapshot_id],
+                            |r| r.get(0),
+                        )?;
+                        if !source_exists {
+                            return Err(Error::invalid(
+                                "Source word tags reference a missing source.",
+                            ));
+                        }
+                        for span in tags.spans {
+                            for code in span.codes {
+                                let present: bool = self.content.query_row(
+                                    "SELECT EXISTS(SELECT 1 FROM strongs_codes WHERE id=?1)",
+                                    [&code],
+                                    |r| r.get(0),
+                                )?;
+                                if !present {
+                                    return Err(Error::invalid(
+                                        "Source word tags reference a missing dictionary code.",
+                                    ));
+                                }
+                                strongs_links.push(StrongsLink {
+                                    start: span.start,
+                                    end: span.end,
+                                    strongs: code,
+                                    source_snapshot_id: tags.source_snapshot_id.clone(),
+                                });
+                            }
+                        }
+                    }
+                }
                 indices.insert(id.clone(), passage.len());
                 passage.push(Verse {
                     id,
                     refs: vec![reference],
                     text,
                     word_links: vec![],
+                    strongs_links,
                 });
             }
         }
@@ -163,10 +209,17 @@ impl Engine {
             ));
         }
         let definitions=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,substr(r.content,1,1500) FROM resources r JOIN resource_links l ON l.resource_id=r.id WHERE l.strongs=?1 AND l.link_type='definition' ORDER BY r.id")?.query_map([&code],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
+        // Read source-supplied dictionary metadata, never infer a lemma from a title or definition.
+        let metadata=self.content.prepare("SELECT DISTINCT r.id,r.display_json FROM resources r JOIN resource_links l ON l.resource_id=r.id WHERE l.strongs=?1 AND l.link_type='definition' ORDER BY r.id")?.query_map([&code],|r|Ok((r.get::<_,String>(0)?,r.get::<_,Option<String>>(1)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let headwords = metadata
+            .into_iter()
+            .filter_map(|(id, display)| dictionary_headword(id, display))
+            .collect();
         let total=self.content.query_row("SELECT count(DISTINCT sr.canonical_ref_id) FROM token_strongs ts JOIN original_tokens t ON t.id=ts.token_id JOIN segment_refs sr ON sr.segment_id=t.segment_id WHERE ts.strongs=?1",[&code],|r|r.get(0))?;
         let occurrences=self.content.prepare("SELECT DISTINCT sr.canonical_ref_id FROM token_strongs ts JOIN original_tokens t ON t.id=ts.token_id JOIN segment_refs sr ON sr.segment_id=t.segment_id WHERE ts.strongs=?1 ORDER BY sr.canonical_ref_id LIMIT 100")?.query_map([&code],|r|{let id=r.get(0)?;Ok(SavedReference{ref_id:id,label:label(&self.books,id),kind:"strongs_occurrence".into()})})?.collect::<std::result::Result<Vec<_>,_>>()?;
         Ok(Data::Word {
             code,
+            headwords,
             definitions,
             occurrences,
             total,
@@ -181,5 +234,21 @@ fn summary(r: &rusqlite::Row<'_>) -> rusqlite::Result<ResourceSummary> {
         kind: r.get(3)?,
         basis: r.get(4)?,
         excerpt: r.get(5)?,
+    })
+}
+
+fn dictionary_headword(resource_id: String, display: Option<String>) -> Option<DictionaryHeadword> {
+    let metadata: serde_json::Value = serde_json::from_str(display.as_deref()?).ok()?;
+    if metadata["type"] != "dictionary_entry" {
+        return None;
+    }
+    let text = metadata["headword"].as_str()?;
+    if text.trim().is_empty() {
+        return None;
+    }
+    Some(DictionaryHeadword {
+        resource_id,
+        text: text.to_owned(),
+        transliteration: metadata["transliteration"].as_str().map(str::to_owned),
     })
 }

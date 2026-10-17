@@ -88,3 +88,7 @@ For v0.1, curate the requested major lines from the public domain scripture: Gen
 8. **Budget after normalization.** The measured compressed files are modest enough to justify a prototype. They do not prove the spec's final size target: full commentary text, token tables, FTS, and embedding indexes must be measured separately. Verse text and reference-rich topic articles can seed retrieval before adding embeddings.
 
 The immediate acquisition step can proceed for the clearly classified base texts, dictionary XML editions, official Robinson Greek, and PD-labelled commentary/reference modules. The remaining work is importer construction, text/link validation, curated genealogies and overviews, and explicit decisions on the conditional annotation datasets.
+
+## 2026-10-16 owner-approved intake update
+
+The initial public-domain default now has two specific owner-approved exceptions: OSHB Hebrew annotations (CC BY 4.0) and the pinned eBible/CrossWire KJV dictionary annotations (GPL). See `data/rights/oshb-hebrew-2026-10-16.md` and `data/rights/kjv-strongs-2026-10-16.md` for exact bytes, attribution, modifications and license handling. Earlier unresolved/disabled statements describe the research stage. These decisions do not authorize unrelated conditional sources. Exact English-to-original-token identity remains distinct from supplied KJV-to-dictionary associations.

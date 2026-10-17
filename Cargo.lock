@@ -1471,6 +1471,7 @@ dependencies = [
  "android_logger",
  "eframe",
  "fontes-ui-egui",
+ "jni",
  "log",
  "winit",
 ]

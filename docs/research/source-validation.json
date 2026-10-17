@@ -288,7 +288,7 @@
         "Verse",
         "Language",
         "WLC / Nestle Base TR RP WH NE NA SBL",
-        "WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]",
+        "WLC / Nestle Base {TR} \u29fcRP\u29fd (WH) \u2329NE\u232a [NA] \u2039SBL\u203a [[ECM]]",
         "Translit",
         "Parsing",
         "Parsing",
@@ -363,6 +363,41 @@
         "book_count": 27,
         "verse_count": 7957,
         "alternate_numbering_annotations": 22
+      }
+    },
+    {
+      "resource_id": "oshb-hebrew",
+      "checked_on_local_date": "2026-10-16",
+      "downloaded_bytes": 20870584,
+      "sha256": "f56c150708b5d74719ecb709c712c31eae9855bca7b111fd82ec91b5d177b4c7",
+      "source_download_url": "https://codeload.github.com/openscriptures/morphhb/zip/3d15126fb1ef74867fc1434be1942e837932691f",
+      "upstream_revision": "3d15126fb1ef74867fc1434be1942e837932691f",
+      "rights_class": "CC-BY-4.0",
+      "rights_review_id": "owner-approved-2026-10-16-oshb-hebrew",
+      "inspection": {
+        "source_verses": 23213,
+        "primary_words": 305507,
+        "canonical_verse_coverage": 23144,
+        "source_omission": "Neh.7.68",
+        "normalization": "Source Unicode unchanged; note-contained variants excluded from primary stream",
+        "retained_psalm_superscription_segments": 63
+      }
+    },
+    {
+      "resource_id": "kjv-strongs",
+      "checked_on_local_date": "2026-10-16",
+      "downloaded_bytes": 2766294,
+      "sha256": "05b021ab465bd283e7df02409c78436487d582276b3a0b60d6fcf5d967a0af14",
+      "source_download_url": "https://ebible.org/Scriptures/eng-kjv_usfm.zip?x=1",
+      "rights_class": "GPL",
+      "rights_review_id": "owner-approved-2026-10-16-kjv-strongs",
+      "inspection": {
+        "source_verses": 31102,
+        "tagged_verses": 31101,
+        "spans": 349297,
+        "withheld": [
+          "1JN.2.23"
+        ]
       }
     }
   ]

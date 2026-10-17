@@ -6,7 +6,7 @@ Use a Rust compiler running in GitHub Actions to turn locked source files into v
 
 This preserves the reference-centric model in Specification v0.1 while making source refreshes, reproducible builds, app compatibility, and interrupted updates explicit. The initial transport is a complete snapshot for a selected content profile. Source imports are modular inside the build; clients do not need to merge resource databases or apply SQL patches.
 
-The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, eight locked inputs, and shared contracts. The workflow compiles both reading and study twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, Matthew Henry, Nave’s, and TSK. Scheduled source discovery and client installation remain implementation work.
+The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, ten locked inputs, and shared contracts. The workflow compiles both reading and study twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, OSHB Hebrew words and KJV dictionary tags, Matthew Henry, Nave’s, and TSK. Scheduled source discovery and client installation remain implementation work.
 
 ## Independently installable resources
 
@@ -37,7 +37,7 @@ Upstream discovery and release compilation are different operations. Discovery m
 | Component | Responsibility | Status |
 | --- | --- | --- |
 | `data/canonical/registry-v1.json` | Permanent book IDs and complete initial verse anchor catalog | Added and checked |
-| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Eight inspected inputs added |
+| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Nine inspected inputs added |
 | `data/profiles.json` | Required source membership and advertised capabilities | Reading and study profiles defined |
 | `data/schema/` | Immutable content and separate mutable user schemas | Added and exercised in SQLite |
 | `crates/fontes-data-contracts` | Shared identities, manifest types, structural checks, embedded schemas | Added with tests |
@@ -90,11 +90,11 @@ At first install, seed that local registry from the bundled trusted registry. La
 
 ### Source registry and lockfile
 
-The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current eight locked inputs correspond to inspected downloads, including the full Robinson TR archive. The earlier checked John sample is historical acquisition evidence, not the production source.
+The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current ten locked inputs correspond to inspected downloads, including the full Robinson TR archive. The earlier checked John sample is historical acquisition evidence, not the production source.
 
 A separate source discovery configuration will describe the upstream branch/release or moving file, rights evidence URL, refresh cadence, expected coverage, and whether the source is enabled. For Git-hosted texts discover a commit and pin it. For moving download URLs compare actual hashes, using HTTP validators to reduce transfers. ETag, Last-Modified, and upstream version labels are hints; SHA-256 identifies the bytes.
 
-A proposed weekly discovery workflow creates or updates one source-refresh PR containing the lock changes, upstream revisions, rights statement differences, and a semantic content diff. Repeated discoveries of the same bytes do nothing. The normal PR review records mapping exceptions or rights decisions. A changed or missing rights statement blocks that source until classified. Conditional tagged KJV and Berean annotations, CC BY morphology, and share-alike genealogies remain disabled under the current content policy.
+A proposed weekly discovery workflow creates or updates one source-refresh PR containing the lock changes, upstream revisions, rights statement differences, and a semantic content diff. Repeated discoveries of the same bytes do nothing. The normal PR review records mapping exceptions or rights decisions. A changed or missing rights statement blocks that source until classified. D034 permits the specifically reviewed CC BY 4.0 OSHB Hebrew source with attribution. D035 separately approves the pinned GPL KJV dictionary annotations with editable source, credits and GPL text. Other tagged editions/Berean annotations remain disabled until separately reviewed.
 
 Retain each accepted raw source in content-addressed storage and include an exact-source archive or immutable source assets with its release where redistribution permits. Future builds retrieve by digest from that retained copy before trying a moving upstream URL. This prevents an upstream replacement from making old builds impossible to reproduce. CI caches accelerate acquisition but are not the only archival copy. Keep evidence-page snapshots/digests for rights review separately from redistributable source content.
 
@@ -137,7 +137,7 @@ FTS5 is built into the SQLite profiles. Search hits retain verse/resource identi
 
 ## Profiles and versioning
 
-The initial `reading` profile contains KJV and WEB; `study` adds both dictionaries, Greek TR parsing, Matthew Henry, Nave, and TSK. These use the same schema and canonical registry. Mobile can select reading to reduce storage, while either platform can select study. Genealogy, book overview, and Hebrew morphology capabilities are advertised only when their actual reviewed data is included. No placeholder data enables a capability.
+The initial `reading` profile contains KJV and WEB; `study` adds both dictionaries, Greek TR parsing, Matthew Henry, Nave, and TSK. These use the same schema and canonical registry. Mobile can select reading to reduce storage, while either platform can select study. Study now includes pinned OSHB Hebrew words and supplied morphology. Genealogy and book overview capabilities are advertised only when their actual reviewed data is included. No placeholder data enables a capability.
 
 Both reading and study profiles are implemented. Current v1 releases distribute complete snapshots. The package-native design will make each resource independently installable and represent these profiles as selection bundles; whole-profile replacement must not erase user-installed add-ons. Optional larger dictionaries can then become independent packages.
 
@@ -259,4 +259,16 @@ Robinson ASCII is converted to unaccented Greek with a checked alphabet. Triple-
 
 The initial study build has 14,298 Strong’s codes, 281,240 tokens, 281,307 analyses, 281,330 Strong’s associations, 15,914 Greek segments, and 64,090 resources. The citation audit retains 439 known source anomalies. These are corpus baseline counts, not guarantees about future source editions. The verifier checks source membership and profile capabilities, relational integrity, complete reading/Greek coverage, dictionary definition links, resource search coverage, and passage smoke queries. SQLite tables retain the v1 contracts; new/partial indexes are additive. The bounded verifier accepts at most 1 GiB SQLite and 256 MiB compressed per profile.
 
-A release contains both complete profile artifacts and their union of eight source snapshots. The publisher refuses to remove an existing profile, verifies older signed manifests (including the original reading-only release), compares semantic verse/resource changes per profile, and verifies every artifact in draft and public downloads. Client activation remains future work; signed package verification is implemented.
+A release contains both complete profile artifacts and their union of ten source snapshots. The publisher refuses to remove an existing profile, verifies older signed manifests (including the original reading-only release), compares semantic verse/resource changes per profile, and verifies every artifact in draft and public downloads. Client activation remains future work; signed package verification is implemented.
+
+## Hebrew word import and compatibility
+
+The OSHB adapter reads primary direct verse words, retains stable source word IDs and Unicode sequences, and parses supplied augmented Strong’s codes without inventing entries for prefix letters. It stores supplied morphology as OSHM; dictionary forms do not become source lemmas. The complete pinned VerseMap handles full MT/KJV reference shifts; `data/mappings/hebrew-oshb-v1.json` reviews partial-word boundaries and preserves Psalm superscriptions alongside canonical verse 1. Nehemiah 7:68 is a source omission, not filled from an unreviewed witness. Note-contained variants stay in the retained source archive. Exact source bytes, attribution, license and modification notices accompany builds and app display.
+
+No published SQL schema or user-data migration is needed. Updated bootstrap/package verification recognizes the new complete source/capability set plus the legacy eight-source and intermediate nine-source Study sets explicitly; arbitrary extra sources or mismatched capabilities are rejected. Older app clients require an update to download the new Study profile. Public deployment/signature checks remain independent of local source/import/UI verification.
+
+## KJV dictionary-tag import
+
+The approved ten-source Study profile adds `kjv-usfm-strongs-v1`. Tags attach only when the entire normalized source verse matches the installed KJV text. Comparison removes paragraph marks and collapses whitespace; stored text is unchanged and offsets address the exact Unicode scalar sequence. Of 31,102 source verses, 31,101 match, producing 349,297 tagged spans. The reviewed 1 John 2:23 bracket mismatch withholds that verse’s tags. No other text mismatch is accepted. WEB receives no KJV tags.
+
+`verse_texts.display_json.source_strongs` uses the explicit [verse Strong’s v1 contract](../../specs/app/verse-strongs-v1.schema.json). Dictionary associations have edition/text hashes and provenance, but no fabricated original-token identity. The engine fails closed on invalid metadata. Exact tagged USFM source, GPL text and attribution/modification notice accompany Study releases; the publisher carries these files into combined releases. The initial eight-source Greek-only counts above describe the prior baseline; the new build additionally has 305,507 OSHB words across 23,144 canonical verses.

@@ -19,14 +19,17 @@
         "strongs-greek",
         "strongs-hebrew",
         "robinson-tr",
+        "oshb-hebrew",
         "matthew-henry",
         "nave",
-        "tsk"
+        "tsk",
+        "kjv-strongs"
       ],
       "capabilities": [
         "reading",
         "strongs_lexicon",
         "greek_morphology",
+        "hebrew_morphology",
         "commentary",
         "topics",
         "cross_references"

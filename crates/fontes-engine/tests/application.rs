@@ -270,6 +270,7 @@ fn context_keeps_typed_links_and_source_analyses() {
         total,
         occurrences,
         definitions,
+        headwords,
     } = e
         .dispatch(Command::Word { code: "g25".into() })
         .unwrap()
@@ -281,6 +282,94 @@ fn context_keeps_typed_links_and_source_analyses() {
     assert_eq!(total, 1);
     assert_eq!(occurrences.len(), 1);
     assert_eq!(definitions.len(), 1);
+    assert!(
+        headwords.is_empty(),
+        "A legacy title/definition is not structured headword metadata"
+    );
+}
+#[test]
+fn dictionary_headwords_use_structured_metadata_and_preserve_language_text() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    db.execute(
+        "UPDATE resources SET title='Unstructured display title',display_json=?1 WHERE id='strong'",
+        [
+            json!({"type":"dictionary_entry","headword":"ἀγαπάω","transliteration":"agapáō"})
+                .to_string(),
+        ],
+    )
+    .unwrap();
+    db.execute_batch("INSERT INTO strongs_codes VALUES('H3068','he');
+        INSERT INTO resources VALUES('hebrew','source','hebrew','dictionary','Unstructured Hebrew title',NULL,'A definition.',NULL);
+        INSERT INTO resource_links VALUES('hebrew-definition','hebrew',NULL,'H3068',NULL,'definition');").unwrap();
+    db.execute(
+        "UPDATE resources SET display_json=?1 WHERE id='hebrew'",
+        [
+            json!({"type":"dictionary_entry","headword":"יְהֹוָה","transliteration":"Yᵉhôvâh"})
+                .to_string(),
+        ],
+    )
+    .unwrap();
+    let mut engine = f.engine();
+    for (code, text, transliteration, id) in [
+        ("G25", "ἀγαπάω", "agapáō", "strong"),
+        ("H3068", "יְהֹוָה", "Yᵉhôvâh", "hebrew"),
+    ] {
+        let Data::Word { headwords, .. } = engine
+            .dispatch(Command::Word { code: code.into() })
+            .unwrap()
+            .data
+        else {
+            panic!()
+        };
+        assert_eq!(headwords.len(), 1);
+        assert_eq!(headwords[0].text, text);
+        assert_eq!(headwords[0].resource_id, id);
+        assert_eq!(
+            headwords[0].transliteration.as_deref(),
+            Some(transliteration)
+        );
+    }
+    db.execute(
+        "UPDATE resources SET display_json=?1 WHERE id='strong'",
+        [json!({"type":"other","headword":"Not a dictionary headword"}).to_string()],
+    )
+    .unwrap();
+    let Data::Word { headwords, .. } = engine
+        .dispatch(Command::Word { code: "G25".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert!(headwords.is_empty());
+    db.execute(
+        "UPDATE resources SET display_json='malformed legacy metadata' WHERE id='strong'",
+        [],
+    )
+    .unwrap();
+    let Data::Word {
+        headwords,
+        definitions,
+        ..
+    } = engine
+        .dispatch(Command::Word { code: "G25".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert!(headwords.is_empty());
+    assert_eq!(
+        definitions.len(),
+        1,
+        "Unavailable headword metadata must not hide a definition"
+    );
+    let legacy: Data = serde_json::from_value(
+        json!({"type":"word","code":"G0025","definitions":[],"occurrences":[],"total":0}),
+    )
+    .unwrap();
+    assert!(matches!(legacy, Data::Word { headwords, .. } if headwords.is_empty()));
 }
 #[test]
 fn literal_search_filters_translation_and_pages_stably() {
@@ -552,4 +641,82 @@ I. Concerning this witness.' WHERE id='mh'; UPDATE resources SET content='Litera
         resource.content, "An intentional literal: &#224;",
         "New normalized content must not receive a second repair"
     );
+}
+
+#[test]
+fn source_dictionary_tags_are_edition_bound_and_never_claim_original_token_identity() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    let text = "Élan loved loved.";
+    let tags = fontes_data_contracts::VerseStrongs {
+        version: 1,
+        verse_text_id: "kjv16".into(),
+        source_snapshot_id: "source".into(),
+        text_sha256: hex::encode(
+            ring::digest::digest(&ring::digest::SHA256, text.as_bytes()).as_ref(),
+        ),
+        spans: vec![fontes_data_contracts::StrongsSpan {
+            start: 5,
+            end: 10,
+            codes: vec!["G0025".into()],
+        }],
+    };
+    let metadata = json!({"type":"verse_annotations","source_strongs":tags});
+    db.execute(
+        "UPDATE verse_texts SET text=?1,display_json=?2 WHERE id='kjv16'",
+        params![text, metadata.to_string()],
+    )
+    .unwrap();
+    let mut engine = f.engine();
+    let state = engine.workspace().unwrap();
+    let verse = state.passage.iter().find(|v| v.id == "kjv16").unwrap();
+    assert!(
+        verse.word_links.is_empty(),
+        "Dictionary tags cannot invent token alignments"
+    );
+    assert_eq!(verse.strongs_links.len(), 1);
+    assert_eq!(
+        verse
+            .text
+            .chars()
+            .skip(verse.strongs_links[0].start)
+            .take(verse.strongs_links[0].end - verse.strongs_links[0].start)
+            .collect::<String>(),
+        "loved"
+    );
+    assert_eq!(
+        verse.strongs_links[0].end, 10,
+        "The repeated second word must remain untagged"
+    );
+    assert!(
+        engine
+            .dispatch(Command::Translation { id: "web".into() })
+            .unwrap()
+            .state
+            .passage
+            .iter()
+            .all(|v| v.strongs_links.is_empty())
+    );
+    drop(engine);
+    for mutation in 0..5 {
+        let mut metadata = metadata.clone();
+        match mutation {
+            0 => metadata["source_strongs"]["text_sha256"] = "wrong text".into(),
+            1 => metadata["source_strongs"]["spans"][0]["end"] = 999.into(),
+            2 => metadata["source_strongs"]["verse_text_id"] = "web16".into(),
+            3 => metadata["source_strongs"]["source_snapshot_id"] = "missing".into(),
+            _ => metadata["source_strongs"]["spans"][0]["codes"][0] = "G+025".into(),
+        }
+        db.execute(
+            "UPDATE verse_texts SET display_json=?1 WHERE id='kjv16'",
+            [metadata.to_string()],
+        )
+        .unwrap();
+        let mut engine = f.engine();
+        let result = engine.dispatch(Command::Translation { id: "kjv".into() });
+        assert!(
+            result.is_err(),
+            "Invalid source metadata must fail closed: {mutation}"
+        );
+    }
 }

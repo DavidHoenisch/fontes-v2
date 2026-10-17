@@ -129,7 +129,7 @@ impl FontesApp {
                         ui.add_space(24.0);
                         for (profile, title, description) in [
                             (Profile::Reading, "Reading", "KJV and World English Bible. A smaller download for everyday reading."),
-                            (Profile::Study, "Study", "Both Bibles plus Strong’s dictionaries, original Greek, Matthew Henry, Nave’s and cross-references."),
+                            (Profile::Study, "Study", "Both Bibles plus Strong’s word lookup, original Hebrew and Greek, Matthew Henry, Nave’s and cross-references."),
                         ] {
                             if ui.add_sized([ui.available_width(), 48.0], egui::Button::selectable(self.setup.profile == profile, title).right_text(())).clicked() { self.setup.profile = profile; }
                             ui.label(description);
@@ -138,7 +138,7 @@ impl FontesApp {
                         caption(ui, "You’ll see the download size before it starts. No account required. Read offline after setup.");
                         if let Some(error) = &self.setup.error {
                             ui.add_space(20.0);
-                            ui.colored_label(egui::Color32::LIGHT_RED, "Setup couldn’t finish. Check your connection and free storage, then retry.");
+                            ui.colored_label(theme::color(assets::COLOR_ERROR), "Setup couldn’t finish. Check your connection and free storage, then retry.");
                             ui.collapsing("Details", |ui| { ui.label(error); });
                         } else if let Some(error) = &self.error {
                             ui.add_space(20.0);

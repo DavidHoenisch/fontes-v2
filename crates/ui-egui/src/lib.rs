@@ -2,11 +2,14 @@
 #[cfg(test)]
 mod tests;
 
+mod picker;
+mod preferences;
 mod setup;
 mod study;
 mod theme;
 
-use study::{SelectedText, StudyTab};
+use picker::PickerStage;
+use study::{SelectedText, StudyTab, WordFocus};
 
 use eframe::egui::{self, RichText};
 
@@ -18,6 +21,9 @@ use fontes_engine::{
 use std::path::PathBuf;
 
 use theme::{accent, assets, caption, icon, muted, nav, primary, scripture};
+
+/// Platform system bars use the same opaque page color as the shared UI.
+pub const BACKGROUND_COLOR: [u8; 4] = assets::COLOR_DESK;
 
 #[derive(Clone, Copy, PartialEq)]
 enum Destination {
@@ -48,6 +54,9 @@ pub struct FontesApp {
     error: Option<String>,
     reference: String,
     picker: bool,
+    reading_settings: bool,
+    picker_stage: PickerStage,
+    picker_reset_scroll: bool,
     picker_book: Option<u16>,
     picker_chapter: u16,
     picker_verse: u16,
@@ -62,9 +71,11 @@ pub struct FontesApp {
     include_mentions: bool,
     witness: String,
     selected_text: Option<SelectedText>,
+    verse_actions: Option<Verse>,
     selection_generation: u64,
     word_code: String,
     word: Option<Data>,
+    word_focus: Option<WordFocus>,
     note: Option<NoteDraft>,
     scroll_to: Option<i64>,
     save_pending: bool,
@@ -116,6 +127,9 @@ impl FontesApp {
             error: None,
             reference: String::new(),
             picker: false,
+            reading_settings: false,
+            picker_stage: PickerStage::Book,
+            picker_reset_scroll: true,
             picker_book: None,
             picker_chapter: 1,
             picker_verse: 1,
@@ -130,9 +144,11 @@ impl FontesApp {
             include_mentions: false,
             witness: String::new(),
             selected_text: None,
+            verse_actions: None,
             selection_generation: 0,
             word_code: String::new(),
             word: None,
+            word_focus: None,
             note: None,
             scroll_to: None,
             save_pending: false,
@@ -220,8 +236,11 @@ impl FontesApp {
                     });
 
                     if content_changed || translation_changed {
+                        self.word = None;
+                        self.word_focus = None;
                         self.selection_generation = self.selection_generation.wrapping_add(1);
                         self.selected_text = None;
+                        self.verse_actions = None;
                     }
                     if translation_changed {
                         self.scroll_to = Some(response.state.session.selected_ref);
@@ -237,6 +256,8 @@ impl FontesApp {
                         }
                     }
                     if changed {
+                        self.word_focus = None;
+                        self.verse_actions = None;
                         self.word = None;
                         if self
                             .selected_text
@@ -352,9 +373,11 @@ impl FontesApp {
             return;
         }
         if ui.input_mut(|i| i.consume_key(egui::Modifiers::COMMAND, egui::Key::K)) {
-            self.picker = true;
+            self.open_picker();
         }
         if ui.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
+            self.verse_actions = None;
+            self.reading_settings = false;
             self.picker = false;
 
             if !self.save_pending {
@@ -394,16 +417,26 @@ impl FontesApp {
         egui::CentralPanel::default()
             .frame(egui::Frame::new().fill(theme::desk()).inner_margin(0))
             .show(ui, |ui| {
-                egui::Frame::new()
-                    .inner_margin(egui::Margin::symmetric(24, 12))
-                    .show(ui, |ui| self.toolbar(ui, mobile));
-
-                ui.separator();
+                let header = egui::Frame::new()
+                    .fill(theme::color(assets::COLOR_SURFACE))
+                    .inner_margin(egui::Margin::symmetric(
+                        if mobile { 16 } else { 24 },
+                        if mobile { 8 } else { 12 },
+                    ))
+                    .show(ui, |ui| {
+                        ui.set_min_width(ui.available_width());
+                        self.toolbar(ui, mobile);
+                    });
+                ui.painter().hline(
+                    header.response.rect.x_range(),
+                    header.response.rect.bottom(),
+                    egui::Stroke::new(1.0, theme::color(assets::COLOR_BORDER)),
+                );
 
                 if let Some(error) = self.error.clone() {
                     egui::Frame::new().inner_margin(12).show(ui, |ui| {
                         ui.horizontal_wrapped(|ui| {
-                            ui.colored_label(egui::Color32::from_rgb(230, 175, 159), error);
+                            ui.colored_label(theme::color(assets::COLOR_ERROR), error);
 
                             if ui.small_button("Dismiss").clicked() {
                                 self.error = None;
@@ -433,6 +466,13 @@ impl FontesApp {
                     }
                 }
             });
+        if mobile {
+            self.mobile_verse_actions(ui.ctx());
+            self.mobile_reading_settings(ui.ctx());
+        } else {
+            self.verse_actions = None;
+            self.reading_settings = false;
+        }
     }
     fn sidebar(&mut self, ui: &mut egui::Ui) {
         ui.add_space(16.0);
@@ -507,64 +547,122 @@ impl FontesApp {
         }
     }
     fn toolbar(&mut self, ui: &mut egui::Ui, mobile: bool) {
-        let s = self.state.clone().expect("loaded");
-
+        let state = self.state.clone().expect("loaded");
         let compact = mobile && ui.available_width() < 312.0;
-
-        ui.horizontal(|ui| {
-            if ui
-                .add(egui::Button::image_and_text(
-                    icon("book", 20.0, true),
-                    s.reference_label(),
-                ))
-                .clicked()
-            {
-                self.picker = !self.picker;
+        let height = if mobile { 44.0 } else { 36.0 };
+        let translation_width = if mobile { 72.0 } else { 110.0 };
+        let action_count = usize::from(!compact) + usize::from(mobile);
+        let reserved =
+            translation_width + action_count as f32 * height + (action_count + 1) as f32 * 4.0;
+        let reference_width = (ui.available_width() - reserved).max(44.0).min(if mobile {
+            f32::INFINITY
+        } else {
+            280.0
+        });
+        ui.scope(|ui| {
+            // One continuous toolbar surface. Only hover/press/open receives a
+            // temporary wash; controls share height, padding and corner treatment.
+            let style = ui.style_mut();
+            style.spacing.item_spacing.x = 4.0;
+            style.spacing.button_padding = egui::vec2(8.0, 8.0);
+            style.spacing.interact_size.y = height;
+            for widget in [
+                &mut style.visuals.widgets.inactive,
+                &mut style.visuals.widgets.hovered,
+                &mut style.visuals.widgets.active,
+                &mut style.visuals.widgets.open,
+            ] {
+                widget.corner_radius = egui::CornerRadius::same(6);
+                widget.bg_stroke = egui::Stroke::NONE;
             }
-            let mut translation = s.session.translation.clone();
-
-            egui::ComboBox::from_id_salt("translation")
-                .width(if mobile { 65.0 } else { 110.0 })
-                .selected_text(
-                    s.translations
-                        .iter()
-                        .find(|t| t.id == translation)
-                        .map(|t| t.abbr.as_str())
-                        .unwrap_or("Bible"),
-                )
-                .show_ui(ui, |ui| {
-                    for t in &s.translations {
-                        ui.selectable_value(&mut translation, t.id.clone(), &t.abbr);
+            style.visuals.widgets.inactive.weak_bg_fill = egui::Color32::TRANSPARENT;
+            ui.horizontal(|ui| {
+                let reference = ui
+                    .add_sized(
+                        [reference_width, height],
+                        egui::Button::image_and_text(
+                            icon("book", 20.0, true),
+                            RichText::new(state.reference_label()).size(if mobile {
+                                16.0
+                            } else {
+                                14.0
+                            }),
+                        )
+                        .right_text(())
+                        .truncate(),
+                    )
+                    .on_hover_text(state.reference_label());
+                if reference.clicked() {
+                    if self.picker {
+                        self.picker = false;
+                    } else {
+                        self.open_picker();
                     }
+                }
+                let mut translation = state.session.translation.clone();
+                let translation_response = egui::ComboBox::from_id_salt("translation")
+                    .width(translation_width)
+                    .truncate()
+                    .selected_text(
+                        state
+                            .translations
+                            .iter()
+                            .find(|t| t.id == translation)
+                            .map(|t| t.abbr.as_str())
+                            .unwrap_or("Bible"),
+                    )
+                    .show_ui(ui, |ui| {
+                        for t in &state.translations {
+                            ui.selectable_value(&mut translation, t.id.clone(), &t.abbr);
+                        }
+                    })
+                    .response;
+                translation_response.widget_info(|| {
+                    egui::WidgetInfo::labeled(egui::WidgetType::ComboBox, true, "Translation")
                 });
-
-            if translation != s.session.translation {
-                self.dispatch(Command::Translation { id: translation });
-            }
-            let enabled = s
-                .saved
-                .iter()
-                .any(|r| r.kind == "favorite" && r.ref_id == s.session.selected_ref);
-
-            if !compact
-                && ui
-                    .add(egui::Button::image(icon("bookmark", 20.0, enabled)))
-                    .on_hover_text("Save passage")
-                    .clicked()
-            {
-                self.dispatch(Command::Favorite {
-                    ref_id: s.session.selected_ref,
-                    enabled: !enabled,
-                });
-            }
-            if mobile
-                && ui
-                    .add(egui::Button::image(icon("settings", 20.0, false)))
-                    .on_hover_text("Reading preferences")
-                    .clicked()
-            {
-                self.choose(Destination::Preferences);
-            }
+                if translation != state.session.translation {
+                    self.dispatch(Command::Translation { id: translation });
+                }
+                let enabled = state
+                    .saved
+                    .iter()
+                    .any(|r| r.kind == "favorite" && r.ref_id == state.session.selected_ref);
+                if !compact {
+                    let bookmark = ui
+                        .add_sized(
+                            [height, height],
+                            egui::Button::image(icon("bookmark", 20.0, enabled)),
+                        )
+                        .on_hover_text("Save passage");
+                    bookmark.widget_info(|| {
+                        egui::WidgetInfo::labeled(egui::WidgetType::Button, true, "Save passage")
+                    });
+                    if bookmark.clicked() {
+                        self.dispatch(Command::Favorite {
+                            ref_id: state.session.selected_ref,
+                            enabled: !enabled,
+                        });
+                    }
+                }
+                if mobile {
+                    let settings = ui
+                        .add_sized(
+                            [height, height],
+                            egui::Button::image(icon("settings", 20.0, false)),
+                        )
+                        .on_hover_text("Reading preferences");
+                    settings.widget_info(|| {
+                        egui::WidgetInfo::labeled(
+                            egui::WidgetType::Button,
+                            true,
+                            "Reading preferences",
+                        )
+                    });
+                    if settings.clicked() {
+                        self.reading_settings = true;
+                    }
+                }
+            });
         });
     }
     fn reader(&mut self, ui: &mut egui::Ui, mobile: bool) {
@@ -609,7 +707,7 @@ impl FontesApp {
                 });
         }
         egui::ScrollArea::vertical().id_salt("passage-scroll").show(ui,|ui|{
-            let width=ui.available_width().min(if mobile{600.0}else{720.0});
+            let width=ui.available_width().min(ui.clip_rect().width()).min(if mobile{600.0}else{720.0});
 
             let inset=((ui.available_width()-width)/2.0).max(if mobile{24.0}else{32.0});
 
@@ -621,7 +719,14 @@ impl FontesApp {
                 caption(ui,format!("{} · AVAILABLE OFFLINE",book.name.to_uppercase()));
 
                 ui.add_space(12.0);
-ui.label(scripture(format!("{} {}",book.name,s.session.selected_ref%1_000_000/1000),if mobile{28.0}else{38.0},true));
+                let heading_width=width-2.0*inset.min(32.0);
+                let mut heading_font=egui::FontId::new(if mobile{44.0}else{38.0},egui::FontFamily::Name("scripture".into()));
+                // Keep whole book-name words readable when a narrow viewport cannot fit one at full size.
+                let longest_word=ui.fonts_mut(|fonts|book.name.split_whitespace().map(|word|fonts.layout_no_wrap(word.to_owned(),heading_font.clone(),theme::color(assets::COLOR_INK)).size().x).fold(0.0_f32,f32::max));
+                if longest_word>heading_width{heading_font.size*=heading_width/longest_word;}
+                let heading=egui::text::LayoutJob::simple(format!("{} {}",book.name,s.session.selected_ref%1_000_000/1000),heading_font,theme::color(assets::COLOR_INK),heading_width);
+                let heading=ui.fonts_mut(|fonts|fonts.layout_job(heading));
+                ui.label(heading);
 
                 ui.add_space(8.0);
 caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.name.clone()).unwrap_or_default());
@@ -637,7 +742,7 @@ caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.n
 
                     let fill=highlight.and_then(|a|a.color.as_deref()).map(highlight_color).unwrap_or_else(||if selected{theme::tint()}else{egui::Color32::TRANSPARENT});
 
-                    let row=egui::Frame::new().fill(fill).corner_radius(6).inner_margin(egui::Margin::symmetric(8,6)).show(ui,|ui|{
+                    let row=egui::Frame::new().fill(fill).corner_radius(12).inner_margin(egui::Margin::symmetric(8,6)).show(ui,|ui|{
                         ui.horizontal_top(|ui|{
                             if s.session.preferences.verse_numbers{ui.add_sized([25.0,32.0],egui::Label::new(RichText::new(verse.refs.iter().map(|r|(r%1000).to_string()).collect::<Vec<_>>().join("–")).size(12.0).color(if selected{accent()}else{muted()})));
 }
@@ -675,175 +780,6 @@ ui.horizontal(|ui|{
 }
             });
 
-        });
-    }
-    fn reference_picker(&mut self, ui: &mut egui::Ui, mobile: bool) {
-        let s = self.state.clone().unwrap();
-
-        if let Some(book) = self
-            .picker_book
-            .and_then(|id| s.books.iter().find(|b| b.id == id))
-        {
-            egui::Panel::bottom("picker-confirm")
-                .exact_size(80.0)
-                .frame(
-                    egui::Frame::new()
-                        .fill(theme::desk())
-                        .inner_margin(egui::Margin::symmetric(24, 16)),
-                )
-                .show(ui, |ui| {
-                    if primary(
-                        ui,
-                        &format!(
-                            "Open {} {}:{}",
-                            book.name, self.picker_chapter, self.picker_verse
-                        ),
-                    ) {
-                        self.select(
-                            i64::from(book.id) * 1_000_000
-                                + i64::from(self.picker_chapter) * 1000
-                                + i64::from(self.picker_verse),
-                        );
-                    }
-                });
-        }
-        egui::ScrollArea::vertical().show(ui, |ui| {
-            egui::Frame::new().inner_margin(24).show(ui, |ui| {
-                ui.spacing_mut().button_padding.x = 6.0;
-
-                ui.horizontal(|ui| {
-                    ui.heading("Go to a passage");
-
-                    if ui.button("Close").clicked() {
-                        self.picker = false;
-                    }
-                });
-
-                ui.add_space(16.0);
-
-                ui.horizontal(|ui| {
-                    let input = ui.add(
-                        egui::TextEdit::singleline(&mut self.reference)
-                            .hint_text("John 3:16 or Rom 1:3")
-                            .desired_width((ui.available_width() - 70.0).max(100.0)),
-                    );
-
-                    if (input.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)))
-                        || ui.button("Go").clicked()
-                    {
-                        self.dispatch(Command::Navigate {
-                            reference: self.reference.clone(),
-                        });
-
-                        self.picker = false;
-                    }
-                });
-
-                ui.add_space(12.0);
-
-                ui.horizontal(|ui| {
-                    ui.selectable_value(&mut self.testament, "OT".into(), "Old Testament");
-
-                    ui.selectable_value(&mut self.testament, "NT".into(), "New Testament");
-                });
-
-                let columns = ((ui.available_width() + 5.0) / if mobile { 55.0 } else { 81.0 })
-                    .floor()
-                    .max(1.0)
-                    .min(if mobile { 5.0 } else { 8.0 }) as usize;
-
-                egui::Grid::new("book-grid")
-                    .spacing([5.0, 5.0])
-                    .show(ui, |ui| {
-                        for (i, b) in s
-                            .books
-                            .iter()
-                            .filter(|b| b.testament == self.testament)
-                            .enumerate()
-                        {
-                            if ui
-                                .add_sized(
-                                    [if mobile { 50.0 } else { 76.0 }, 44.0],
-                                    egui::Button::new(RichText::new(&b.osis).size(12.0))
-                                        .truncate()
-                                        .selected(
-                                            self.picker_book.unwrap_or(
-                                                (s.session.selected_ref / 1_000_000) as u16,
-                                            ) == b.id,
-                                        ),
-                                )
-                                .on_hover_text(&b.name)
-                                .clicked()
-                            {
-                                self.picker_book = Some(b.id);
-
-                                self.picker_chapter = 1;
-
-                                self.picker_verse = 1;
-                            }
-                            if (i + 1) % columns == 0 {
-                                ui.end_row();
-                            }
-                        }
-                    });
-
-                if let Some(book) = self
-                    .picker_book
-                    .and_then(|id| s.books.iter().find(|b| b.id == id))
-                {
-                    ui.add_space(24.0);
-
-                    caption(ui, format!("{} · CHAPTER", book.name));
-
-                    number_grid(
-                        ui,
-                        "chapters",
-                        book.verse_counts.len() as u16,
-                        &mut self.picker_chapter,
-                        if mobile { 6 } else { 10 },
-                    );
-
-                    let count = book.verse_counts[(self.picker_chapter - 1) as usize];
-
-                    self.picker_verse = self.picker_verse.min(count);
-
-                    ui.add_space(16.0);
-
-                    caption(ui, "VERSE");
-
-                    number_grid(
-                        ui,
-                        "verses",
-                        count,
-                        &mut self.picker_verse,
-                        if mobile { 6 } else { 10 },
-                    );
-                }
-                ui.add_space(24.0);
-
-                caption(ui, "FAVORITE PASSAGES");
-
-                for r in s.saved.iter().filter(|r| r.kind == "favorite").take(8) {
-                    if ui
-                        .add_sized([ui.available_width(), 44.0], egui::Button::new(&r.label))
-                        .clicked()
-                    {
-                        self.select(r.ref_id);
-                    }
-                }
-                ui.add_space(16.0);
-
-                caption(ui, "RECENT PASSAGES");
-
-                for r in s.saved.iter().filter(|r| r.kind == "recent").take(8) {
-                    if ui
-                        .add_sized([ui.available_width(), 44.0], egui::Button::new(&r.label))
-                        .clicked()
-                    {
-                        self.select(r.ref_id);
-                    }
-                }
-            });
         });
     }
     fn search_ui(&mut self, ui: &mut egui::Ui) {
@@ -1037,38 +973,7 @@ ui.separator();
 
                 ui.add_space(24.0);
 
-                ui.label("Scripture typeface");
-
-                ui.horizontal(|ui| {
-                    ui.selectable_value(&mut p.scripture_serif, true, "Lora");
-
-                    ui.selectable_value(&mut p.scripture_serif, false, "IBM Plex Sans");
-                });
-
-                ui.add_space(16.0);
-
-                ui.add(egui::Slider::new(&mut p.text_size, 16.0..=36.0).text("Text size"));
-
-                ui.add_space(16.0);
-
-                ui.add(egui::Slider::new(&mut p.line_spacing, 1.2..=2.2).text("Line spacing"));
-
-                ui.add_space(16.0);
-
-                ui.checkbox(&mut p.verse_numbers, "Verse numbers");
-
-                ui.add_space(24.0);
-
-                caption(ui, "READING PREVIEW");
-
-                if let Some(v) = s
-                    .passage
-                    .iter()
-                    .find(|v| v.refs.contains(&s.session.selected_ref))
-                {
-                    ui.label(scripture(&v.text, p.text_size, p.scripture_serif));
-                }
-                ui.add_space(24.0);
+                Self::reading_controls(ui, &mut p, &s);
 
                 if primary(ui, "Back to reading") {
                     self.destination = Destination::Read;
@@ -1114,6 +1019,9 @@ ui.separator();
     }
 }
 impl eframe::App for FontesApp {
+    fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
+        egui::Rgba::from(theme::desk()).to_array()
+    }
     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.receive();
 
@@ -1127,7 +1035,13 @@ impl eframe::App for FontesApp {
         }
     }
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
-        self.draw(ui);
+        // eframe 0.35 supplies a root Ui covering the whole viewport, including
+        // system bars. Panels and their input region must start in the safe area.
+        let safe = ui.ctx().content_rect().intersect(ui.max_rect());
+        ui.scope_builder(egui::UiBuilder::new().max_rect(safe), |ui| {
+            ui.set_clip_rect(safe);
+            self.draw(ui);
+        });
     }
 }
 fn destinations() -> [(Destination, &'static str, &'static str); 4] {
@@ -1138,31 +1052,36 @@ fn destinations() -> [(Destination, &'static str, &'static str); 4] {
         (Destination::Study, "tree", "Study"),
     ]
 }
-fn number_grid(ui: &mut egui::Ui, id: &str, count: u16, selected: &mut u16, columns: u16) {
+fn number_grid(ui: &mut egui::Ui, id: &str, count: u16, selected: &mut u16, columns: u16) -> bool {
+    let mut clicked = false;
     let columns = columns.min(((ui.available_width() + 5.0) / 49.0).floor().max(1.0) as u16);
+    let cell_width = ((ui.available_width() - f32::from(columns - 1) * 5.0) / f32::from(columns))
+        .clamp(44.0, 64.0);
 
     egui::Grid::new(id).spacing([5.0, 5.0]).show(ui, |ui| {
         for n in 1..=count {
             if ui
                 .add_sized(
-                    [44.0, 44.0],
+                    [cell_width, 44.0],
                     egui::Button::new(n.to_string()).selected(*selected == n),
                 )
                 .clicked()
             {
                 *selected = n;
+                clicked = true;
             }
             if n % columns == 0 {
                 ui.end_row();
             }
         }
     });
+    clicked
 }
 fn highlight_color(name: &str) -> egui::Color32 {
     match name {
-        "sage" => egui::Color32::from_rgb(48, 65, 45),
-        "blue" => egui::Color32::from_rgb(43, 59, 66),
-        "rose" => egui::Color32::from_rgb(65, 47, 47),
-        _ => theme::tint(),
+        "sage" => theme::color(assets::HIGHLIGHT_SAGE),
+        "blue" => theme::color(assets::HIGHLIGHT_BLUE),
+        "rose" => theme::color(assets::HIGHLIGHT_ROSE),
+        _ => theme::color(assets::HIGHLIGHT_AMBER),
     }
 }
