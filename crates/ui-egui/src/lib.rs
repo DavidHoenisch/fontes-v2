@@ -2,6 +2,7 @@
 #[cfg(test)]
 mod tests;
 
+mod backdrop;
 mod picker;
 mod preferences;
 mod setup;
@@ -22,8 +23,11 @@ use std::path::PathBuf;
 
 use theme::{accent, assets, caption, icon, muted, nav, primary, scripture};
 
-/// Platform system bars use the same opaque page color as the shared UI.
-pub const BACKGROUND_COLOR: [u8; 4] = assets::COLOR_DESK;
+/// Platform system bars use the same opaque chrome color as the shared UI.
+pub fn system_bar_appearance(ctx: &egui::Context) -> (bool, [u8; 4]) {
+    let p = theme::palette(ctx);
+    (!p.dark, p.chrome.to_array())
+}
 
 #[derive(Clone, Copy, PartialEq)]
 enum Destination {
@@ -55,6 +59,8 @@ pub struct FontesApp {
     reference: String,
     picker: bool,
     reading_settings: bool,
+    reading_advanced: bool,
+    backdrop: backdrop::Backdrop,
     picker_stage: PickerStage,
     picker_reset_scroll: bool,
     picker_book: Option<u16>,
@@ -76,6 +82,9 @@ pub struct FontesApp {
     word_code: String,
     word: Option<Data>,
     word_focus: Option<WordFocus>,
+    reply_previews: std::collections::VecDeque<bool>,
+    word_previews: std::collections::BTreeMap<String, Vec<DictionaryHeadword>>,
+    preview_requested: std::collections::BTreeSet<String>,
     note: Option<NoteDraft>,
     scroll_to: Option<i64>,
     save_pending: bool,
@@ -128,6 +137,8 @@ impl FontesApp {
             reference: String::new(),
             picker: false,
             reading_settings: false,
+            reading_advanced: false,
+            backdrop: Default::default(),
             picker_stage: PickerStage::Book,
             picker_reset_scroll: true,
             picker_book: None,
@@ -149,6 +160,9 @@ impl FontesApp {
             word_code: String::new(),
             word: None,
             word_focus: None,
+            reply_previews: Default::default(),
+            word_previews: Default::default(),
+            preview_requested: Default::default(),
             note: None,
             scroll_to: None,
             save_pending: false,
@@ -187,6 +201,7 @@ impl FontesApp {
         match self.host.requests.try_send(request) {
             Ok(()) => {
                 self.pending += 1;
+                self.reply_previews.push_back(false);
 
                 self.error = None;
             }
@@ -199,6 +214,7 @@ impl FontesApp {
     fn receive(&mut self) {
         self.receive_setup();
         while let Ok(result) = self.host.events.try_recv() {
+            let preview_reply = self.reply_previews.pop_front().unwrap_or(false);
             self.pending = self.pending.saturating_sub(1);
 
             match result {
@@ -225,6 +241,8 @@ impl FontesApp {
                             s.session.selected_ref != response.state.session.selected_ref
                         });
                     if content_changed {
+                        self.word_previews.clear();
+                        self.preview_requested.clear();
                         self.word = None;
                         self.hits.clear();
                         self.search_offset = 0;
@@ -250,7 +268,7 @@ impl FontesApp {
                         {
                             self.dispatch(Command::Search {
                                 query: self.query.clone(),
-                                limit: 30,
+                                limit: 10,
                                 offset: 0,
                             });
                         }
@@ -301,9 +319,16 @@ impl FontesApp {
                             }
                         }
                         d @ Data::Word { .. } => {
-                            self.word = Some(d);
-
-                            self.resource = None;
+                            if let Data::Word {
+                                code, headwords, ..
+                            } = &d
+                            {
+                                self.word_previews.insert(code.clone(), headwords.clone());
+                            }
+                            if !preview_reply {
+                                self.word = Some(d);
+                                self.resource = None;
+                            }
                         }
                         Data::Resource { resource } => self.resource = Some(resource),
                         Data::Search {
@@ -363,6 +388,18 @@ impl FontesApp {
     pub fn draw(&mut self, ui: &mut egui::Ui) {
         self.receive();
 
+        let key = self
+            .state
+            .as_ref()
+            .map(|s| s.session.preferences.theme)
+            .unwrap_or_default();
+        if theme::palette(ui.ctx()).key != key
+            || ui.ctx().global_style().visuals.panel_fill != theme::Palette::for_theme(key).page
+        {
+            theme::apply(ui.ctx(), key);
+            // Apply to this root Ui immediately; subsequent frames inherit the style.
+        }
+        ui.set_style(ui.ctx().global_style());
         let mobile = ui.max_rect().width() < 760.0;
 
         ui.spacing_mut().interact_size.y = if mobile { 44.0 } else { 36.0 };
@@ -390,17 +427,18 @@ impl FontesApp {
                 .resizable(false)
                 .frame(
                     egui::Frame::new()
-                        .fill(theme::color(assets::COLOR_SIDEBAR))
+                        .fill(theme::palette(ui.ctx()).chrome)
                         .inner_margin(16),
                 )
                 .show(ui, |ui| self.sidebar(ui));
         } else if self.note.is_none() && !self.picker {
             egui::Panel::bottom("mobile-navigation")
-                .exact_size(84.0)
+                .exact_size(64.0)
                 .frame(
                     egui::Frame::new()
-                        .fill(theme::color(assets::COLOR_SIDEBAR))
-                        .inner_margin(8),
+                        .fill(theme::palette(ui.ctx()).surface)
+                        .stroke(egui::Stroke::new(1.0, theme::palette(ui.ctx()).border))
+                        .inner_margin(4),
                 )
                 .show(ui, |ui| {
                     ui.columns(4, |cols| {
@@ -415,13 +453,18 @@ impl FontesApp {
                 });
         }
         egui::CentralPanel::default()
-            .frame(egui::Frame::new().fill(theme::desk()).inner_margin(0))
+            .frame(
+                egui::Frame::new()
+                    .fill(theme::desk(ui.ctx()))
+                    .inner_margin(0),
+            )
             .show(ui, |ui| {
+                ui.spacing_mut().item_spacing.y = 0.0;
                 let header = egui::Frame::new()
-                    .fill(theme::color(assets::COLOR_SURFACE))
+                    .fill(theme::palette(ui.ctx()).chrome)
                     .inner_margin(egui::Margin::symmetric(
-                        if mobile { 16 } else { 24 },
-                        if mobile { 8 } else { 12 },
+                        if mobile { 14 } else { 24 },
+                        if mobile { 6 } else { 12 },
                     ))
                     .show(ui, |ui| {
                         ui.set_min_width(ui.available_width());
@@ -430,13 +473,13 @@ impl FontesApp {
                 ui.painter().hline(
                     header.response.rect.x_range(),
                     header.response.rect.bottom(),
-                    egui::Stroke::new(1.0, theme::color(assets::COLOR_BORDER)),
+                    egui::Stroke::new(1.0, theme::palette(ui.ctx()).border),
                 );
 
                 if let Some(error) = self.error.clone() {
                     egui::Frame::new().inner_margin(12).show(ui, |ui| {
                         ui.horizontal_wrapped(|ui| {
-                            ui.colored_label(theme::color(assets::COLOR_ERROR), error);
+                            ui.colored_label(theme::palette(ui.ctx()).error, error);
 
                             if ui.small_button("Dismiss").clicked() {
                                 self.error = None;
@@ -466,18 +509,25 @@ impl FontesApp {
                     }
                 }
             });
-        if mobile {
+        if mobile
+            && self.backdrop.prepare(
+                ui.ctx(),
+                self.verse_actions.is_some() || self.reading_settings,
+                key,
+            )
+        {
             self.mobile_verse_actions(ui.ctx());
             self.mobile_reading_settings(ui.ctx());
-        } else {
+        } else if !mobile {
             self.verse_actions = None;
             self.reading_settings = false;
+            self.backdrop.prepare(ui.ctx(), false, key);
         }
     }
     fn sidebar(&mut self, ui: &mut egui::Ui) {
         ui.add_space(16.0);
 
-        ui.label(scripture("fontes", 32.0, true).color(accent()));
+        ui.label(scripture("fontes", 32.0, true).color(accent(ui.ctx())));
 
         caption(ui, "YOUR STUDY DESK");
 
@@ -543,14 +593,18 @@ impl FontesApp {
         caption(ui, "ON THIS DEVICE");
 
         if let Some(s) = &self.state {
-            caption(ui, format!("{} library · Offline", s.profile));
+            ui.label(
+                RichText::new(format!("{} library · Offline", s.profile))
+                    .size(12.0)
+                    .color(theme::palette(ui.ctx()).green),
+            );
         }
     }
     fn toolbar(&mut self, ui: &mut egui::Ui, mobile: bool) {
         let state = self.state.clone().expect("loaded");
-        let compact = mobile && ui.available_width() < 312.0;
+        let compact = mobile && ui.available_width() < 280.0;
         let height = if mobile { 44.0 } else { 36.0 };
-        let translation_width = if mobile { 72.0 } else { 110.0 };
+        let translation_width = if mobile { 64.0 } else { 110.0 };
         let action_count = usize::from(!compact) + usize::from(mobile);
         let reserved =
             translation_width + action_count as f32 * height + (action_count + 1) as f32 * 4.0;
@@ -562,6 +616,7 @@ impl FontesApp {
         ui.scope(|ui| {
             // One continuous toolbar surface. Only hover/press/open receives a
             // temporary wash; controls share height, padding and corner treatment.
+            let caret_ink = muted(ui.ctx());
             let style = ui.style_mut();
             style.spacing.item_spacing.x = 4.0;
             style.spacing.button_padding = egui::vec2(8.0, 8.0);
@@ -574,6 +629,7 @@ impl FontesApp {
             ] {
                 widget.corner_radius = egui::CornerRadius::same(6);
                 widget.bg_stroke = egui::Stroke::NONE;
+                widget.fg_stroke.color = caret_ink;
             }
             style.visuals.widgets.inactive.weak_bg_fill = egui::Color32::TRANSPARENT;
             ui.horizontal(|ui| {
@@ -581,17 +637,38 @@ impl FontesApp {
                     .add_sized(
                         [reference_width, height],
                         egui::Button::image_and_text(
-                            icon("book", 20.0, true),
-                            RichText::new(state.reference_label()).size(if mobile {
-                                16.0
-                            } else {
-                                14.0
-                            }),
+                            icon(ui.ctx(), "book", 20.0, true),
+                            RichText::new(state.reference_label()).size(14.0),
                         )
                         .right_text(())
                         .truncate(),
                     )
                     .on_hover_text(state.reference_label());
+                reference.widget_info(|| {
+                    egui::WidgetInfo::labeled(
+                        egui::WidgetType::Button,
+                        true,
+                        state.reference_label(),
+                    )
+                });
+                if mobile {
+                    let name_width = ui
+                        .painter()
+                        .layout_no_wrap(
+                            state.reference_label(),
+                            egui::FontId::proportional(14.0),
+                            theme::palette(ui.ctx()).ink,
+                        )
+                        .size()
+                        .x;
+                    let p = egui::pos2(
+                        (reference.rect.left() + 8.0 + 20.0 + 6.0 + name_width + 10.0)
+                            .min(reference.rect.right() - 10.0),
+                        reference.rect.center().y,
+                    );
+                    icon(ui.ctx(), "down", 9.0, false)
+                        .paint_at(ui, egui::Rect::from_center_size(p, egui::vec2(9.0, 9.0)));
+                }
                 if reference.clicked() {
                     if self.picker {
                         self.picker = false;
@@ -631,7 +708,13 @@ impl FontesApp {
                     let bookmark = ui
                         .add_sized(
                             [height, height],
-                            egui::Button::image(icon("bookmark", 20.0, enabled)),
+                            egui::Button::image(icon(ui.ctx(), "bookmark", 20.0, enabled).tint(
+                                if enabled {
+                                    accent(ui.ctx())
+                                } else {
+                                    theme::palette(ui.ctx()).ink
+                                },
+                            )),
                         )
                         .on_hover_text("Save passage");
                     bookmark.widget_info(|| {
@@ -648,7 +731,10 @@ impl FontesApp {
                     let settings = ui
                         .add_sized(
                             [height, height],
-                            egui::Button::image(icon("settings", 20.0, false)),
+                            egui::Button::image(
+                                icon(ui.ctx(), "settings", 20.0, false)
+                                    .tint(theme::palette(ui.ctx()).ink),
+                            ),
                         )
                         .on_hover_text("Reading preferences");
                     settings.widget_info(|| {
@@ -677,7 +763,7 @@ impl FontesApp {
                 .resizable(true)
                 .frame(
                     egui::Frame::new()
-                        .fill(theme::color(assets::COLOR_SURFACE))
+                        .fill(theme::palette(ui.ctx()).surface)
                         .inner_margin(0),
                 )
                 .show(ui, |ui| self.study_ui(ui));
@@ -685,7 +771,7 @@ impl FontesApp {
             egui::Panel::right("context-panel")
                 .exact_size(320.0)
                 .resizable(false)
-                .frame(egui::Frame::new().fill(theme::color(assets::COLOR_SURFACE)).inner_margin(24))
+                .frame(egui::Frame::new().fill(theme::palette(ui.ctx()).surface).inner_margin(24))
                 .show(ui, |ui| {
                     caption(ui, "ALONGSIDE YOUR READING");
                     ui.add_space(12.0);
@@ -696,7 +782,7 @@ impl FontesApp {
                     if primary(ui, "Study this verse") {
                         self.open_study(s.session.selected_ref, StudyTab::Commentary);
                     }
-                    if ui.add_sized([ui.available_width(), 48.0], egui::Button::image_and_text(icon("notes", 20.0, false), "Add a note")).clicked() {
+                    if ui.add_sized([ui.available_width(), 48.0], egui::Button::image_and_text(icon(ui.ctx(), "notes", 20.0, false), "Add a note")).clicked() {
                         self.new_note(s.session.selected_ref);
                     }
                     ui.add_space(24.0);
@@ -706,32 +792,40 @@ impl FontesApp {
                     }
                 });
         }
-        egui::ScrollArea::vertical().id_salt("passage-scroll").show(ui,|ui|{
+        egui::ScrollArea::vertical().scroll_bar_visibility(if mobile{egui::scroll_area::ScrollBarVisibility::AlwaysHidden}else{egui::scroll_area::ScrollBarVisibility::VisibleWhenNeeded}).id_salt("passage-scroll").show(ui,|ui|{
             let width=ui.available_width().min(ui.clip_rect().width()).min(if mobile{600.0}else{720.0});
 
-            let inset=((ui.available_width()-width)/2.0).max(if mobile{24.0}else{32.0});
+            let inset=((ui.available_width()-width)/2.0).max(if mobile{18.0}else{32.0});
 
-            egui::Frame::new().inner_margin(egui::Margin::symmetric(inset as i8,24)).show(ui,|ui|{
+            egui::Frame::new().inner_margin(egui::Margin::symmetric(inset as i8,27)).show(ui,|ui|{
                 ui.set_max_width(width-2.0*inset.min(32.0));
 
+                egui::Frame::new().inner_margin(egui::Margin::symmetric(if mobile{6}else{0},0)).show(ui,|ui|{
                 let book=s.books.iter().find(|b|i64::from(b.id)==s.session.selected_ref/1_000_000).expect("valid book");
 
-                caption(ui,format!("{} · AVAILABLE OFFLINE",book.name.to_uppercase()));
+                let chapter_start=ui.cursor().min;
+                let chapter_wash=ui.painter().add(egui::Shape::Noop);
+                theme::eyebrow(ui,reading_section(book.id),muted(ui.ctx()));
 
                 ui.add_space(12.0);
-                let heading_width=width-2.0*inset.min(32.0);
-                let mut heading_font=egui::FontId::new(if mobile{44.0}else{38.0},egui::FontFamily::Name("scripture".into()));
+                let heading_width=ui.available_width();
+                let mut heading_font=egui::FontId::new(if mobile{42.0}else{38.0},egui::FontFamily::Name("scripture".into()));
                 // Keep whole book-name words readable when a narrow viewport cannot fit one at full size.
-                let longest_word=ui.fonts_mut(|fonts|book.name.split_whitespace().map(|word|fonts.layout_no_wrap(word.to_owned(),heading_font.clone(),theme::color(assets::COLOR_INK)).size().x).fold(0.0_f32,f32::max));
+                let heading_ink=theme::palette(ui.ctx()).ink;
+                let longest_word=ui.fonts_mut(|fonts|book.name.split_whitespace().map(|word|fonts.layout_no_wrap(word.to_owned(),heading_font.clone(),heading_ink).size().x).fold(0.0_f32,f32::max));
                 if longest_word>heading_width{heading_font.size*=heading_width/longest_word;}
-                let heading=egui::text::LayoutJob::simple(format!("{} {}",book.name,s.session.selected_ref%1_000_000/1000),heading_font,theme::color(assets::COLOR_INK),heading_width);
+                let heading=egui::text::LayoutJob::simple(format!("{} {}",book.name,s.session.selected_ref%1_000_000/1000),heading_font,theme::palette(ui.ctx()).ink,heading_width);
+                let mut heading=heading; heading.sections[0].format.extra_letter_spacing = -1.8;heading.sections[0].format.line_height=Some(heading.sections[0].format.font_id.size*1.16);
                 let heading=ui.fonts_mut(|fonts|fonts.layout_job(heading));
                 ui.label(heading);
 
                 ui.add_space(8.0);
-caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.name.clone()).unwrap_or_default());
+ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),14.5),egui::Layout::left_to_right(egui::Align::Center),|ui|{ui.label(RichText::new(s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.name.clone()).unwrap_or_default()).size(11.0).color(muted(ui.ctx())));caption(ui,"·");let (dot,_)=ui.allocate_exact_size(egui::vec2(5.0,12.0),egui::Sense::hover());ui.painter().circle_filled(dot.center(),2.5,accent(ui.ctx()));ui.label(RichText::new("Available offline").size(11.0).color(muted(ui.ctx())));});
 
-                ui.add_space(28.0);
+                ui.add_space(24.0);
+                let p=theme::palette(ui.ctx());
+                theme::radial_wash(ui,chapter_wash,egui::Rect::from_min_max(chapter_start-egui::vec2(24.0,24.0),egui::pos2(ui.max_rect().right()+24.0,ui.cursor().min.y)),0.0,p.page,p.glow,0.7);
+                });
 
                 if s.passage.is_empty(){ui.label("This chapter has no supplied text in this translation. Try another translation.");
 }
@@ -740,19 +834,24 @@ caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.n
 
                     let highlight=s.annotations.iter().find(|a|a.color.is_some() && verse.refs.iter().any(|id|*id>=a.start_ref && *id<=a.end_ref));
 
-                    let fill=highlight.and_then(|a|a.color.as_deref()).map(highlight_color).unwrap_or_else(||if selected{theme::tint()}else{egui::Color32::TRANSPARENT});
+                    let fill=highlight.and_then(|a|a.color.as_deref()).map(|c|highlight_color(ui.ctx(),c)).unwrap_or_else(||if selected{theme::palette(ui.ctx()).selection}else{egui::Color32::TRANSPARENT});
 
-                    let row=egui::Frame::new().fill(fill).corner_radius(12).inner_margin(egui::Margin::symmetric(8,6)).show(ui,|ui|{
+                    let mut row_wash=None;
+                    let row=egui::Frame::new().fill(if selected && highlight.is_none(){egui::Color32::TRANSPARENT}else{fill}).corner_radius(17).stroke(if selected{egui::Stroke::new(1.0,theme::palette(ui.ctx()).mark.gamma_multiply(0.10))}else{egui::Stroke::NONE}).shadow(if selected{egui::epaint::Shadow{offset:[0,5],blur:16,spread:0,color:theme::palette(ui.ctx()).feature.gamma_multiply(0.10)}}else{Default::default()}).inner_margin(egui::Margin::symmetric(if selected{13}else{7},if selected{17}else{13})).show(ui,|ui|{
+                        row_wash=Some(ui.painter().add(egui::Shape::Noop));
+                        ui.spacing_mut().item_spacing.x=10.0;
                         ui.horizontal_top(|ui|{
-                            if s.session.preferences.verse_numbers{ui.add_sized([25.0,32.0],egui::Label::new(RichText::new(verse.refs.iter().map(|r|(r%1000).to_string()).collect::<Vec<_>>().join("–")).size(12.0).color(if selected{accent()}else{muted()})));
+                            if s.session.preferences.verse_numbers{ui.add_sized([12.0,32.0],egui::Label::new(RichText::new(verse.refs.iter().map(|r|(r%1000).to_string()).collect::<Vec<_>>().join("–")).size(12.0).color(if selected{theme::palette(ui.ctx()).mark}else{muted(ui.ctx())})));
 }
                             let text=if verse.text.is_empty(){"[No text supplied by this edition]"}else{&verse.text};
 
                             let mut job=egui::text::LayoutJob::default();
 
-                            job.append(text,0.0,egui::TextFormat{font_id:egui::FontId::new(s.session.preferences.text_size,if s.session.preferences.scripture_serif{egui::FontFamily::Name("scripture".into())}else{egui::FontFamily::Proportional}),color:theme::color(assets::COLOR_INK),line_height:Some(s.session.preferences.text_size*s.session.preferences.line_spacing),..Default::default()});
+                            job.append(text,0.0,egui::TextFormat{font_id:egui::FontId::new(s.session.preferences.text_size,if s.session.preferences.scripture_serif{egui::FontFamily::Name("scripture".into())}else{egui::FontFamily::Proportional}),color:theme::palette(ui.ctx()).ink,extra_letter_spacing:-0.25,line_height:Some(s.session.preferences.text_size*s.session.preferences.line_spacing),..Default::default()});
 
-                            self.verse_text(ui, verse, job, mobile);
+                            ui.vertical(|ui|{self.verse_text(ui, verse, job, mobile);
+                            if mobile && selected && verse.strongs_links.len()+verse.word_links.len()>0 {ui.add_space(8.0);ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),12.5),egui::Layout::left_to_right(egui::Align::Center),|ui|{ui.add(icon(ui.ctx(),"spark",11.0,false));ui.label(RichText::new("Tap a word to explore the original").size(10.0).color(muted(ui.ctx())));});}
+                            });
 
                         });
 
@@ -760,6 +859,7 @@ caption(ui,s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.n
 }
                     });
 
+                    if selected && highlight.is_none(){theme::wash(ui,row_wash.expect("row background"),row.response.rect.shrink(0.7),17.0,fill,fill.lerp_to_gamma(theme::palette(ui.ctx()).page,0.35));}
                     if self.scroll_to.is_some_and(|id|verse.refs.contains(&id)){row.response.scroll_to_me(Some(egui::Align::Center));
 self.scroll_to=None;
 }
@@ -783,32 +883,184 @@ ui.horizontal(|ui|{
         });
     }
     fn search_ui(&mut self, ui: &mut egui::Ui) {
-        egui::ScrollArea::vertical().show(ui,|ui|{egui::Frame::new().inner_margin(24).show(ui,|ui|{
-            ui.heading("Search your library");
-caption(ui,"ON THIS DEVICE · KEYWORD SEARCH");
-ui.add_space(16.0);
-
-            let edit=ui.add(egui::TextEdit::singleline(&mut self.query).hint_text("Search words, for example forgiveness").desired_width(f32::INFINITY));
-
-            if primary(ui,"Search") || (edit.lost_focus() && ui.input(|i|i.key_pressed(egui::Key::Enter))){self.dispatch(Command::Search{query:self.query.clone(),limit:30,offset:0});
-}
-            ui.add_space(16.0);
-caption(ui,"Results come from the selected translation and installed study articles. Local AI answers require a future model and retrieval layer.");
-
-            for hit in self.hits.clone(){ui.add_space(16.0);
-if ui.add_sized([ui.available_width(),44.0],egui::Button::new(RichText::new(&hit.title).color(accent())).frame(false)).clicked(){if let Some(id)=hit.ref_id{self.select(id);
-}else{self.dispatch(Command::Resource{id:hit.id});
-self.destination=Destination::Study;
-}}ui.label(hit.excerpt);
-ui.separator();
-}
-            ui.horizontal(|ui|{if self.search_offset>0 && ui.button("← Previous results").clicked(){self.dispatch(Command::Search{query:self.query.clone(),limit:30,offset:self.search_offset.saturating_sub(30)});
-}
-if self.search_more && ui.button("More results →").clicked(){self.dispatch(Command::Search{query:self.query.clone(),limit:30,offset:self.search_offset+30});
-}});
-
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            egui::Frame::new()
+                .inner_margin(egui::Margin::symmetric(18, 22))
+                .show(ui, |ui| {
+                    theme::card(ui.ctx()).show(ui, |ui| {
+                        ui.set_min_width(ui.available_width());
+                        theme::eyebrow(ui, "SEARCH", muted(ui.ctx()));
+                        ui.add_space(8.0);
+                        theme::editorial(
+                            ui,
+                            "What are you exploring?",
+                            25.0,
+                            theme::palette(ui.ctx()).ink,
+                        );
+                        ui.add_space(16.0);
+                        ui.label(
+                            RichText::new(
+                                "Search the selected translation and installed study works.",
+                            )
+                            .size(13.0)
+                            .color(muted(ui.ctx())),
+                        );
+                        ui.add_space(16.0);
+                        ui.label(RichText::new("Search words").size(13.0));
+                        let p = theme::palette(ui.ctx());
+                        let edit = egui::Frame::new()
+                            .fill(p.page)
+                            .stroke(egui::Stroke::new(1.0, p.border))
+                            .corner_radius(12)
+                            .inner_margin(egui::Margin::symmetric(12, 8))
+                            .show(ui, |ui| {
+                                ui.add_sized(
+                                    [ui.available_width(), 28.0],
+                                    egui::TextEdit::singleline(&mut self.query)
+                                        .frame(egui::Frame::NONE)
+                                        .hint_text("For example, forgiveness")
+                                        .desired_width(f32::INFINITY),
+                                )
+                            })
+                            .inner;
+                        let valid_query = !self.query.trim().is_empty() && self.query.len() <= 512;
+                        if self.query.len() > 512 {
+                            ui.label(
+                                RichText::new("Use a shorter search (up to 512 bytes).")
+                                    .size(12.0)
+                                    .color(p.error),
+                            );
+                        }
+                        ui.add_space(12.0);
+                        let submitted = ui
+                            .add_enabled_ui(valid_query, |ui| primary(ui, "Search"))
+                            .inner;
+                        if valid_query
+                            && (submitted
+                                || (edit.lost_focus()
+                                    && ui.input(|i| i.key_pressed(egui::Key::Enter))))
+                        {
+                            self.dispatch(Command::Search {
+                                query: self.query.clone(),
+                                limit: 10,
+                                offset: 0,
+                            });
+                        }
+                    });
+                    if !self.hits.is_empty() || self.search_offset > 0 {
+                        ui.add_space(20.0);
+                        ui.horizontal_wrapped(|ui| {
+                            ui.label(
+                                RichText::new(format!(
+                                    "Matches {}–{}",
+                                    self.search_offset + 1,
+                                    self.search_offset + self.hits.len() as u32
+                                ))
+                                .size(13.0)
+                                .strong(),
+                            );
+                            if ui
+                                .add_enabled(
+                                    self.search_offset > 0,
+                                    egui::Button::new("Previous").min_size(egui::vec2(72.0, 44.0)),
+                                )
+                                .clicked()
+                            {
+                                self.dispatch(Command::Search {
+                                    query: self.query.clone(),
+                                    limit: 10,
+                                    offset: self.search_offset.saturating_sub(10),
+                                });
+                            }
+                            if ui
+                                .add_enabled(
+                                    self.search_more,
+                                    egui::Button::new("Next").min_size(egui::vec2(60.0, 44.0)),
+                                )
+                                .clicked()
+                            {
+                                self.dispatch(Command::Search {
+                                    query: self.query.clone(),
+                                    limit: 10,
+                                    offset: self.search_offset + 10,
+                                });
+                            }
+                        });
+                        ui.label(
+                            RichText::new("Open a group to explore its matches on this page.")
+                                .size(12.0)
+                                .color(muted(ui.ctx())),
+                        );
+                    }
+                    let mut groups: Vec<(String, Vec<SearchHit>)> = Vec::new();
+                    for hit in self.hits.clone() {
+                        let group = hit
+                            .ref_id
+                            .and_then(|reference| {
+                                self.state.as_ref().and_then(|s| {
+                                    s.books
+                                        .iter()
+                                        .find(|book| book.id as i64 == reference / 1_000_000)
+                                        .map(|book| book.name.clone())
+                                })
+                            })
+                            .unwrap_or_else(|| "Study articles".into());
+                        if let Some((_, matches)) =
+                            groups.iter_mut().find(|(name, _)| *name == group)
+                        {
+                            matches.push(hit);
+                        } else {
+                            groups.push((group, vec![hit]));
+                        }
+                    }
+                    if !groups.is_empty() {
+                        ui.add_space(12.0);
+                        theme::card(ui.ctx()).show(ui, |ui| {
+                            ui.set_min_width(ui.available_width());
+                            for (index, (group, hits)) in groups.into_iter().enumerate() {
+                                if index > 0 {
+                                    ui.separator();
+                                }
+                                egui::CollapsingHeader::new(format!("{} · {}", group, hits.len()))
+                                    .id_salt(("search-group", &group))
+                                    .show(ui, |ui| {
+                                        ui.set_min_width(ui.available_width());
+                                        for hit in hits {
+                                            if ui
+                                                .add_sized(
+                                                    [ui.available_width(), 44.0],
+                                                    egui::Button::new(
+                                                        scripture(&hit.title, 16.0, true)
+                                                            .color(accent(ui.ctx())),
+                                                    )
+                                                    .frame(false)
+                                                    .wrap(),
+                                                )
+                                                .clicked()
+                                            {
+                                                if let Some(id) = hit.ref_id {
+                                                    self.select(id);
+                                                } else {
+                                                    self.dispatch(Command::Resource { id: hit.id });
+                                                    self.destination = Destination::Study;
+                                                }
+                                            }
+                                            ui.add(
+                                                egui::Label::new(
+                                                    RichText::new(hit.excerpt)
+                                                        .size(13.0)
+                                                        .color(muted(ui.ctx())),
+                                                )
+                                                .truncate(),
+                                            );
+                                            ui.add_space(12.0);
+                                        }
+                                    });
+                            }
+                        });
+                    }
+                });
         });
-});
     }
     fn new_note(&mut self, reference: i64) {
         self.note = Some(NoteDraft {
@@ -827,7 +1079,7 @@ if self.search_more && ui.button("More results →").clicked(){self.dispatch(Com
             .exact_size(80.0)
             .frame(
                 egui::Frame::new()
-                    .fill(theme::desk())
+                    .fill(theme::desk(ui.ctx()))
                     .inner_margin(egui::Margin::symmetric(24, 16)),
             )
             .show(ui, |ui| {
@@ -895,7 +1147,7 @@ if self.search_more && ui.button("More results →").clicked(){self.dispatch(Com
                             .add_sized(
                                 [48.0, 44.0],
                                 egui::Button::new(c)
-                                    .fill(highlight_color(c))
+                                    .fill(highlight_color(ui.ctx(), c))
                                     .selected(draft.color.as_deref() == Some(c)),
                             )
                             .clicked()
@@ -925,7 +1177,7 @@ if self.search_more && ui.button("More results →").clicked(){self.dispatch(Com
         let s = self.state.clone().unwrap();
 
         egui::ScrollArea::vertical().show(ui,|ui|{egui::Frame::new().inner_margin(24).show(ui,|ui|{
-            ui.heading("Notes & highlights");
+            ui.label(scripture("Notes & highlights",30.0,true));
 caption(ui,"PRIVATE ON THIS DEVICE");
 ui.add_space(16.0);
 
@@ -941,7 +1193,9 @@ ui.add_space(16.0);
 ui.label("Your observations belong alongside the passage. Select a verse and add your first note.");
 }
             for note in &s.annotations{ui.add_space(24.0);
-ui.colored_label(accent(),label(&s.books,note.start_ref));
+theme::card(ui.ctx()).show(ui,|ui|{
+ui.set_min_width(ui.available_width());
+ui.colored_label(accent(ui.ctx()),label(&s.books,note.start_ref));
 ui.label(note.content.as_deref().unwrap_or("Highlight"));
 if let Some(c)=&note.color{caption(ui,format!("Color · {c}"));
 }
@@ -954,7 +1208,7 @@ if ui.button("Edit").clicked(){self.note=Some(NoteDraft{id:Some(note.id.clone())
                 ui.menu_button("Delete…",|ui|{if ui.button("Permanently delete this annotation").clicked(){self.dispatch(Command::DeleteAnnotation{id:note.id.clone()});
 ui.close();
 }});
-ui.separator();
+});
 
             }
         });
@@ -1009,18 +1263,19 @@ ui.separator();
             });
         });
 
-        if p.text_size != s.session.preferences.text_size
-            || p.line_spacing != s.session.preferences.line_spacing
-            || p.verse_numbers != s.session.preferences.verse_numbers
-            || p.scripture_serif != s.session.preferences.scripture_serif
-        {
+        if p != s.session.preferences {
             self.dispatch(Command::Preferences { preferences: p });
         }
     }
 }
 impl eframe::App for FontesApp {
     fn clear_color(&self, _visuals: &egui::Visuals) -> [f32; 4] {
-        egui::Rgba::from(theme::desk()).to_array()
+        let key = self
+            .state
+            .as_ref()
+            .map(|s| s.session.preferences.theme)
+            .unwrap_or_default();
+        egui::Rgba::from(theme::Palette::for_theme(key).chrome).to_array()
     }
     fn logic(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         self.receive();
@@ -1077,11 +1332,25 @@ fn number_grid(ui: &mut egui::Ui, id: &str, count: u16, selected: &mut u16, colu
     });
     clicked
 }
-fn highlight_color(name: &str) -> egui::Color32 {
+fn highlight_color(ctx: &egui::Context, name: &str) -> egui::Color32 {
     match name {
-        "sage" => theme::color(assets::HIGHLIGHT_SAGE),
-        "blue" => theme::color(assets::HIGHLIGHT_BLUE),
-        "rose" => theme::color(assets::HIGHLIGHT_ROSE),
-        _ => theme::color(assets::HIGHLIGHT_AMBER),
+        "sage" => theme::palette(ctx).highlights[1],
+        "blue" => theme::palette(ctx).highlights[2],
+        "rose" => theme::palette(ctx).highlights[3],
+        _ => theme::palette(ctx).highlights[0],
+    }
+}
+
+/// Familiar canonical reading groups, not authored book-overview assertions.
+fn reading_section(id: u16) -> &'static str {
+    match id {
+        1..=5 => "LAW",
+        6..=17 => "HISTORY",
+        18..=22 => "WISDOM LITERATURE",
+        23..=39 => "PROPHETS",
+        40..=43 => "GOSPELS",
+        44 => "ACTS",
+        45..=65 => "LETTERS",
+        _ => "REVELATION",
     }
 }

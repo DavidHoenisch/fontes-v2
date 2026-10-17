@@ -1,24 +1,24 @@
 //! Embedded Fontes UI assets and design constants. No network access required.
 //! Include this file as a module; colors are sRGB RGBA bytes.
 
-pub const COLOR_DESK: [u8; 4] = [250, 248, 243, 255];
-pub const COLOR_SIDEBAR: [u8; 4] = [241, 243, 239, 255];
-pub const COLOR_SURFACE: [u8; 4] = [255, 255, 255, 255];
-pub const COLOR_RAISED: [u8; 4] = [239, 242, 238, 255];
-pub const COLOR_BORDER: [u8; 4] = [216, 224, 219, 255];
-pub const COLOR_INK: [u8; 4] = [32, 47, 48, 255];
-pub const COLOR_MUTED: [u8; 4] = [82, 103, 104, 255];
-pub const COLOR_QUIET: [u8; 4] = [98, 118, 120, 255];
-pub const COLOR_ACCENT: [u8; 4] = [36, 103, 107, 255];
-pub const COLOR_TINT: [u8; 4] = [224, 238, 234, 255];
-pub const COLOR_INVERSE: [u8; 4] = [255, 255, 255, 255];
-pub const COLOR_GREEN: [u8; 4] = [70, 113, 92, 255];
+pub const COLOR_DESK: [u8; 4] = [251, 248, 240, 255];
+pub const COLOR_SIDEBAR: [u8; 4] = [223, 235, 230, 255];
+pub const COLOR_SURFACE: [u8; 4] = [255, 254, 250, 255];
+pub const COLOR_RAISED: [u8; 4] = [215, 235, 226, 255];
+pub const COLOR_BORDER: [u8; 4] = [217, 224, 214, 255];
+pub const COLOR_INK: [u8; 4] = [24, 61, 64, 255];
+pub const COLOR_MUTED: [u8; 4] = [85, 103, 104, 255];
+pub const COLOR_QUIET: [u8; 4] = [85, 103, 104, 255];
+pub const COLOR_ACCENT: [u8; 4] = [8, 107, 103, 255];
+pub const COLOR_TINT: [u8; 4] = [215, 235, 226, 255];
+pub const COLOR_INVERSE: [u8; 4] = [255, 251, 237, 255];
+pub const COLOR_GREEN: [u8; 4] = [49, 100, 78, 255];
 pub const COLOR_ERROR: [u8; 4] = [164, 61, 55, 255];
-pub const COLOR_SCRIM: [u8; 4] = [32, 50, 52, 255];
-pub const HIGHLIGHT_AMBER: [u8; 4] = [247, 232, 186, 255];
-pub const HIGHLIGHT_SAGE: [u8; 4] = [223, 235, 221, 255];
-pub const HIGHLIGHT_BLUE: [u8; 4] = [222, 234, 245, 255];
-pub const HIGHLIGHT_ROSE: [u8; 4] = [246, 225, 222, 255];
+pub const COLOR_SCRIM: [u8; 4] = [13, 63, 59, 255];
+pub const HIGHLIGHT_AMBER: [u8; 4] = [248, 227, 176, 255];
+pub const HIGHLIGHT_SAGE: [u8; 4] = [220, 234, 214, 255];
+pub const HIGHLIGHT_BLUE: [u8; 4] = [220, 233, 250, 255];
+pub const HIGHLIGHT_ROSE: [u8; 4] = [244, 219, 225, 255];
 pub const DESKTOP_SIDEBAR_WIDTH: f32 = 208.0;
 pub const DESKTOP_NAVIGATION_ROW_HEIGHT: f32 = 36.0;
 pub const DESKTOP_SIDEBAR_ITEM_GAP: f32 = 4.0;
@@ -37,8 +37,11 @@ pub const MOBILE_HORIZONTAL_PADDING: f32 = 24.0;
 pub const MOBILE_CONTENT_WIDTH: f32 = 342.0;
 pub const MOBILE_TAP_TARGET_MINIMUM: f32 = 44.0;
 pub const MOBILE_ACTION_HEIGHT: f32 = 48.0;
-pub const MOBILE_NAVIGATION_ROW_HEIGHT: f32 = 84.0;
-pub const MOBILE_ICON_SIZE: f32 = 24.0;
+pub const MOBILE_NAVIGATION_ROW_HEIGHT: f32 = 64.0;
+pub const MOBILE_ICON_SIZE: f32 = 22.0;
+pub const MOBILE_VERSE_HORIZONTAL_PADDING: f32 = 18.0;
+pub const MOBILE_VERSE_CONTENT_WIDTH: f32 = 354.0;
+pub const MOBILE_LOOKUP_ACTION_HEIGHT: f32 = 64.0;
 pub const MOBILE_REFERENCE_CELL_SIZE: f32 = 44.0;
 pub const MOBILE_REFERENCE_CELL_GAP: f32 = 5.0;
 

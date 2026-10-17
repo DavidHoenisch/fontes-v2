@@ -1,13 +1,14 @@
 # Fontes UI assets
 
-Local assets for the working paper-and-sea-glass UI direction, pending owner visual review. The owner’s ebook references supersede the original dark study-desk default (SPEC D032); compact sidebar density and embedded fonts/icons are retained. Core UI assets require no runtime downloads.
+Local assets for seven bundled selectable native themes; Sea glass & amber is the default. The owner’s ebook references supersede the original dark study-desk default (SPEC D032); compact sidebar density and embedded fonts/icons are retained. Core UI assets require no runtime downloads.
 
 ## Contents
 
 - `icons/phosphor/regular/`: 18 Phosphor Regular SVGs with 24 × 24 dimensions and white fills for tinting.
 - `icons/png/24/` and `icons/png/48/`: matching white transparent PNGs for 1× and 2× display at 24 logical pixels.
 - `fonts/`: IBM Plex Sans Regular/Medium for UI text, Lora Regular for Scripture, Noto Serif for Greek fallback, and Noto Serif Hebrew for Hebrew fallback.
-- `tokens.json`: palette, highlights, typography, spacing, radii, desktop dimensions, and mobile touch dimensions.
+- `themes.json`: authoritative seven-palette catalog, semantic colors and light/dark annotation backgrounds.
+- `tokens.json`: default-theme colors, typography, spacing, radii, desktop dimensions, and mobile touch dimensions.
 - `assets.rs`: dependency-free Rust constants and `include_bytes!` tables for fonts and SVGs. A font's role is recorded separately from its family so UI body and medium labels can be configured independently.
 - `manifest.json`: icon role mapping, upstream sources, licenses, file sizes, and SHA-256 hashes.
 - `licenses/`: Phosphor MIT license and each font's SIL Open Font License.
@@ -21,13 +22,13 @@ Use the compact desktop values in `tokens.json`: 36 px navigation rows, 4 px sid
 
 Load the font bytes into the application's font system and retain the Noto fallbacks for original-language text. Greek and Hebrew fallback files provide glyph coverage; Hebrew reading also needs correct right-to-left layout and shaping in the UI text pipeline. Font coverage alone does not implement that behavior.
 
-SVGs and PNGs use white artwork with transparent backgrounds. Tint them with the semantic icon color: muted `#526768` normally, accent `#24676B` for the selected destination, or inverse `#FFFFFF` on a teal primary button. Use the full Phosphor filenames in `manifest.json`; short semantic roles such as `book` and `notes` are also mapped there. The icon catalog and font tables in `assets.rs` can be referenced from an existing Rust module without a build step.
+SVGs and PNGs use white artwork with transparent backgrounds. Tint them using the current context's semantic palette: muted normally, accent ink when selected, or on-accent on a primary button. The icon catalog and font tables in `assets.rs` require no runtime downloads.
 
 ## Palette and surfaces
 
-The page is warm ivory `#FAF8F3`, sheets are white, ink is `#202F30`, and active controls use deep teal `#24676B` with pale mint `#E0EEEA`. Annotation highlight tokens are distinct from transient selection: amber, sage, blue and rose remain persistent semantic names. Error ink and overlay scrims have their own tokens. The generator exports both palette and highlight constants.
+`themes.json` contains Sea glass & amber, Ink & saffron, Charcoal & raspberry, Cobalt & citron, Terracotta & linen, Aubergine & apricot and Midnight & mint. Sea glass is the legacy/default choice. Each palette distinguishes page, chrome, sheet, raised, selection and feature surfaces, plus ink, secondary text, actions and inverse foregrounds. Persistent annotation names remain amber/sage/blue/rose, with separate readable dark backgrounds. The native UI reads this catalog at compile time, including separate glow, feature-light, action-light and selection-mark roles for the approved material treatment. The asset generator synchronizes the legacy default constants and inventory with it.
 
-The older static SVG/PNG and Figma references retain their historical dark appearance; actual native renders in `dist/paper-sea-glass/` document the working light direction. They are local verification artifacts, not published or approved design assets. Runtime theme selection remains planned.
+The older static SVG/PNG and Figma references retain their historical appearance. HTML color studies in `design/color-studies/` are design references; native captures in `dist/selectable-themes/` document implementation. Local captures are not proof of a published release or physical-device rendering.
 
 ## Design references
 

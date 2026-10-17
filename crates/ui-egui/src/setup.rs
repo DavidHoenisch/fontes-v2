@@ -71,8 +71,8 @@ impl FontesApp {
     }
     pub(super) fn welcome(&mut self, ui: &mut egui::Ui) {
         let busy = self.setup.job.is_some() || self.pending > 0;
-        egui::CentralPanel::default().frame(egui::Frame::new().fill(theme::desk()).inner_margin(0)).show(ui, |ui| {
-            egui::Panel::bottom("setup-actions").exact_size(100.0).frame(egui::Frame::new().fill(theme::desk()).inner_margin(24)).show(ui, |ui| {
+        egui::CentralPanel::default().frame(egui::Frame::new().fill(theme::desk(ui.ctx())).inner_margin(0)).show(ui, |ui| {
+            egui::Panel::bottom("setup-actions").exact_size(100.0).frame(egui::Frame::new().fill(theme::desk(ui.ctx())).inner_margin(24)).show(ui, |ui| {
                 if self.pending > 0 {
                     ui.horizontal(|ui| { ui.spinner(); ui.label("Opening your library…"); });
                 } else if self.setup.offer.is_some() && !self.setup.downloading && !self.setup.cancelling {
@@ -138,7 +138,7 @@ impl FontesApp {
                         caption(ui, "You’ll see the download size before it starts. No account required. Read offline after setup.");
                         if let Some(error) = &self.setup.error {
                             ui.add_space(20.0);
-                            ui.colored_label(theme::color(assets::COLOR_ERROR), "Setup couldn’t finish. Check your connection and free storage, then retry.");
+                            ui.colored_label(theme::palette(ui.ctx()).error, "Setup couldn’t finish. Check your connection and free storage, then retry.");
                             ui.collapsing("Details", |ui| { ui.label(error); });
                         } else if let Some(error) = &self.error {
                             ui.add_space(20.0);

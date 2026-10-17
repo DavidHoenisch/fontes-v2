@@ -223,13 +223,13 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 3846,
-      "sha256": "bbbd9ce8ddfd4a6b2199db3036c4a28fe582fc659d1e33fb14bcd9108a3b1478"
+      "bytes": 4085,
+      "sha256": "ce9a21e6998efa6a6dc8fe55bb5a1c5bf946a2bfb451c1dffb066648bb2d040e"
     },
     {
       "path": "assets.rs",
-      "bytes": 5160,
-      "sha256": "af4998545a140e1c60284e7d4879445c52ef3f6fadc4a180a2bd2dd07c0ee8ad"
+      "bytes": 5316,
+      "sha256": "3d98026a5633c04fffae3e21c63ce9261be8b1193b729132a24472d286ff6ea5"
     },
     {
       "path": "fonts/IBMPlexSans-Medium.ttf",
@@ -572,9 +572,15 @@
       "sha256": "d8df687b9c5257701312b64b4af0d02d814f03de56731e145a1f54fee37dafdf"
     },
     {
+      "path": "themes.json",
+      "bytes": 6266,
+      "sha256": "7b1446b6fa3e706bb1e2cb612ed1cd454853fda650504da24b408ba64eb956d5"
+    },
+    {
       "path": "tokens.json",
-      "bytes": 3868,
-      "sha256": "748e874acbc888811135595c18eaeca81bfa649b9a423927ad8042866e634a06"
+      "bytes": 4905,
+      "sha256": "135cce5c2069db498bf2be1844f126b05daa71700a5930c5705c85245b80ca4e"
     }
-  ]
+  ],
+  "themeFile": "themes.json"
 }

@@ -98,7 +98,7 @@ fn description(id: &str) -> &'static str {
         }
         "annotation.delete" => "Delete a local annotation by its stable ID.",
         "reference.favorite" => "Set or clear a favorite canonical verse.",
-        "preferences.set" => "Save bounded reading typography and verse-number preferences.",
+        "preferences.set" => "Save reading theme, bounded typography and verse-number preferences.",
         _ => unreachable!(),
     }
 }

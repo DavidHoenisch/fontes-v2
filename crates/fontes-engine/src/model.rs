@@ -50,9 +50,47 @@ pub struct WordLink {
     pub method: String,
 }
 
+/// Stable theme IDs; palette values and presentation remain in the UI layer.
+#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, JsonSchema, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum ReadingTheme {
+    #[default]
+    SeaGlass,
+    InkSaffron,
+    CharcoalRaspberry,
+    CobaltCitron,
+    TerracottaLinen,
+    AubergineApricot,
+    MidnightMint,
+}
+impl ReadingTheme {
+    pub const ALL: [Self; 7] = [
+        Self::SeaGlass,
+        Self::InkSaffron,
+        Self::CharcoalRaspberry,
+        Self::CobaltCitron,
+        Self::TerracottaLinen,
+        Self::AubergineApricot,
+        Self::MidnightMint,
+    ];
+    pub fn id(self) -> &'static str {
+        match self {
+            Self::SeaGlass => "sea_glass",
+            Self::InkSaffron => "ink_saffron",
+            Self::CharcoalRaspberry => "charcoal_raspberry",
+            Self::CobaltCitron => "cobalt_citron",
+            Self::TerracottaLinen => "terracotta_linen",
+            Self::AubergineApricot => "aubergine_apricot",
+            Self::MidnightMint => "midnight_mint",
+        }
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct Preferences {
+    #[serde(default)]
+    pub theme: ReadingTheme,
     pub text_size: f32,
     pub line_spacing: f32,
     pub verse_numbers: bool,
@@ -61,8 +99,9 @@ pub struct Preferences {
 impl Default for Preferences {
     fn default() -> Self {
         Self {
-            text_size: 22.0,
-            line_spacing: 1.65,
+            theme: ReadingTheme::default(),
+            text_size: 24.0,
+            line_spacing: 1.63,
             verse_numbers: true,
             scripture_serif: true,
         }

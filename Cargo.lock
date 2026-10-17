@@ -1564,6 +1564,7 @@ dependencies = [
  "egui_extras",
  "egui_kittest",
  "fontes-engine",
+ "serde_json",
  "tempfile",
 ]
 

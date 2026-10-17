@@ -40,7 +40,7 @@ impl FontesApp {
                 .exact_size(80.0)
                 .frame(
                     egui::Frame::new()
-                        .fill(theme::desk())
+                        .fill(theme::desk(ui.ctx()))
                         .inner_margin(egui::Margin::symmetric(24, 16)),
                 )
                 .show(ui, |ui| {

@@ -720,3 +720,61 @@ fn source_dictionary_tags_are_edition_bound_and_never_claim_original_token_ident
         );
     }
 }
+
+#[test]
+fn reading_themes_persist_and_legacy_preferences_default_without_touching_notes() {
+    let f = Fixture::new();
+    let old =
+        json!({"text_size":22.0,"line_spacing":1.65,"verse_numbers":true,"scripture_serif":true});
+    let legacy: Preferences = serde_json::from_value(old.clone()).unwrap();
+    assert_eq!(legacy.theme, ReadingTheme::SeaGlass);
+    let mut invalid = old.clone();
+    invalid["theme"] = json!("not-a-theme");
+    assert!(serde_json::from_value::<Preferences>(invalid).is_err());
+    let mut e = f.engine();
+    e.dispatch(Command::SaveAnnotation {
+        id: None,
+        start_ref: 43003016,
+        end_ref: 43003016,
+        kind: AnnotationKind::Note,
+        color: None,
+        content: Some("Keep this note".into()),
+    })
+    .unwrap();
+    for theme in ReadingTheme::ALL {
+        let mut prefs = e.workspace().unwrap().session.preferences;
+        prefs.theme = theme;
+        e.dispatch(Command::Preferences { preferences: prefs })
+            .unwrap();
+        drop(e);
+        e = f.engine();
+        let state = e.workspace().unwrap();
+        assert_eq!(state.session.preferences.theme, theme);
+        assert_eq!(state.session.selected_ref, 43003016);
+        assert_eq!(
+            state.annotations[0].content.as_deref(),
+            Some("Keep this note")
+        );
+    }
+    drop(e);
+    // Simulate the actual pre-theme session representation on disk.
+    let db = Connection::open(f.dir.path().join("user.sqlite")).unwrap();
+    let raw: String = db
+        .query_row("SELECT json FROM fontes_app_session_v1", [], |r| r.get(0))
+        .unwrap();
+    let mut session: Value = serde_json::from_str(&raw).unwrap();
+    session["preferences"]
+        .as_object_mut()
+        .unwrap()
+        .remove("theme");
+    db.execute(
+        "UPDATE fontes_app_session_v1 SET json=?1",
+        [session.to_string()],
+    )
+    .unwrap();
+    drop(db);
+    assert_eq!(
+        f.engine().workspace().unwrap().session.preferences.theme,
+        ReadingTheme::SeaGlass
+    );
+}

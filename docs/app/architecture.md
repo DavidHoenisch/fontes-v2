@@ -95,3 +95,19 @@ D032 revises the UI default without changing the engine or stored session shape.
 The Android adapter requests light system-bar backgrounds/dark foregrounds on the Java UI thread: API 30+ uses WindowInsetsController appearance masks; API 28–29 preserves unrelated legacy visibility flags. Pre-35 bar colors and the shared viewport clear color use the same embedded page token; target-35 edge-to-edge bars show that clear color outside the safe UI. Compilation does not establish physical-device bar appearance or accessibility conformance.
 
 The D033 toolbar refinement uses a full-width shared surface and a scoped transparent resting style, with common hover/press/open treatment. It reserves space for translation and icon controls before constraining the reference label. This changes layout only; the existing picker, translation, favorite and settings commands/flows are retained.
+
+## Theme ownership and compatibility
+
+The engine owns the serializable `ReadingTheme` key in `Preferences`; the UI owns colors in the embedded `assets/ui/themes.json` catalog. Immutable palette definitions are shared, while the active key lives in each egui Context, avoiding mutable global colors and cross-window interference. All destinations use semantic roles. Android polls the context's chrome color and light/dark appearance and reapplies system-bar foreground flags when the choice changes. The window clear color matches the chrome in safe areas.
+
+The existing `preferences.set` command and app-session JSON persist the key. Missing keys default to Sea glass; unknown enum values are errors. No content or user SQL contract changes. Strict older app binaries may reject newly saved sessions with this additive field; downgrade compatibility for app-session JSON is not guaranteed. Independent user notes/highlights and canonical anchors are preserved. Saved annotation color names stay `amber`, `sage`, `blue`, `rose`, with readable light/dark rendering chosen by the active palette.
+
+The D037 mockup composition uses native mesh gradients and reusable card/sheet treatments. Each rounded gradient uses a bounded 37-vertex fan, with no blur textures or network assets. Actual source fields remain separate within the word feature card; rendering never synthesizes glosses or original-language alignment. The root UI refreshes its style from the context so eframe startup styling cannot leave the default palette partially applied.
+
+## Reference fidelity (D038)
+
+The native presentation follows the owner-approved HTML geometry rather than relying on toolkit defaults: explicit font line heights/tracking, compact noninteractive metadata rows, rounded radial grids, tinted shadows painted behind fills, pill/code details and full-sized mobile hit areas. Existing data titles/excerpts remain authoritative; demo glosses and topic summaries are not substituted.
+
+Word-action previews use the same bounded serial worker and `study.word` command, with FIFO UI-local reply purposes. Preview headwords are cached within a bounded session cache and never replace an existing word or article result. A single tap resolves only the supplied scalar span of the exact displayed edition; it does not infer a link from spelling.
+
+Backdrop blur requests one clean frame through eframe/wgpu's application-frame readback, downscales to at most 512 pixels per dimension and runs three bounded blur passes on a background thread. Input is capped at 16 million pixels. Only the app frame is involved; no OS desktop capture, storage or transmission. Stale replies are generation-tagged and ignored; closing a sheet releases the texture/result receiver. Resizing recaptures; a palette switch discards stale-colored blur. Unsupported readback leaves an interactive tinted scrim. Native Metal readback is observed separately from injected readback events in the egui harness; Android runtime validation remains separate.

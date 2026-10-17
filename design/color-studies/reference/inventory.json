@@ -1,0 +1,38 @@
+{
+  "reference_version": 1,
+  "authority": "Owner-approved HTML mockups and supplied captures",
+  "files": [
+    {
+      "path": "reading.png",
+      "sha256": "d1247f655ad5138388e1e34ca57533d8504d75f958af061c51c0faaa1f590bb2"
+    },
+    {
+      "path": "actions.png",
+      "sha256": "07daed0d66436946d3922c887b696aeda4e2bfd379c9648768e78b743c985b2b"
+    },
+    {
+      "path": "word-study.png",
+      "sha256": "01e5d6b4d5a44a7e574b350969ebc07e099e544036b25780019adfc5ccc56d55"
+    },
+    {
+      "path": "commentary.png",
+      "sha256": "42eb24584647c8ca308f8f1a0938bf077a8e284812b4b77786523bc09c7dade4"
+    },
+    {
+      "path": "references.png",
+      "sha256": "d136251852e196182cf01db5a59aabf2b1f5c9d63ad7ee2540302c647b407ca8"
+    },
+    {
+      "path": "topics.png",
+      "sha256": "33c4939ac0dce2fe45d97e365173c2cfb1f19b7e186642626832559d0fb57fda"
+    },
+    {
+      "path": "preferences.png",
+      "sha256": "f7f2bbc00ec0d4ae6517773d598181517e97b00d6e94883f3a87e91803eeba8d"
+    },
+    {
+      "path": "search.png",
+      "sha256": "6f3f306d1bd1a0ed846cc58e10af51a8cf8794d537d0460d16732a2f77ba1fba"
+    }
+  ]
+}

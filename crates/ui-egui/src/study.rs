@@ -43,6 +43,21 @@ impl FontesApp {
             self.dispatch(Command::Context { ref_id: reference });
         }
     }
+    fn request_word_preview(&mut self, code: &str) {
+        if self.word_previews.contains_key(code) || self.preview_requested.contains(code) {
+            return;
+        }
+        if self.preview_requested.len() >= 32 {
+            self.preview_requested.clear();
+            self.word_previews.clear();
+        }
+        let before = self.pending;
+        self.dispatch(Command::Word { code: code.into() });
+        if self.pending > before {
+            *self.reply_previews.back_mut().expect("queued request") = true;
+            self.preview_requested.insert(code.into());
+        }
+    }
     fn lookup_word(&mut self, code: &str) {
         self.word_focus = None;
         self.study_tab = StudyTab::Words;
@@ -82,7 +97,7 @@ impl FontesApp {
             job.sections.clear();
             job.append(&verse.text[..start], 0.0, format.clone());
             let mut selected_format = format.clone();
-            selected_format.background = theme::color(assets::HIGHLIGHT_AMBER);
+            selected_format.background = theme::palette(ui.ctx()).highlights[0];
             job.append(&verse.text[start..end], 0.0, selected_format);
             job.append(&verse.text[end..], 0.0, format);
         }
@@ -120,8 +135,32 @@ impl FontesApp {
             let range = range.start.0..range.end.0;
             if !range.is_empty() {
                 self.selected_text = Some(selection(verse, range));
-            } else if !response.secondary_clicked() && !response.context_menu_opened() {
+            } else if !response.secondary_clicked()
+                && !response.context_menu_opened()
+                && self.verse_actions.is_none()
+                && !self.reading_settings
+            {
                 self.selected_text = None;
+            }
+        }
+        if mobile
+            && response.clicked()
+            && let Some(pos) = response.interact_pointer_pos()
+        {
+            let cursor = output
+                .galley
+                .cursor_from_pos(pos - output.galley_pos)
+                .index
+                .0;
+            let range = verse
+                .strongs_links
+                .iter()
+                .map(|l| l.start..l.end)
+                .chain(verse.word_links.iter().map(|l| l.start..l.end))
+                .find(|range| range.contains(&cursor));
+            if let Some(range) = range {
+                self.selected_text = Some(selection(verse, range));
+                self.verse_actions = Some(verse.clone());
             }
         }
         if response.secondary_clicked() {
@@ -163,7 +202,7 @@ impl FontesApp {
             .selected_text
             .as_ref()
             .is_some_and(|t| t.verse_id == verse.id);
-        let height = (bounds.height() * 0.9).min(if has_selection { 600.0 } else { 344.0 });
+        let height = (bounds.height() * 0.9).min(if has_selection { 528.0 } else { 344.0 });
         let modal = egui::Modal::new(egui::Id::new("verse-action-sheet"))
             .area(
                 egui::Modal::default_area(egui::Id::new("verse-action-sheet"))
@@ -171,47 +210,53 @@ impl FontesApp {
             )
             .frame(
                 egui::Frame::new()
-                    .fill(theme::color(assets::COLOR_SURFACE))
+                    .fill(theme::palette(ctx).surface)
                     .corner_radius(egui::CornerRadius {
                         nw: 24,
                         ne: 24,
                         sw: 0,
                         se: 0,
                     })
-                    .inner_margin(16),
+                    .inner_margin(egui::Margin {
+                        left: 22,
+                        right: 22,
+                        top: 10,
+                        bottom: 27,
+                    }),
             )
-            .backdrop_color(theme::color(assets::COLOR_SCRIM).gamma_multiply(0.24))
+            .backdrop_color(theme::palette(ctx).scrim.gamma_multiply(0.26))
             .show(ctx, |ui| {
-                ui.set_width(width - 32.0);
-                ui.set_height(height - 32.0);
-                ui.spacing_mut().item_spacing = egui::vec2(8.0, 4.0);
+                ui.set_width(width - 44.0);
+                ui.set_height(height - 37.0);
+                theme::sheet_handle(ui);
+                ui.spacing_mut().item_spacing = egui::vec2(8.0, 0.0);
                 ui.horizontal(|ui| {
                     caption(
                         ui,
-                        label(&self.state.as_ref().unwrap().books, verse.refs[0]),
+                        format!(
+                            "{} · {}",
+                            label(&self.state.as_ref().unwrap().books, verse.refs[0]),
+                            self.state
+                                .as_ref()
+                                .unwrap()
+                                .translations
+                                .iter()
+                                .find(|t| t.id == self.state.as_ref().unwrap().session.translation)
+                                .map(|t| t.abbr.as_str())
+                                .unwrap_or("")
+                        ),
                     );
                     ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                        let close = ui
-                            .add_sized(
-                                [44.0, 44.0],
-                                egui::Button::image(icon("close", 20.0, false)).frame(false),
-                            )
-                            .on_hover_text("Close actions");
-                        close.widget_info(|| {
-                            egui::WidgetInfo::labeled(
-                                egui::WidgetType::Button,
-                                true,
-                                "Close actions",
-                            )
-                        });
+                        let close = theme::round_close(ui, "Close actions");
                         if close.clicked() {
                             ui.close();
                         }
                     });
                 });
                 egui::ScrollArea::vertical()
+                    .scroll_bar_visibility(egui::scroll_area::ScrollBarVisibility::AlwaysHidden)
                     .id_salt("verse-action-sheet-scroll")
-                    .max_height((height - 88.0).max(80.0))
+                    .max_height((height - 108.0).max(80.0))
                     .show(ui, |ui| {
                         self.verse_action_contents(ui, &verse, true);
                     });
@@ -227,15 +272,18 @@ impl FontesApp {
             .clone()
             .filter(|t| t.verse_id == verse.id);
         if let Some(selected) = &selected {
-            caption(ui, "SELECTED TEXT");
             let mut preview = egui::text::LayoutJob::simple(
                 format!("“{}”", selected.text),
-                egui::FontId::new(24.0, egui::FontFamily::Name("scripture".into())),
-                theme::color(assets::COLOR_INK),
+                egui::FontId::new(37.0, egui::FontFamily::Name("scripture".into())),
+                theme::palette(ui.ctx()).ink,
                 ui.available_width(),
             );
+            preview.sections[0].format.extra_letter_spacing = -1.0;
+            preview.sections[0].format.line_height = Some(44.0);
             preview.wrap.max_rows = 2;
             ui.add(egui::Label::new(preview).wrap().selectable(false));
+            ui.add_space(12.0);
+            caption(ui, "Explore the word. Stay in the passage.");
             ui.add_space(12.0);
             let codes = lookup_codes(verse, &selected.range);
             if codes.is_empty() {
@@ -250,21 +298,20 @@ impl FontesApp {
                 );
             } else {
                 for code in codes {
-                    if action_row(
-                        ui,
-                        "search",
-                        &format!("Look up Strong’s {code}"),
-                        true,
-                        mobile,
-                    )
-                    .clicked()
-                    {
+                    self.request_word_preview(&code);
+                    let headword = self
+                        .word_previews
+                        .get(&code)
+                        .and_then(|v| v.first())
+                        .cloned();
+                    if lookup_button(ui, &code, headword.as_ref()).clicked() {
                         self.open_study(verse.refs[0], StudyTab::Words);
                         self.lookup_word(&code);
                         ui.close();
                     }
                 }
             }
+            ui.add_space(12.0);
             if action_row(ui, "copy", "Copy selection", false, mobile).clicked() {
                 ui.ctx().copy_text(selected.text.clone());
                 ui.close();
@@ -273,7 +320,6 @@ impl FontesApp {
             ui.separator();
             ui.add_space(8.0);
         }
-        caption(ui, "VERSE ACTIONS");
         if action_row(ui, "book", "Study this verse", false, mobile).clicked() {
             self.open_study(verse.refs[0], StudyTab::Commentary);
             ui.close();
@@ -307,28 +353,37 @@ impl FontesApp {
         let s = self.state.clone().unwrap();
         // Each article opens at its beginning; returning restores the results scroll.
         let article_id = self.resource.as_ref().map(|r| r.id.clone());
-        egui::ScrollArea::vertical().id_salt(("study-scroll", self.study_tab as u8, article_id)).show(ui, |ui| {
-            egui::Frame::new().inner_margin(20).show(ui, |ui| {
+        egui::ScrollArea::vertical().scroll_bar_visibility(if ui.available_width()<760.0{egui::scroll_area::ScrollBarVisibility::AlwaysHidden}else{egui::scroll_area::ScrollBarVisibility::VisibleWhenNeeded}).id_salt(("study-scroll", self.study_tab as u8, article_id)).show(ui, |ui| {
+            egui::Frame::new().inner_margin(18).show(ui, |ui| {
+                let header_top=ui.cursor().min;
+                let header_wash=ui.painter().add(egui::Shape::Noop);
+                ui.add_space(4.0);
                 ui.horizontal(|ui| {
-                    ui.heading("Study");
-                    if ui.button("Back to reading").clicked() {
-                        self.choose(Destination::Read);
+                    ui.add_space(5.0);
+                    let size=if ui.available_width()<310.0{26.0}else{30.0};
+                    theme::editorial(ui,"Word study",size,theme::palette(ui.ctx()).ink);
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center),|ui|{
+                        if ui.add(egui::Button::new(RichText::new("← Back to reading").size(11.0).color(muted(ui.ctx()))).frame(false)).clicked(){self.choose(Destination::Read);}
+                    });
+                });
+                ui.add_space(19.0);
+                ui.columns(4, |cols| {
+                    for (col, (tab, title, accessible)) in cols.iter_mut().zip([
+                        (StudyTab::Words,"Words","Words"), (StudyTab::Commentary,"Commentary","Commentary"),
+                        (StudyTab::References,"References","Cross-references"), (StudyTab::Topics,"Topics","Topics"),
+                    ]) {
+                        let active=self.study_tab==tab;
+                        let text=RichText::new(title).size(11.0).family(if active{egui::FontFamily::Name("medium".into())}else{egui::FontFamily::Proportional}).color(if active{accent(col.ctx())}else{muted(col.ctx())});
+                        let response=col.add_sized([col.available_width(),44.0],egui::Button::new(text).frame(false).wrap());
+                        response.widget_info(||egui::WidgetInfo::labeled(egui::WidgetType::Button,true,accessible));
+                        if active {let line=egui::Rect::from_min_size(egui::pos2(response.rect.left(),response.rect.bottom()-1.0),egui::vec2(response.rect.width().min(64.0),3.0));col.painter().rect_filled(line,2,accent(col.ctx()));}
+                        if response.clicked(){self.study_tab=tab;self.resource=None;}
                     }
                 });
-                caption(ui, s.reference_label());
-                ui.add_space(16.0);
-                for row in [[(StudyTab::Words, "Words"), (StudyTab::Commentary, "Commentary")], [(StudyTab::References, "Cross-references"), (StudyTab::Topics, "Topics")]] {
-                    ui.columns(2, |cols| {
-                        for (col, (tab, title)) in cols.iter_mut().zip(row) {
-                            if col.add_sized([col.available_width(), col.spacing().interact_size.y], egui::Button::selectable(self.study_tab == tab, title)).clicked() {
-                                self.study_tab = tab;
-                                self.resource = None;
-                            }
-                        }
-                    });
-                }
                 ui.separator();
-                ui.add_space(12.0);
+                let p=theme::palette(ui.ctx());
+                theme::radial_wash(ui,header_wash,egui::Rect::from_min_max(header_top-egui::vec2(18.0,18.0),egui::pos2(ui.max_rect().right()+18.0,ui.cursor().min.y)),0.0,p.page,p.glow,0.55);
+                ui.add_space(22.0);
                 if !s.has_study {
                     ui.label("Open a study library to add Strong’s dictionaries, original Hebrew and Greek, commentary, topics and cross-references.");
                     return;
@@ -362,14 +417,23 @@ impl FontesApp {
                     if self.study_tab == StudyTab::References {
                         if cross_references.is_empty() { ui.label("No cross-reference targets are installed for this verse."); }
                         for target in &cross_references {
-                            ui.push_id(("cross-reference", target.start_ref, target.end_ref), |ui| {
-                                if ui.add_sized([ui.available_width(), ui.spacing().interact_size.y], egui::Button::new(RichText::new(&target.label).color(accent())).right_text(()).wrap()).clicked() { self.select(target.start_ref); }
-                                if let Some(preview) = &target.preview { ui.label(preview); } else { caption(ui, "No verse text supplied by this edition."); }
-                                if target.start_ref != target.end_ref { caption(ui, "Preview of the first verse"); }
-                                if ui.small_button("Source article").clicked() { self.dispatch(Command::Resource { id: target.resource_id.clone() }); }
-                                ui.add_space(12.0);
-                                ui.separator();
-                                ui.add_space(12.0);
+                            ui.push_id(("cross-reference",target.start_ref,target.end_ref),|ui|{
+                                theme::card(ui.ctx()).show(ui,|ui|{
+                                    ui.set_min_width(ui.available_width());
+                                    theme::eyebrow(ui,"REFERENCE",muted(ui.ctx()));
+                                    ui.add_space(8.0);
+                                    if ui.add_sized([ui.available_width(),44.0],egui::Button::new(scripture(&target.label,22.0,true).color(theme::palette(ui.ctx()).ink)).frame(false).right_text(()).wrap()).clicked(){self.select(target.start_ref);}
+                                    ui.add_space(12.0);
+                                    if let Some(preview)=&target.preview{
+                                        let mut job=egui::text::LayoutJob::simple(preview.clone(),egui::FontId::proportional(13.0),muted(ui.ctx()),ui.available_width());
+                                        job.sections[0].format.line_height=Some(21.5);
+                                        ui.add(egui::Label::new(job).wrap());
+                                    }else{caption(ui,"No verse text supplied by this edition.");}
+                                    if target.start_ref!=target.end_ref{ui.add_space(8.0);caption(ui,"Preview of the first verse");}
+                                    ui.add_space(12.0);
+                                    if ui.add_sized([144.0,44.0],egui::Button::new("Source article")).clicked(){self.dispatch(Command::Resource{id:target.resource_id.clone()});}
+                                });
+                                ui.add_space(16.0);
                             });
                         }
                         if cross_references.len() == 100 { caption(ui, "Showing the first 100 distinct reference ranges."); }
@@ -404,11 +468,6 @@ impl FontesApp {
             total,
         }) = self.word.clone()
         {
-            if ui.button("← Words in this verse").clicked() {
-                self.word = None;
-                self.word_focus = None;
-            }
-            ui.add_space(12.0);
             let linked = self.selected_text.as_ref().and_then(|selected| {
                 self.state
                     .as_ref()?
@@ -424,52 +483,199 @@ impl FontesApp {
                     })
             });
             let focus = self.word_focus.as_ref().filter(|focus| focus.code == code);
-            if let Some(focus) = focus {
-                original_word_heading(ui, &focus.surface);
-                caption(
-                    ui,
-                    format!("Verse word · {}", witness_title(&focus.witness)),
-                );
-            } else if let Some(link) = linked {
-                original_word_heading(ui, &link.surface);
-                caption(ui, "Linked source word");
-            } else if headwords.is_empty() {
-                ui.heading(format!("Strong’s {code}"));
-            }
-            for headword in &headwords {
-                if focus.is_none() && linked.is_none() {
-                    original_word_heading(ui, &headword.text);
-                } else {
-                    ui.label(scripture(&headword.text, 24.0, true));
-                }
-                caption(ui, "Dictionary headword");
-                if let Some(transliteration) = &headword.transliteration {
-                    ui.label(RichText::new(transliteration).size(16.0).color(muted()));
-                }
-            }
-            if let Some(selected) = &self.selected_text {
-                caption(ui, format!("Reading selection: “{}”", selected.text));
-            }
-            if focus.is_some() || linked.is_some() || !headwords.is_empty() {
-                ui.add_space(8.0);
-                caption(ui, format!("Strong’s {code}"));
-            }
-            ui.add_space(12.0);
-            ui.separator();
+            let p = theme::palette(ui.ctx());
+            let mut slots = None;
+            let has_form = focus.is_some() || linked.is_some();
+            let hero = egui::Frame::new()
+                .corner_radius(22)
+                .inner_margin(23)
+                .shadow(egui::epaint::Shadow {
+                    offset: [0, 10],
+                    blur: 24,
+                    spread: 0,
+                    color: p.scrim.gamma_multiply(0.30),
+                })
+                .show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    slots = Some((
+                        ui.painter().add(egui::Shape::Noop),
+                        ui.painter().add(egui::Shape::Noop),
+                    ));
+                    ui.visuals_mut().override_text_color = Some(p.on_feature);
+                    ui.columns(2, |cols| {
+                        let language = if code.starts_with('H') {
+                            "HEBREW"
+                        } else {
+                            "GREEK"
+                        };
+                        let kind = if focus.is_some() {
+                            "VERSE WORD"
+                        } else if linked.is_some() {
+                            "LINKED SOURCE WORD"
+                        } else {
+                            "DICTIONARY HEADWORD"
+                        };
+                        theme::eyebrow(&mut cols[0], format!("{language} {kind}"), p.on_feature);
+                        let reference = self
+                            .state
+                            .as_ref()
+                            .unwrap()
+                            .reference_label()
+                            .to_uppercase();
+                        cols[1].with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
+                            ui.set_max_width(72.0);
+                            theme::eyebrow(ui, reference, p.on_feature);
+                        });
+                    });
+                    ui.add_space(12.0);
+                    if let Some(focus) = focus {
+                        original_word_heading(ui, &focus.surface);
+                    } else if let Some(link) = linked {
+                        original_word_heading(ui, &link.surface);
+                    } else if let Some(headword) = headwords.first() {
+                        original_word_heading(ui, &headword.text);
+                    } else {
+                        theme::editorial(ui, format!("Strong’s {code}"), 30.0, p.on_feature);
+                    }
+                    if let Some(headword) = headwords.first() {
+                        if has_form {
+                            feature_caption(ui, format!("Dictionary headword · {}", headword.text));
+                        }
+                        if let Some(transliteration) = &headword.transliteration {
+                            ui.label(scripture(transliteration, 16.0, true).color(p.on_feature));
+                        }
+                    }
+                    for headword in headwords.iter().skip(1) {
+                        feature_caption(ui, format!("Dictionary headword · {}", headword.text));
+                    }
+                    if let Some(focus) = focus {
+                        feature_caption(ui, witness_title(&focus.witness));
+                    }
+                    if !has_form && !headwords.is_empty() {
+                        // The label remains explicit for assistive technology and source distinction.
+                        let response = ui.allocate_response(egui::Vec2::ZERO, egui::Sense::hover());
+                        response.widget_info(|| {
+                            egui::WidgetInfo::labeled(
+                                egui::WidgetType::Label,
+                                true,
+                                "Dictionary headword",
+                            )
+                        });
+                    }
+                    ui.add_space(15.0);
+                    let (line, _) = ui.allocate_exact_size(
+                        egui::vec2(ui.available_width(), 1.0),
+                        egui::Sense::hover(),
+                    );
+                    ui.painter().hline(
+                        line.x_range(),
+                        line.center().y,
+                        egui::Stroke::new(1.0, p.on_feature.gamma_multiply(0.18)),
+                    );
+                    ui.add_space(8.0);
+                    ui.allocate_ui_with_layout(
+                        egui::vec2(ui.available_width(), 28.0),
+                        egui::Layout::left_to_right(egui::Align::Center),
+                        |ui| {
+                            let text = self
+                                .selected_text
+                                .as_ref()
+                                .map(|t| format!("Reading selection: “{}”", t.text))
+                                .unwrap_or_else(|| {
+                                    if has_form {
+                                        "Supplied source form".into()
+                                    } else {
+                                        "Dictionary entry".into()
+                                    }
+                                });
+                            ui.add(
+                                egui::Label::new(
+                                    RichText::new(text).size(10.0).color(p.on_feature),
+                                )
+                                .wrap(),
+                            );
+                            ui.with_layout(
+                                egui::Layout::right_to_left(egui::Align::Center),
+                                |ui| {
+                                    egui::Frame::new()
+                                        .fill(p.on_feature.gamma_multiply(0.12))
+                                        .corner_radius(6)
+                                        .inner_margin(egui::Margin::symmetric(8, 5))
+                                        .show(ui, |ui| {
+                                            ui.label(
+                                                RichText::new(&code).size(11.0).color(p.on_feature),
+                                            );
+                                        });
+                                },
+                            );
+                        },
+                    );
+                });
+            let (slot, rings) = slots.expect("word card background");
+            theme::radial_wash(
+                ui,
+                slot,
+                hero.response.rect,
+                22.0,
+                p.feature,
+                p.feature_light,
+                0.60,
+            );
+            theme::word_rings(ui, rings, hero.response.rect);
+            ui.add_space(18.0);
             if definitions.is_empty() {
                 ui.label("No dictionary entry installed for this number.");
             }
             for d in definitions {
+                theme::card(ui.ctx()).show(ui, |ui| {
+                    ui.set_min_width(ui.available_width());
+                    theme::eyebrow(
+                        ui,
+                        if code.starts_with('H') {
+                            "STRONG’S HEBREW DICTIONARY"
+                        } else {
+                            "STRONG’S GREEK DICTIONARY"
+                        },
+                        muted(ui.ctx()),
+                    );
+                    ui.add_space(8.0);
+                    theme::editorial(ui, &d.title, 22.0, theme::palette(ui.ctx()).ink);
+                    ui.add_space(8.0);
+                    let mut excerpt = egui::text::LayoutJob::simple(
+                        d.excerpt.clone(),
+                        egui::FontId::proportional(13.0),
+                        muted(ui.ctx()),
+                        ui.available_width(),
+                    );
+                    excerpt.sections[0].format.line_height = Some(21.5);
+                    ui.add(egui::Label::new(excerpt).wrap().selectable(true));
+                    ui.add_space(8.0);
+                    if ui
+                        .add(
+                            egui::Button::new(
+                                RichText::new("Read full dictionary entry").color(accent(ui.ctx())),
+                            )
+                            .frame(false),
+                        )
+                        .clicked()
+                    {
+                        self.dispatch(Command::Resource { id: d.id });
+                    }
+                    if let Some(author) = d.author {
+                        caption(ui, author);
+                    }
+                });
                 ui.add_space(12.0);
-                ui.add(egui::Label::new(&d.excerpt).wrap().selectable(true));
-                if ui.button("Read full dictionary entry").clicked() {
-                    self.dispatch(Command::Resource { id: d.id });
-                }
-                if let Some(author) = d.author {
-                    caption(ui, author);
-                }
             }
             ui.add_space(16.0);
+            if ui
+                .add(egui::Button::new("← Words in this verse").frame(false))
+                .clicked()
+            {
+                self.word = None;
+                self.word_focus = None;
+            }
+            ui.add_space(8.0);
             ui.collapsing(format!("Occurrences · {total} verses"), |ui| {
                 caption(ui, "Installed source tokens · first 100 distinct verses");
                 ui.horizontal_wrapped(|ui| {
@@ -505,7 +711,14 @@ impl FontesApp {
                         .map(|link| link.surface.as_str())
                         .collect();
                     for surface in surfaces {
-                        original_word_heading(ui, surface);
+                        let mut job = egui::text::LayoutJob::simple(
+                            surface.to_owned(),
+                            egui::FontId::new(40.0, egui::FontFamily::Name("original".into())),
+                            theme::palette(ui.ctx()).ink,
+                            ui.available_width(),
+                        );
+                        job.wrap.max_rows = 3;
+                        ui.add(egui::Label::new(job).wrap().selectable(false));
                     }
                     caption(ui, "Linked source word");
                     ui.horizontal_wrapped(|ui| {
@@ -639,30 +852,56 @@ impl FontesApp {
     }
     fn resource_card(&mut self, ui: &mut egui::Ui, r: &ResourceSummary) {
         ui.push_id(&r.id, |ui| {
-            ui.label(
-                RichText::new(friendly_title(&r.title))
-                    .strong()
-                    .color(accent()),
-            );
-            if let Some(author) = &r.author {
-                caption(ui, author);
-            }
-            caption(
-                ui,
-                match r.basis.as_str() {
-                    "applies_to" => "On this passage",
-                    "citation" => "Mentions this passage",
-                    _ => "Related to this passage",
-                },
-            );
-            ui.add_space(8.0);
-            ui.label(&r.excerpt);
-            if ui.button("Open article").clicked() {
-                self.dispatch(Command::Resource { id: r.id.clone() });
-            }
-            ui.add_space(12.0);
-            ui.separator();
-            ui.add_space(12.0);
+            theme::card(ui.ctx()).show(ui, |ui| {
+                ui.set_min_width(ui.available_width());
+                theme::eyebrow(ui, r.kind.replace('_', " ").to_uppercase(), muted(ui.ctx()));
+                ui.add_space(8.0);
+                theme::editorial(
+                    ui,
+                    friendly_title(&r.title),
+                    22.0,
+                    theme::palette(ui.ctx()).ink,
+                );
+                if let Some(author) = &r.author {
+                    ui.add_space(8.0);
+                    caption(ui, author);
+                }
+                ui.add_space(16.0);
+                let mut excerpt = egui::text::LayoutJob::simple(
+                    r.excerpt.clone(),
+                    egui::FontId::proportional(13.0),
+                    muted(ui.ctx()),
+                    ui.available_width(),
+                );
+                excerpt.sections[0].format.line_height = Some(21.5);
+                ui.add(egui::Label::new(excerpt).wrap());
+                ui.add_space(8.0);
+                caption(
+                    ui,
+                    match r.basis.as_str() {
+                        "applies_to" => "On this passage",
+                        "citation" => "Mentions this passage",
+                        _ => "Related to this passage",
+                    },
+                );
+                ui.add_space(16.0);
+                let p = theme::palette(ui.ctx());
+                if ui
+                    .add_sized(
+                        [160.0, 44.0],
+                        egui::Button::image_and_text(
+                            icon(ui.ctx(), "arrow", 16.0, false).tint(p.on_accent),
+                            RichText::new("Open article").color(p.on_accent),
+                        )
+                        .fill(p.accent)
+                        .corner_radius(12),
+                    )
+                    .clicked()
+                {
+                    self.dispatch(Command::Resource { id: r.id.clone() });
+                }
+            });
+            ui.add_space(16.0);
         });
     }
 }
@@ -753,7 +992,7 @@ fn article_body(ui: &mut egui::Ui, text: &str) {
                 0.0,
                 egui::TextFormat {
                     font_id: egui::FontId::proportional(16.0),
-                    color: theme::color(assets::COLOR_INK),
+                    color: theme::palette(ui.ctx()).ink,
                     line_height: Some(25.0),
                     ..Default::default()
                 },
@@ -770,35 +1009,180 @@ fn action_row(
     role: &str,
     title: &str,
     emphasized: bool,
-    mobile: bool,
+    _mobile: bool,
 ) -> egui::Response {
-    let text = RichText::new(title)
-        .size(if mobile { 16.0 } else { 14.0 })
-        .color(if emphasized {
-            accent()
-        } else {
-            theme::color(assets::COLOR_INK)
-        });
-    ui.add_sized(
-        [ui.available_width(), 48.0],
-        egui::Button::image_and_text(icon(role, 20.0, emphasized || role == "bookmark"), text)
+    if emphasized {
+        return ui.add_sized(
+            [ui.available_width(), 64.0],
+            egui::Button::image_and_text(
+                icon(ui.ctx(), role, 20.0, false).tint(theme::palette(ui.ctx()).on_accent),
+                RichText::new(title)
+                    .size(14.0)
+                    .color(theme::palette(ui.ctx()).on_accent),
+            )
+            .fill(theme::palette(ui.ctx()).accent)
+            .corner_radius(15)
             .right_text(())
-            .wrap()
-            .frame(emphasized)
-            .fill(if emphasized {
-                theme::tint()
-            } else {
-                egui::Color32::TRANSPARENT
-            })
-            .corner_radius(8),
-    )
+            .wrap(),
+        );
+    }
+    let p = theme::palette(ui.ctx());
+    let response = ui.add_sized(
+        [ui.available_width(), 48.0],
+        egui::Button::new("").frame(false),
+    );
+    response.widget_info(|| egui::WidgetInfo::labeled(egui::WidgetType::Button, true, title));
+    if response.hovered() {
+        ui.painter().rect_filled(response.rect, 9, p.tint);
+    }
+    let is_highlight = title.starts_with("Highlight verse");
+    let actual_role = if is_highlight {
+        "spark"
+    } else if title == "Study this verse" {
+        "tree"
+    } else {
+        role
+    };
+    icon(ui.ctx(), actual_role, 19.0, false).paint_at(
+        ui,
+        egui::Rect::from_center_size(
+            egui::pos2(response.rect.left() + 14.0, response.rect.center().y),
+            egui::vec2(19.0, 19.0),
+        ),
+    );
+    let text = if is_highlight {
+        "Highlight verse"
+    } else {
+        title
+    };
+    ui.painter().text(
+        egui::pos2(response.rect.left() + 38.0, response.rect.center().y),
+        egui::Align2::LEFT_CENTER,
+        text,
+        egui::FontId::proportional(13.0),
+        p.ink,
+    );
+    if is_highlight {
+        ui.painter().circle_filled(
+            egui::pos2(response.rect.right() - 49.0, response.rect.center().y),
+            6.0,
+            egui::Color32::from_rgb(231, 179, 72),
+        );
+        ui.painter().text(
+            egui::pos2(response.rect.right() - 4.0, response.rect.center().y),
+            egui::Align2::RIGHT_CENTER,
+            "Amber",
+            egui::FontId::proportional(10.0),
+            p.muted,
+        );
+    } else if title == "Study this verse" {
+        icon(ui.ctx(), "chevron", 16.0, false).paint_at(
+            ui,
+            egui::Rect::from_center_size(
+                egui::pos2(response.rect.right() - 8.0, response.rect.center().y),
+                egui::vec2(16.0, 16.0),
+            ),
+        );
+    }
+    response
+}
+fn lookup_button(
+    ui: &mut egui::Ui,
+    code: &str,
+    headword: Option<&DictionaryHeadword>,
+) -> egui::Response {
+    let p = theme::palette(ui.ctx());
+    let shadow = ui.painter().add(egui::Shape::Noop);
+    let slot = ui.painter().add(egui::Shape::Noop);
+    let response = ui.add_sized(
+        [ui.available_width(), 64.0],
+        egui::Button::new("").frame(false),
+    );
+    response.widget_info(|| {
+        egui::WidgetInfo::labeled(
+            egui::WidgetType::Button,
+            true,
+            format!("Look up Strong’s {code}"),
+        )
+    });
+    ui.painter().set(
+        shadow,
+        egui::epaint::Shadow {
+            offset: [0, 5],
+            blur: 12,
+            spread: 0,
+            color: p.scrim.gamma_multiply(0.18),
+        }
+        .as_shape(response.rect, egui::CornerRadius::same(15)),
+    );
+    theme::wash(
+        ui,
+        slot,
+        response.rect,
+        15.0,
+        p.accent,
+        p.accent.lerp_to_gamma(p.action_light, 0.65),
+    );
+    let title = if code.starts_with('H') {
+        "Look up the Hebrew word"
+    } else {
+        "Look up the Greek word"
+    };
+    let available =
+        (response.rect.width() - if headword.is_some() { 98.0 } else { 32.0 }).max(80.0);
+    let title = ui.painter().layout(
+        title.into(),
+        egui::FontId::new(13.0, egui::FontFamily::Name("medium".into())),
+        p.on_accent,
+        available,
+    );
+    ui.painter().galley(
+        response.rect.min + egui::vec2(16.0, 12.0),
+        title,
+        p.on_accent,
+    );
+    ui.painter().text(
+        response.rect.min + egui::vec2(16.0, 39.0),
+        egui::Align2::LEFT_TOP,
+        format!("Strong’s {code} · Dictionary entry"),
+        egui::FontId::proportional(10.0),
+        p.on_accent,
+    );
+    if let Some(headword) = headword {
+        let galley = ui.painter().layout(
+            headword.text.clone(),
+            egui::FontId::new(27.0, egui::FontFamily::Name("original".into())),
+            p.on_accent,
+            76.0,
+        );
+        ui.painter().galley(
+            egui::pos2(
+                response.rect.right() - 16.0 - galley.size().x,
+                response.rect.center().y - galley.size().y / 2.0,
+            ),
+            galley,
+            p.on_accent,
+        );
+    }
+    response
 }
 
 /// Keep each original-language word in its own shaping run, separate from Latin labels.
 fn original_word_heading(ui: &mut egui::Ui, text: &str) {
-    let font = egui::FontId::new(40.0, egui::FontFamily::Name("original".into()));
-    let mut job =
-        egui::text::LayoutJob::simple(text.to_owned(), font, accent(), ui.available_width());
+    let mut job = egui::text::LayoutJob::simple(
+        text.to_owned(),
+        egui::FontId::new(53.0, egui::FontFamily::Name("original".into())),
+        theme::palette(ui.ctx()).on_feature,
+        ui.available_width(),
+    );
+    job.sections[0].format.line_height = Some(84.0);
     job.wrap.max_rows = 3;
     ui.add(egui::Label::new(job).wrap().selectable(false));
+}
+fn feature_caption(ui: &mut egui::Ui, text: impl Into<String>) {
+    ui.label(
+        RichText::new(text)
+            .size(12.0)
+            .color(theme::palette(ui.ctx()).on_feature),
+    );
 }

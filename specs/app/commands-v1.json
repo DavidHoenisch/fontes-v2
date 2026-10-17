@@ -25,6 +25,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -36,6 +40,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -68,6 +85,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -79,6 +100,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -119,6 +153,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -130,6 +168,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -171,6 +222,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -182,6 +237,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -223,6 +291,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -234,6 +306,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -274,6 +359,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -285,6 +374,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -337,6 +439,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -348,6 +454,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -389,6 +508,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -400,6 +523,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -440,6 +576,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -451,6 +591,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -491,6 +644,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -502,6 +659,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -573,6 +743,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -584,6 +758,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -624,6 +811,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -635,6 +826,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -656,7 +860,7 @@
       "name": "reference.favorite"
     },
     {
-      "description": "Save bounded reading typography and verse-number preferences.",
+      "description": "Save reading theme, bounded typography and verse-number preferences.",
       "inputSchema": {
         "$defs": {
           "AnnotationKind": {
@@ -680,6 +884,10 @@
                 "format": "float",
                 "type": "number"
               },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
               "verse_numbers": {
                 "type": "boolean"
               }
@@ -691,6 +899,19 @@
               "scripture_serif"
             ],
             "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
           }
         },
         "additionalProperties": false,

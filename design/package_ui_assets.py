@@ -53,14 +53,25 @@ tokens = {
     'spacing':[2,4,6,8,12,16,20,24,32,40,48,64],
     'radii':dict(control=12,card=16,dialog=16,mobileSheet=24),
     'desktop':dict(viewport=[1440,960],sidebarWidth=208,navigationRowHeight=36,sidebarItemGap=4,navigationIconGap=8,navigationPaddingVertical=8,savedPassagePaddingVertical=6,savedPassageContentGap=2,navigationSectionSpacer=16,smallSectionSpacer=4,toolbarHeight=72,windowBarHeight=64,readerWidth=800,studyPanelWidth=432,iconSize=20),
-    'mobile':dict(viewport=[390,844],horizontalPadding=24,contentWidth=342,tapTargetMinimum=44,actionHeight=48,navigationRowHeight=84,iconSize=24,referenceCellSize=44,referenceCellGap=5),
+    'mobile':dict(viewport=[390,844],horizontalPadding=24,contentWidth=342,tapTargetMinimum=44,actionHeight=48,navigationRowHeight=64,iconSize=22,verseHorizontalPadding=18,verseContentWidth=354,lookupActionHeight=64,referenceCellSize=44,referenceCellGap=5),
     'typography':{
-        'desktop':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=15,lineHeight=22),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=14,lineHeight=20),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=24,lineHeight=32),'passage':dict(family='Lora',weight=400,size=22,lineHeight=37),'readingHeading':dict(family='Lora',weight=400,size=38,lineHeight=48),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=40,lineHeight=52)},
-        'mobile':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=16,lineHeight=24),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=16,lineHeight=24),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=20,lineHeight=28),'passage':dict(family='Lora',weight=400,size=20,lineHeight=28),'readingHeading':dict(family='Lora',weight=400,size=44,lineHeight=56),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=40,lineHeight=52)},
+        'desktop':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=15,lineHeight=22),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=14,lineHeight=20),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=24,lineHeight=32),'passage':dict(family='Lora',weight=400,size=24,lineHeight=39.12),'readingHeading':dict(family='Lora',weight=400,size=38,lineHeight=44.08),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=53,lineHeight=84)},
+        'mobile':{'uiBody':dict(family='IBM Plex Sans',weight=400,size=16,lineHeight=24),'uiLabel':dict(family='IBM Plex Sans',weight=500,size=16,lineHeight=24),'caption':dict(family='IBM Plex Sans',weight=400,size=12,lineHeight=18),'title':dict(family='IBM Plex Sans',weight=500,size=20,lineHeight=28),'passage':dict(family='Lora',weight=400,size=24,lineHeight=39.12),'readingHeading':dict(family='Lora',weight=400,size=42,lineHeight=48.72),'originalWordHeading':dict(family='Noto Serif',fallback='Noto Serif Hebrew',weight=400,size=53,lineHeight=84)},
         'originalLanguageFallback':['Noto Serif','Noto Serif Hebrew'],
     },
     'status':{'palette':'Working light direction for owner review; supersedes dark study-desk default','sidebarSpacing':'Approved locally; Figma changes pending tool quota','mobileMockups':'Local SVG and PNG mockups','desktopMockups':'Figma only; desktop frame export blocked by tool quota'},
 }
+tokens['typography']['mobile']['uiBody'].update(size=15,lineHeight=22)
+tokens['typography']['mobile']['uiLabel'].update(size=14,lineHeight=20)
+for platform in ['desktop','mobile']:
+    tokens['typography'][platform].update(editorialTitle=dict(family='Lora',weight=400,size=30,lineHeight=35.4),cardTitle=dict(family='Lora',weight=400,size=22,lineHeight=25.96),eyebrow=dict(family='IBM Plex Sans',weight=500,size=9,lineHeight=12.5,letterSpacing=1.3))
+catalog=json.loads((DEST/'themes.json').read_text())
+base=next(t for t in catalog['themes'] if t['id']==catalog['default'])
+roles=dict(desk='page',sidebar='chrome',surface='surface',raised='raised',border='border',ink='ink',muted='muted',quiet='muted',accent='accent',tint='tint',inverse='on_accent',green='green',error='error',scrim='scrim')
+tokens.update(name='Fontes selectable reading themes',themeFile='themes.json',defaultTheme=catalog['default'])
+tokens['colors']={k:base['colors'][v] for k,v in roles.items()}
+tokens['highlightColors']=base['highlights']
+tokens['status']['palette']='Seven owner-selected local palettes; default sea glass. Native device verification remains separate.'
 (DEST/'tokens.json').write_text(json.dumps(tokens,indent=2)+'\n')
 
 rs=['//! Embedded Fontes UI assets and design constants. No network access required.','//! Include this file as a module; colors are sRGB RGBA bytes.','']
@@ -82,7 +93,7 @@ rs+= ['];','']
 (DEST/'assets.rs').write_text('\n'.join(rs))
 # Native integration makes this module part of cargo fmt. Hash the formatted bytes.
 subprocess.run(['rustfmt', '--edition', '2024', str(DEST/'assets.rs')], cwd=ROOT, check=True)
-manifest={'version':1,'icons':icons,'fonts':fonts,'tokenFile':'tokens.json','rustBindings':'assets.rs','figmaUrl':'https://www.figma.com/design/fdGlrRfs8AGQfpmCDhU3Bp','references':{'mobile':'../../design/mobile/screens','mobileOverview':'../../design/mobile/mobile-mockups.png','sidebarSpacing':'../../design/sidebar-spacing/sidebar-comparison.svg','pendingSidebarEdit':'../../design/compact-desktop-sidebar.figma.js'},'files':[]}
+manifest={'version':1,'icons':icons,'fonts':fonts,'tokenFile':'tokens.json','themeFile':'themes.json','rustBindings':'assets.rs','figmaUrl':'https://www.figma.com/design/fdGlrRfs8AGQfpmCDhU3Bp','references':{'mobile':'../../design/mobile/screens','mobileOverview':'../../design/mobile/mobile-mockups.png','sidebarSpacing':'../../design/sidebar-spacing/sidebar-comparison.svg','pendingSidebarEdit':'../../design/compact-desktop-sidebar.figma.js'},'files':[]}
 for p in sorted(DEST.rglob('*')):
     if p.is_file() and p.name!='manifest.json':
         manifest['files'].append({'path':str(p.relative_to(DEST)),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()})

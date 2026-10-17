@@ -16,7 +16,7 @@ Initial implemented contract, separate from snapshot update-protocol v1 and draf
 | `annotation.save` | optional existing `id`, `start_ref`, `end_ref`, `kind` (`note`/`highlight`), optional `color`, `content`; UUID on create, inclusive range |
 | `annotation.delete` | existing annotation `id`; durable local deletion |
 | `reference.favorite` | `ref_id`, `enabled: boolean`; idempotently add/remove favorite |
-| `preferences.set` | complete `preferences` object: `text_size`, `line_spacing`, `verse_numbers`, `scripture_serif` |
+| `preferences.set` | complete `preferences` object: `text_size`, `line_spacing`, `verse_numbers`, `scripture_serif`, optional `theme` (default `sea_glass`) |
 
 Workspace `passage` entries now include additive `word_links` (default empty when reading older serialized models). Each link has `start`/`end` Unicode scalar offsets against that entry’s exact `text`, `surface`, `witness`, `strongs` and source/reviewed `method`. Codes come only from explicit existing alignment records, with canonical source-token compatibility and valid spans; they are not inferred. SQL/schema and command IDs are unchanged. The current released KJV/WEB corpus supplies no English links. UI lookup/panel support is not evidence of a completed aligned corpus.
 
@@ -61,3 +61,9 @@ The client chooses which user database to expose. Tools can read private notes a
 `passage.strongs_links` is additive (default empty when deserializing older replies). Each item contains exact Unicode-scalar `start`/`end`, a Strong’s code and `source_snapshot_id`. This is a dictionary association, without a claimed original-token identity, surface, lemma or morphology. `word_links` retains its distinct source/reviewed original-token alignment meaning. The context menu can use both to open dictionary definitions; an original-language surface is promoted only from a known token alignment or chosen source word, otherwise the dictionary headword is labeled as such.
 
 Optional stored metadata uses the new [verse Strong’s tags v1 schema](verse-strongs-v1.schema.json) inside existing `verse_texts.display_json.source_strongs`; published SQL is unchanged. The engine checks the exact edition/verse ID, SHA-256 of UTF-8 verse text, valid non-overlapping scalar offsets, source snapshot existence and installed dictionary codes. Corrupt metadata fails closed. The pinned GPL KJV source is owner-approved and enabled in the ten-source Study build. One reviewed text mismatch (1 John 2:23) is withheld; WEB receives no KJV tags. Eight- and nine-source complete Study profiles remain accepted explicitly. Source code/credits and full license accompany builds; existing installations need both a compatible client and the updated published Study library.
+
+## Selectable reading themes
+
+`preferences.set` retains its command ID and adds optional `preferences.theme`: `sea_glass`, `ink_saffron`, `charcoal_raspberry`, `cobalt_citron`, `terracotta_linen`, `aubergine_apricot`, or `midnight_mint`. Omission defaults to Sea glass; unknown values are rejected. The generated catalog is authoritative. The same field is included in workspace preferences and saved in the existing app-session JSON. No published content/user SQL changes. Legacy sessions without this field load with Sea glass; older binaries may reject sessions saved with the new field because session decoding is strict. Notes/highlights are independent of this presentation preference.
+
+New app sessions default to 24px Scripture at 1.63 line spacing (D038). Existing explicitly serialized typography values are preserved; this does not rewrite saved preferences or change the accepted 16–36 / 1.2–2.2 ranges.

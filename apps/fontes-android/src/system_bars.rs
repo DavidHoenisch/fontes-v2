@@ -20,7 +20,7 @@ pub(super) struct Sample {
 pub(super) struct SystemBars {
     sample: Arc<Mutex<Option<Sample>>>,
     pending: Arc<AtomicBool>,
-    styled: Arc<AtomicBool>,
+    styled: Arc<Mutex<Option<(bool, [u8; 4])>>>,
     last_poll: Option<Instant>,
 }
 
@@ -36,11 +36,12 @@ impl SystemBars {
             let sample = self.sample.clone();
             let pending = self.pending.clone();
             let styled = self.styled.clone();
+            let appearance = fontes_ui_egui::system_bar_appearance(ctx);
             let wake = ctx.clone();
             app.run_on_java_main_thread(Box::new(move || {
-                if !styled.load(Ordering::Acquire) {
-                    match style_light_bars(&activity) {
-                        Ok(()) => styled.store(true, Ordering::Release),
+                if *styled.lock().unwrap() != Some(appearance) {
+                    match style_bars(&activity, appearance) {
+                        Ok(()) => *styled.lock().unwrap() = Some(appearance),
                         Err(error) => log::debug!("System-bar appearance unavailable: {error}"),
                     }
                 }
@@ -56,9 +57,12 @@ impl SystemBars {
     }
 }
 
-/// Match OS-owned foregrounds to the paper background. Preserve unrelated flags
+/// Match OS-owned foregrounds to the selected theme. Preserve unrelated flags
 /// on API 28–29; API 30+ uses the dedicated appearance mask.
-fn style_light_bars(app: &AndroidApp) -> jni::errors::Result<()> {
+fn style_bars(
+    app: &AndroidApp,
+    (light_background, color): (bool, [u8; 4]),
+) -> jni::errors::Result<()> {
     let vm = unsafe { jni::JavaVM::from_raw(app.vm_as_ptr().cast()) };
     vm.attach_current_thread(|env| -> jni::errors::Result<_> {
         let raw = app.activity_as_ptr() as jni::sys::jobject;
@@ -103,7 +107,10 @@ fn style_light_bars(app: &AndroidApp) -> jni::errors::Result<()> {
                 &controller,
                 jni_str!("setSystemBarsAppearance"),
                 jni_sig!((jint, jint)),
-                &[JValue::Int(mask), JValue::Int(mask)],
+                &[
+                    JValue::Int(if light_background { mask } else { 0 }),
+                    JValue::Int(mask),
+                ],
             )?;
         } else {
             let flags = env
@@ -119,12 +126,16 @@ fn style_light_bars(app: &AndroidApp) -> jni::errors::Result<()> {
                 &decor,
                 jni_str!("setSystemUiVisibility"),
                 jni_sig!((jint)),
-                &[JValue::Int(flags | 0x2000 | 0x10)],
+                &[JValue::Int(if light_background {
+                    flags | 0x2000 | 0x10
+                } else {
+                    flags & !(0x2000 | 0x10)
+                })],
             )?;
         }
         if sdk < 35 {
             // Target-35 edge-to-edge bars use the shared app clear color on newer Android.
-            let [r, g, b, a] = fontes_ui_egui::BACKGROUND_COLOR;
+            let [r, g, b, a] = color;
             let argb = u32::from_be_bytes([a, r, g, b]) as i32;
             for method in [
                 jni_str!("setStatusBarColor"),

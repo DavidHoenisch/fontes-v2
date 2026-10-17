@@ -32,15 +32,24 @@ fn first_run_offers_path_free_setup_with_reachable_actions() {
 
 fn wait(harness: &mut Harness<'_, FontesApp>) {
     let start = Instant::now();
-    while harness.state().pending > 0 {
+    let mut idle = 0;
+    loop {
         assert!(
             start.elapsed() < Duration::from_secs(15),
             "Engine worker did not finish"
         );
-        std::thread::sleep(Duration::from_millis(10));
         harness.step();
+        if harness.state().pending == 0 {
+            idle += 1;
+        } else {
+            idle = 0;
+        }
+        // A newly opened sheet can enqueue a preview after its clean capture frame.
+        if idle >= 4 {
+            break;
+        }
+        std::thread::sleep(Duration::from_millis(10));
     }
-    harness.run();
 }
 
 #[test]
@@ -154,6 +163,10 @@ fn real_library_safe_areas() {
         h.get_by_label("Reading preferences").click();
         h.run_ok();
         assert!(safe.contains_rect(h.get_by_label("Done").rect()));
+        h.get_by_label("Theme & typography").scroll_to_me();
+        h.run_ok();
+        h.get_by_label("Theme & typography").click();
+        h.run_ok();
         h.get_by_label("Library settings").scroll_to_me();
         h.run_ok();
         assert!(safe.contains_rect(h.get_by_label("Library settings").rect()));
@@ -237,6 +250,12 @@ fn real_library_desktop_and_mobile() {
                 .unwrap()
                 .save(out.join(format!("{name}-reading-style.png")))
                 .unwrap();
+            h.get_by_label("Theme & typography").scroll_to_me();
+            h.run_ok();
+            h.get_by_label("Theme & typography").click();
+            h.run_ok();
+            h.get_by_label("IBM Plex Sans").scroll_to_me();
+            h.run_ok();
             h.get_by_label("IBM Plex Sans").click();
             h.run_ok();
             wait(&mut h);
@@ -249,6 +268,8 @@ fn real_library_desktop_and_mobile() {
                     .preferences
                     .scripture_serif
             );
+            h.get_by_label("Lora").scroll_to_me();
+            h.run_ok();
             h.get_by_label("Lora").click();
             h.run_ok();
             wait(&mut h);
@@ -354,6 +375,7 @@ fn real_library_desktop_and_mobile() {
                         assert!(rect.left() >= 0.0 && rect.right() <= size[0]);
                         assert!(rect.top() >= 0.0 && rect.bottom() <= size[1]);
                     }
+                    wait(&mut h);
                     h.get_by_label(lookup_title).scroll_to_me();
                     h.run_ok();
                     h.render()
@@ -634,6 +656,8 @@ fn real_library_desktop_and_mobile() {
                 .unwrap()
                 .save(out.join(format!("{name}-hebrew-word-heading.png")))
                 .unwrap();
+            h.get_by_label("← Words in this verse").scroll_to_me();
+            h.run_ok();
             h.get_by_label("← Words in this verse").click();
             h.run_ok();
         }
@@ -970,6 +994,8 @@ fn real_library_ot_word_lookup() {
                 .unwrap()
                 .save(out.join(format!("{name}-{capture}-hebrew-lookup.png")))
                 .unwrap();
+            h.get_by_label("← Words in this verse").scroll_to_me();
+            h.run_ok();
             h.get_by_label("← Words in this verse").click();
             h.run_ok();
         }
@@ -1084,6 +1110,484 @@ fn real_library_kjv_source_word_lookup() {
                 .iter()
                 .all(|v| v.strongs_links.is_empty()),
             "KJV tags must never transfer to WEB"
+        );
+    }
+}
+
+#[test]
+fn theme_picker_reaches_every_palette_at_narrow_and_wide_sizes() {
+    struct Picker {
+        selected: ReadingTheme,
+    }
+    impl eframe::App for Picker {
+        fn ui(&mut self, ui: &mut egui::Ui, _: &mut eframe::Frame) {
+            theme::apply(ui.ctx(), self.selected);
+            ui.set_style(ui.ctx().global_style());
+            egui::ScrollArea::vertical()
+                .show(ui, |ui| preferences::theme_choices(ui, &mut self.selected));
+        }
+    }
+    for size in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
+        let mut h = Harness::builder().with_size(size).build_eframe(|cc| {
+            theme::install(&cc.egui_ctx);
+            Picker {
+                selected: ReadingTheme::default(),
+            }
+        });
+        for key in ReadingTheme::ALL {
+            let p = theme::Palette::for_theme(key);
+            h.get_by_label(p.name).scroll_to_me();
+            h.run_ok();
+            let rect = h.get_by_label(p.name).rect();
+            assert!(rect.height() >= 44.0 && rect.left() >= 0.0 && rect.right() <= size[0]);
+            h.get_by_label(p.name).click();
+            h.run_ok();
+            assert_eq!(h.state().selected, key);
+        }
+    }
+}
+
+#[test]
+fn theme_colors_are_context_local_and_keep_text_readable() {
+    fn luminance(c: egui::Color32) -> f32 {
+        let linear = |v: u8| {
+            let x = f32::from(v) / 255.0;
+            if x <= 0.04045 {
+                x / 12.92
+            } else {
+                ((x + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * linear(c.r()) + 0.7152 * linear(c.g()) + 0.0722 * linear(c.b())
+    }
+    fn ratio(a: egui::Color32, b: egui::Color32) -> f32 {
+        let a = luminance(a);
+        let b = luminance(b);
+        (a.max(b) + 0.05) / (a.min(b) + 0.05)
+    }
+    let a = egui::Context::default();
+    let b = egui::Context::default();
+    for key in ReadingTheme::ALL {
+        theme::apply(&a, key);
+        theme::apply(&b, ReadingTheme::SeaGlass);
+        let p = theme::palette(&a);
+        assert_eq!(p.key, key);
+        assert_eq!(theme::palette(&b).key, ReadingTheme::SeaGlass);
+        for background in [p.page, p.chrome, p.surface, p.tint, p.selection]
+            .into_iter()
+            .chain(p.highlights)
+        {
+            assert!(
+                ratio(p.ink, background) >= 4.5,
+                "{} has unreadable body/highlight text",
+                p.name
+            );
+        }
+        for background in [p.page, p.chrome, p.surface, p.tint, p.selection] {
+            assert!(
+                ratio(p.muted, background) >= 4.5,
+                "{} secondary text",
+                p.name
+            );
+        }
+        assert!(
+            ratio(p.on_accent, p.accent) >= 4.5,
+            "{} action text",
+            p.name
+        );
+        assert!(
+            ratio(p.on_feature, p.feature) >= 4.5
+                && ratio(p.on_feature, p.feature.lerp_to_gamma(p.feature_light, 0.60)) >= 4.5
+                && ratio(p.on_accent, p.accent.lerp_to_gamma(p.action_light, 0.65)) >= 4.5,
+            "{} feature text",
+            p.name
+        );
+        assert_eq!(a.global_style().visuals.dark_mode, p.dark);
+        assert_eq!(a.global_style().visuals.panel_fill, p.page);
+        assert_eq!(a.global_style().visuals.window_fill, p.surface);
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY and a working wgpu adapter"]
+fn real_library_selectable_themes() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let out = PathBuf::from(std::env::var("FONTES_CAPTURE_DIR").unwrap());
+    std::fs::create_dir_all(&out).unwrap();
+    let dir = tempfile::tempdir().unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+    wait(&mut h);
+    h.state_mut().dispatch(Command::Navigate {
+        reference: "Proverbs 16:1".into(),
+    });
+    wait(&mut h);
+    for key in ReadingTheme::ALL {
+        h.state_mut().choose(Destination::Read);
+        h.run_ok();
+        h.get_by_label("Reading preferences").click();
+        h.run_ok();
+        if !h.state().reading_advanced {
+            h.get_by_label("Theme & typography").scroll_to_me();
+            h.run_ok();
+            h.get_by_label("Theme & typography").click();
+            h.run_ok();
+        }
+        let palette = theme::Palette::for_theme(key);
+        h.get_by_label(palette.name).scroll_to_me();
+        h.run_ok();
+        h.get_by_label(palette.name).click();
+        h.run_ok();
+        wait(&mut h);
+        assert_eq!(
+            h.state().state.as_ref().unwrap().session.preferences.theme,
+            key
+        );
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{}-settings.png", key.id())))
+            .unwrap();
+        h.get_by_label("Done").click();
+        h.run_ok();
+        h.get_by_label("Proverbs 16").scroll_to_me();
+        h.run_ok();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{}-reading.png", key.id())))
+            .unwrap();
+        h.state_mut().open_study(20016001, StudyTab::Words);
+        wait(&mut h);
+        h.state_mut().dispatch(Command::Word {
+            code: "H3068".into(),
+        });
+        wait(&mut h);
+        let headword = match h.state().word.as_ref().unwrap() {
+            Data::Word { headwords, .. } => headwords[0].text.clone(),
+            _ => panic!(),
+        };
+        h.get_by_label(&headword).scroll_to_me();
+        h.run_ok();
+        assert!(h.get_by_label(&headword).rect().height() >= 40.0);
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{}-study.png", key.id())))
+            .unwrap();
+    }
+    drop(h);
+    let mut restored = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library), dir.path().to_owned()));
+    wait(&mut restored);
+    assert_eq!(
+        restored
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .session
+            .preferences
+            .theme,
+        ReadingTheme::MidnightMint
+    );
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY and a working wgpu adapter"]
+fn real_library_reference_fidelity() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let out = PathBuf::from(std::env::var("FONTES_CAPTURE_DIR").unwrap());
+    std::fs::create_dir_all(&out).unwrap();
+    // The HTML reference uses a 340×772 device, including 43px of simulated OS chrome.
+    for (name, size) in [("reference", [340.0, 729.0]), ("phone", [390.0, 844.0])] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.state_mut().dispatch(Command::Navigate {
+            reference: "Proverbs 16:1".into(),
+        });
+        wait(&mut h);
+        let mut prefs = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .session
+            .preferences
+            .clone();
+        prefs.theme = ReadingTheme::TerracottaLinen;
+        h.state_mut()
+            .dispatch(Command::Preferences { preferences: prefs });
+        wait(&mut h);
+        h.get_by_label("Proverbs 16").scroll_to_me();
+        h.run_ok();
+        h.input_mut().events.push(egui::Event::PointerGone);
+        h.run_ok();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{name}-reading.png")))
+            .unwrap();
+        let clean_frame = h.render().unwrap();
+        let clean_image = std::sync::Arc::new(egui::ColorImage::from_rgba_unmultiplied(
+            [clean_frame.width() as usize, clean_frame.height() as usize],
+            clean_frame.as_raw(),
+        ));
+        h.get_by_label("Reading preferences").click();
+        h.run_ok();
+        let stamp = h.state().backdrop.stamp;
+        h.input_mut().events.push(egui::Event::Screenshot {
+            viewport_id: egui::ViewportId::ROOT,
+            user_data: egui::UserData::new(backdrop::Capture(stamp)),
+            image: clean_image.clone(),
+        });
+        h.run_ok();
+        let start = Instant::now();
+        while !h.state().backdrop.ready() {
+            assert!(start.elapsed() < Duration::from_secs(5));
+            std::thread::sleep(Duration::from_millis(10));
+            h.step();
+        }
+        h.run_ok();
+        assert!(h.get_by_label("Done").rect().bottom() <= size[1]);
+        assert!(
+            h.query_by_label("Color theme").is_none(),
+            "Theme details start collapsed"
+        );
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{name}-preferences.png")))
+            .unwrap();
+        h.get_by_label("Done").click();
+        h.run_ok();
+        h.input_mut().events.push(egui::Event::Screenshot {
+            viewport_id: egui::ViewportId::ROOT,
+            user_data: egui::UserData::new(backdrop::Capture(stamp)),
+            image: clean_image.clone(),
+        });
+        h.step();
+        assert!(
+            !h.state().backdrop.ready(),
+            "Closing releases the blur and ignores late readback"
+        );
+        h.state_mut().dispatch(Command::Word { code: "G25".into() });
+        wait(&mut h);
+        let prior_word = serde_json::to_value(&h.state().word).unwrap();
+        let verse = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .passage
+            .iter()
+            .find(|v| v.refs.contains(&20016001))
+            .unwrap()
+            .clone();
+        let span = verse
+            .strongs_links
+            .iter()
+            .find(|l| l.strongs == "H3068")
+            .unwrap();
+        let text_rect = h.get_by_value(&verse.text).rect();
+        let p = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .session
+            .preferences
+            .clone();
+        let ctx = &h.ctx;
+        let mut job = egui::text::LayoutJob::simple(
+            verse.text.clone(),
+            egui::FontId::new(p.text_size, egui::FontFamily::Name("scripture".into())),
+            theme::palette(ctx).ink,
+            text_rect.width(),
+        );
+        job.sections[0].format.line_height = Some(p.text_size * p.line_spacing);
+        job.sections[0].format.extra_letter_spacing = -0.25;
+        let galley = ctx.fonts_mut(|f| f.layout_job(job));
+        let cursor = galley.pos_from_cursor(egui::text::CCursor::new(span.start));
+        let point = text_rect.min + cursor.center().to_vec2() + egui::vec2(4.0, 0.0);
+        h.input_mut().events.extend([
+            egui::Event::PointerMoved(point),
+            egui::Event::PointerButton {
+                pos: point,
+                button: egui::PointerButton::Primary,
+                pressed: true,
+                modifiers: Default::default(),
+            },
+        ]);
+        h.step();
+        h.input_mut().events.push(egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: false,
+            modifiers: Default::default(),
+        });
+        h.step();
+        wait(&mut h);
+        let stamp = h.state().backdrop.stamp;
+        h.input_mut().events.push(egui::Event::Screenshot {
+            viewport_id: egui::ViewportId::ROOT,
+            user_data: egui::UserData::new(backdrop::Capture(stamp)),
+            image: clean_image.clone(),
+        });
+        h.run_ok();
+        let start = Instant::now();
+        while !h.state().backdrop.ready() {
+            assert!(start.elapsed() < Duration::from_secs(5));
+            std::thread::sleep(Duration::from_millis(10));
+            h.step();
+        }
+        h.run_ok();
+        assert!(
+            h.state().verse_actions.is_some(),
+            "A tap on a verified KJV word opens its action sheet"
+        );
+        assert_eq!(h.state().selected_text.as_ref().unwrap().text, "LORD");
+        assert!(!h.state().word_previews["H3068"].is_empty());
+        assert_eq!(
+            serde_json::to_value(&h.state().word).unwrap(),
+            prior_word,
+            "Preview must not replace a study result"
+        );
+        for title in [
+            "Copy selection",
+            "Study this verse",
+            "Add note",
+            "Highlight verse · amber",
+            "Copy verse",
+        ] {
+            let rect = h.get_by_label(title).rect();
+            assert!(
+                rect.top() >= 0.0 && rect.bottom() <= size[1],
+                "{title} stays visible at reference size: {rect:?}"
+            );
+        }
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{name}-actions.png")))
+            .unwrap();
+        h.get_by_label("Look up Strong’s H3068").click();
+        h.run_ok();
+        wait(&mut h);
+        assert!(matches!(&h.state().word,Some(Data::Word{code,..})if code=="H3068"));
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{name}-word-study.png")))
+            .unwrap();
+        for tab in ["Commentary", "Cross-references", "Topics"] {
+            h.get_by_label(tab).click();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join(format!("{name}-{}.png", tab.to_lowercase())))
+                .unwrap();
+        }
+        h.state_mut().choose(Destination::Search);
+        h.run_ok();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("{name}-search.png")))
+            .unwrap();
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_search_controls() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    for size in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.get_by_label("Search").click();
+        h.run_ok();
+        let input = h.get_by_role(egui::accesskit::Role::TextInput);
+        assert!(
+            input.rect().right() <= size[0],
+            "Search input outside viewport: {:?}",
+            input.rect()
+        );
+        input.focus();
+        input.type_text("   ");
+        h.run_ok();
+        h.key_press(egui::Key::Enter);
+        wait(&mut h);
+        assert!(
+            h.state().error.is_none(),
+            "Empty search must not dispatch an engine error"
+        );
+        assert!(h.state().hits.is_empty());
+        let input = h.get_by_role(egui::accesskit::Role::TextInput);
+        input.focus();
+        input.type_text("forgiveness");
+        h.run_ok();
+        h.key_press(egui::Key::Enter);
+        wait(&mut h);
+        assert!(h.state().error.is_none(), "{:?}", h.state().error);
+        assert!(
+            !h.state().hits.is_empty(),
+            "Enter did not return results at {size:?}"
+        );
+        if h.state().search_more {
+            h.get_by_label("Next").click();
+            wait(&mut h);
+            assert_eq!(h.state().search_offset, 10);
+            h.get_by_label("Previous").click();
+            wait(&mut h);
+            assert_eq!(h.state().search_offset, 0);
+        }
+        if size == [390.0, 844.0] {
+            let out = PathBuf::from("../../dist/reference-fidelity/search-grouped.png");
+            std::fs::create_dir_all(out.parent().unwrap()).unwrap();
+            h.render().unwrap().save(out).unwrap();
+        }
+        let first = h
+            .state()
+            .hits
+            .iter()
+            .find(|hit| hit.ref_id.is_some())
+            .unwrap()
+            .clone();
+        assert!(h.state().hits.len() <= 10);
+        let group = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .books
+            .iter()
+            .find(|book| book.id as i64 == first.ref_id.unwrap() / 1_000_000)
+            .unwrap()
+            .name
+            .clone();
+        let count = h
+            .state()
+            .hits
+            .iter()
+            .filter(|hit| {
+                hit.ref_id
+                    .is_some_and(|id| id / 1_000_000 == first.ref_id.unwrap() / 1_000_000)
+            })
+            .count();
+        let heading = format!("{group} · {count}");
+        h.get_by_label(&heading).scroll_to_me();
+        h.run_ok();
+        h.get_by_label(&heading).click();
+        h.run_ok();
+        h.get_by_label(&first.title).scroll_to_me();
+        h.run_ok();
+        h.get_by_label(&first.title).click();
+        wait(&mut h);
+        assert!(h.state().destination == Destination::Read);
+        assert_eq!(
+            h.state().state.as_ref().unwrap().session.selected_ref,
+            first.ref_id.unwrap()
         );
     }
 }
