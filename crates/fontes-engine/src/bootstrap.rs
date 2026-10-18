@@ -41,14 +41,14 @@ impl Profile {
         }
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Progress {
     pub message: String,
     pub completed: u64,
     pub total: Option<u64>,
     pub offer: Option<Offer>,
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct Offer {
     pub download_bytes: u64,
     pub installed_bytes: u64,
@@ -213,17 +213,23 @@ fn artifact(m: &ReleaseManifest, profile: Profile) -> Result<&ProfileArtifact> {
         .context("This release does not contain the selected library.")
 }
 fn parse_receipt(data_dir: &Path) -> Result<(Receipt, ReleaseManifest, PathBuf)> {
+    let trust: Trust = serde_json::from_str(TRUST)?;
+    parse_receipt_with(data_dir, &trust)
+}
+fn parse_receipt_with(
+    data_dir: &Path,
+    trust: &Trust,
+) -> Result<(Receipt, ReleaseManifest, PathBuf)> {
     let receipt: Receipt =
         serde_json::from_slice(&read_limited(&receipt_path(data_dir), 150_000)?)?;
     ensure!(
         receipt.format_version == 1,
         "Unsupported local setup receipt."
     );
-    let trust: Trust = serde_json::from_str(TRUST)?;
     let manifest = verify(
         receipt.manifest.as_bytes(),
         &hex::decode(&receipt.signature_hex)?,
-        &trust,
+        trust,
     )?;
     let p = artifact(&manifest, receipt.profile)?;
     let nonce = receipt
@@ -562,6 +568,115 @@ async fn discover(
         "No compatible, verified library release is available. Check your connection or update Fontes, then retry."
     )
 }
+/// Verified metadata only: checking never downloads the database or changes active content.
+#[derive(Clone, Debug, Serialize)]
+pub struct UpdateInfo {
+    pub installed_sequence: Option<u64>,
+    pub available_sequence: u64,
+    pub update_available: bool,
+    pub download_bytes: u64,
+    pub installed_bytes: u64,
+    pub temporary_bytes: u64,
+    pub manifest_sha256: String,
+    pub release_url: String,
+}
+fn check_high_water(data_dir: &Path, verified: &Verified) -> Result<()> {
+    let water_path = root(data_dir).join("high-water.json");
+    if water_path.exists() {
+        let previous: HighWater = serde_json::from_slice(&read_limited(&water_path, 4096)?)?;
+        ensure!(
+            previous.format_version == 1
+                && previous.repository == REPOSITORY
+                && previous.channel == Channel::Stable
+                && previous.schema == 1
+                && previous.protocol == 1
+                && verified.manifest.sequence >= previous.sequence,
+            "The server offered an older library release. Please retry later."
+        );
+        ensure!(
+            verified.manifest.sequence != previous.sequence
+                || previous.manifest_sha256 == hash(&verified.bytes),
+            "This release changed after it was published."
+        );
+    }
+    Ok(())
+}
+async fn check_with(
+    data_dir: &Path,
+    profile: Profile,
+    cancel: &AtomicBool,
+    transport: &impl Transport,
+    trust: &Trust,
+) -> Result<UpdateInfo> {
+    let verified = discover(transport, trust, cancel).await?;
+    check_high_water(data_dir, &verified)?;
+    let p = artifact(&verified.manifest, profile)?;
+    let installed = if receipt_path(data_dir).exists() {
+        Some(parse_receipt_with(data_dir, trust)?)
+    } else {
+        None
+    };
+    if let Some((_, manifest, _)) = &installed {
+        ensure!(
+            verified.manifest.sequence >= manifest.sequence,
+            "The server offered an older library release. Please retry later."
+        );
+    }
+    let current = installed.as_ref().map(|(r, m, _)| (r, m));
+    let same_content = current.is_some_and(|(r, m)| {
+        artifact(m, r.profile).is_ok_and(|old| old.sqlite_sha256 == p.sqlite_sha256)
+    });
+    Ok(UpdateInfo {
+        installed_sequence: current.map(|(_, m)| m.sequence),
+        available_sequence: verified.manifest.sequence,
+        update_available: !same_content,
+        download_bytes: p.compressed_bytes,
+        installed_bytes: p.sqlite_bytes,
+        temporary_bytes: p.compressed_bytes + p.sqlite_bytes + 32 * 1024 * 1024,
+        manifest_sha256: hash(&verified.bytes),
+        release_url: format!(
+            "https://github.com/{REPOSITORY}/releases/tag/{}",
+            verified.manifest.release_tag
+        ),
+    })
+}
+pub fn check_update(data_dir: &Path, cancel: &AtomicBool) -> Result<UpdateInfo> {
+    let http = Http::new()?;
+    let trust: Trust = serde_json::from_str(TRUST)?;
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(check_with(
+            data_dir,
+            Profile::default(),
+            cancel,
+            &http,
+            &trust,
+        ))
+}
+/// Install only the exact signed release whose size the user reviewed.
+pub fn install_update(
+    data_dir: &Path,
+    manifest_sha256: &str,
+    cancel: &AtomicBool,
+    progress: impl Fn(Progress),
+) -> Result<PathBuf> {
+    let http = Http::new()?;
+    let trust: Trust = serde_json::from_str(TRUST)?;
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(install_with_expected(
+            data_dir,
+            Profile::default(),
+            cancel,
+            None,
+            &progress,
+            &http,
+            &trust,
+            Some(manifest_sha256),
+        ))
+}
 /// Same setup service used by the GUI and headless CLI. Downloads only on request.
 pub fn install(
     data_dir: &Path,
@@ -597,6 +712,22 @@ async fn install_with(
     transport: &impl Transport,
     trust: &Trust,
 ) -> Result<PathBuf> {
+    install_with_expected(
+        data_dir, profile, cancel, approval, progress, transport, trust, None,
+    )
+    .await
+}
+#[allow(clippy::too_many_arguments)]
+async fn install_with_expected(
+    data_dir: &Path,
+    profile: Profile,
+    cancel: &AtomicBool,
+    approval: Option<&AtomicBool>,
+    progress: &impl Fn(Progress),
+    transport: &impl Transport,
+    trust: &Trust,
+    expected_manifest: Option<&str>,
+) -> Result<PathBuf> {
     check_cancel(cancel)?;
     let root = root(data_dir);
     fs::create_dir_all(root.join("generations"))?;
@@ -620,24 +751,14 @@ async fn install_with(
     let verified = discover(transport, trust, cancel).await?;
     let manifest = &verified.manifest;
     let p = artifact(manifest, profile)?;
-    let water_path = root.join("high-water.json");
-    if water_path.exists() {
-        let previous: HighWater = serde_json::from_slice(&read_limited(&water_path, 4096)?)?;
+    check_high_water(data_dir, &verified)?;
+    if let Some(expected) = expected_manifest {
         ensure!(
-            previous.format_version == 1
-                && previous.repository == REPOSITORY
-                && previous.channel == Channel::Stable
-                && previous.schema == 1
-                && previous.protocol == 1
-                && manifest.sequence >= previous.sequence,
-            "The server offered an older library release. Please retry later."
-        );
-        ensure!(
-            manifest.sequence != previous.sequence
-                || previous.manifest_sha256 == hash(&verified.bytes),
-            "This release changed after it was published."
+            hash(&verified.bytes) == expected,
+            "A newer release is available. Check for updates again before downloading."
         );
     }
+    let water_path = root.join("high-water.json");
     atomic_write(
         &water_path,
         &serde_json::to_vec(&HighWater {
@@ -759,7 +880,7 @@ async fn install_with(
         profile,
         generation,
     };
-    if let Ok((old_receipt, old_manifest, old_path)) = parse_receipt(data_dir) {
+    if let Ok((old_receipt, old_manifest, old_path)) = parse_receipt_with(data_dir, trust) {
         let previous = artifact(&old_manifest, old_receipt.profile)?;
         if verify_file(
             &old_path,

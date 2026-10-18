@@ -447,3 +447,145 @@ fn unsigned_higher_tag_does_not_override_verified_release() {
             .is_ok()
     );
 }
+
+fn check_fixture(f: &Fixture, dir: &Path) -> Result<UpdateInfo> {
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(check_with(
+            dir,
+            Profile::Reading,
+            &AtomicBool::new(false),
+            &f.transport,
+            &f.trust,
+        ))
+}
+fn advance_fixture(f: &mut Fixture) {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().join("new.sqlite");
+    fs::write(
+        &path,
+        zstd::stream::decode_all(sample().0.as_slice()).unwrap(),
+    )
+    .unwrap();
+    let db = rusqlite::Connection::open(&path).unwrap();
+    db.execute(
+        "UPDATE verse_texts SET text='Updated source text.' WHERE id='kjv16'",
+        [],
+    )
+    .unwrap();
+    drop(db);
+    let sqlite = fs::read(path).unwrap();
+    let compressed = zstd::stream::encode_all(sqlite.as_slice(), 1).unwrap();
+    f.manifest.sequence += 1;
+    let p = &mut f.manifest.profiles[0];
+    p.sqlite_bytes = sqlite.len() as u64;
+    p.sqlite_sha256 = hash(&sqlite);
+    p.compressed_bytes = compressed.len() as u64;
+    p.compressed_sha256 = hash(&compressed);
+    f.publish();
+    f.transport
+        .0
+        .lock()
+        .unwrap()
+        .insert(f.manifest.asset_url("reading").unwrap(), compressed);
+}
+#[test]
+fn update_check_is_metadata_only_and_pinned_update_preserves_user_data() {
+    let mut f = Fixture::new();
+    let dir = tempfile::tempdir().unwrap();
+    let cancel = AtomicBool::new(false);
+    let old = f.install(dir.path(), &cancel, |_| {}).unwrap();
+    let user = dir.path().join("user.sqlite");
+    let mut engine = Engine::open(&old, &user).unwrap();
+    engine
+        .dispatch(crate::Command::SaveAnnotation {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            kind: crate::AnnotationKind::Note,
+            color: None,
+            content: Some("My private note".into()),
+        })
+        .unwrap();
+    engine
+        .dispatch(crate::Command::SaveAnnotation {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            kind: crate::AnnotationKind::Highlight,
+            color: Some("amber".into()),
+            content: None,
+        })
+        .unwrap();
+    drop(engine);
+    let notes = fs::read(&user).unwrap();
+    let active = fs::read(receipt_path(dir.path())).unwrap();
+    assert!(!check_fixture(&f, dir.path()).unwrap().update_available);
+    advance_fixture(&mut f);
+    f.transport.1.lock().unwrap().clear();
+    let offer = check_fixture(&f, dir.path()).unwrap();
+    assert!(offer.update_available);
+    assert_eq!(offer.installed_sequence, Some(4));
+    assert_eq!(offer.available_sequence, 5);
+    assert!(
+        !f.transport
+            .1
+            .lock()
+            .unwrap()
+            .contains(&f.manifest.asset_url("reading").unwrap())
+    );
+    assert_eq!(fs::read(receipt_path(dir.path())).unwrap(), active);
+    let runtime = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    // A stale reviewed offer is refused before any artifact transfer.
+    assert!(
+        runtime
+            .block_on(install_with_expected(
+                dir.path(),
+                Profile::Reading,
+                &cancel,
+                None,
+                &|_| {},
+                &f.transport,
+                &f.trust,
+                Some(&"0".repeat(64))
+            ))
+            .is_err()
+    );
+    assert_eq!(fs::read(receipt_path(dir.path())).unwrap(), active);
+    let new = runtime
+        .block_on(install_with_expected(
+            dir.path(),
+            Profile::Reading,
+            &cancel,
+            None,
+            &|_| {},
+            &f.transport,
+            &f.trust,
+            Some(&offer.manifest_sha256),
+        ))
+        .unwrap();
+    assert_ne!(old, new);
+    assert!(old.is_file());
+    assert_eq!(
+        fs::read(root(dir.path()).join("previous.json")).unwrap(),
+        active
+    );
+    assert_eq!(fs::read(&user).unwrap(), notes);
+    assert_eq!(
+        Engine::open(&new, &user)
+            .unwrap()
+            .workspace()
+            .unwrap()
+            .annotations
+            .len(),
+        2
+    );
+    assert!(!check_fixture(&f, dir.path()).unwrap().update_available);
+    f.manifest.sequence = 4;
+    f.publish();
+    assert!(check_fixture(&f, dir.path()).is_err());
+}

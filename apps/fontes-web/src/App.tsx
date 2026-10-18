@@ -1,3 +1,4 @@
+import { ResourceUpdates } from "./components/ResourceUpdates";
 import { spotlightVerse } from "./verseArrival";
 import { LibraryResourceCard, resourceIdentity } from "./components/LibraryResourceCard";
 import { ResourceCitations, type Citation } from "./components/ResourceCitations";
@@ -253,7 +254,7 @@ export default function App({ live }: { live?: Live }) {
       void run("library.catalog", { source_id: null, offset: 0 })
         .then((r) => setCatalog(r.data.sources as typeof catalog))
         .catch((e) => showNotice(String(e)));
-  }, [page]);
+  }, [page, live?.state.content_id]);
   async function searchLibrary(offset = 0) {
     try {
       const r = await run("search.query", { query, limit: 30, offset });
@@ -1884,6 +1885,7 @@ export default function App({ live }: { live?: Live }) {
                         ? "Introductions to the books of the Bible."
                         : "Bibles and study resources, each in its own place."}
                   </p>
+                  {!libraryResource && !parentSource && <ResourceUpdates reload={live?.reload} />}
                   <Input
                     fullWidth
                     aria-label={

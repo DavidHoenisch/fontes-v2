@@ -82,6 +82,7 @@ export type Live = {
   send: (command: Command) => Promise<Response>;
   error: string;
   busy: boolean;
+  reload?: () => Promise<void>;
 };
 export function label(w: Workspace, ref: number) {
   return `${w.books.find((b) => b.id === Math.floor(ref / 1000000))?.name || ""} ${Math.floor((ref % 1000000) / 1000)}:${ref % 1000}`;
@@ -221,7 +222,12 @@ export function NativeApp() {
       setBusy(false);
     }
   }
-  if (state) return <App live={{ state, send, error, busy }} />;
+  async function reload() {
+    const r = await invoke<Response>("library_open");
+    setState(r.state);
+    setError("");
+  }
+  if (state) return <App live={{ state, send, error, busy, reload }} />;
   // A normal cold start never renders the installer or database-loading copy.
   if (phase === "checking")
     return <main className="native-startup" aria-hidden="true" />;

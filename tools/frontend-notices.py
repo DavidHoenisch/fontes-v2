@@ -17,4 +17,4 @@ for path in sorted((root / 'assets/ui/licenses').glob('*.txt')):
     notices.append(f"\n{'='*72}\n{path.name}\n{path.read_text()}\n")
 output = app / 'public/THIRD_PARTY_NOTICES.txt'
 output.parent.mkdir(exist_ok=True)
-output.write_text('\n'.join(notices))
+output.write_text('\n'.join(line.rstrip() for line in '\n'.join(notices).splitlines()).rstrip() + '\n')

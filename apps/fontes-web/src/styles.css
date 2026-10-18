@@ -1317,3 +1317,18 @@ html.dark .note-preview .card-meta {
 .dictionary-choices { display: grid; gap: 8px; margin-block: 12px 20px; }
 .resource-abbott { background: #31594d; }
 .resource-easton { background: #775a38; }
+
+.resource-update-entry { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:16px; margin:0 0 24px; background:var(--surface); border:1px solid var(--rule); border-radius:20px; cursor:pointer; color:inherit; }
+.resource-update-entry > span:nth-child(2) { flex:1; }
+.resource-update-entry strong, .resource-update-entry small { display:block; }
+.resource-update-entry small { color:var(--muted-ink); margin-top:4px; }
+.resource-update-icon { display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:color-mix(in srgb, var(--accent) 10%, transparent); }
+.resource-update-summary { display:flex; gap:12px; align-items:center; margin-bottom:16px; }
+.resource-update-offer, .resource-update-progress { margin-top:24px; }
+.resource-update-offer h3 { font-size:20px; margin-bottom:8px; }
+.resource-update-offer dl { margin:16px 0; padding:16px; border:1px solid var(--rule); border-radius:16px; }
+.resource-update-offer dl div { display:flex; justify-content:space-between; gap:16px; margin:8px 0; }
+.resource-update-offer dd { margin:0; font-variant-numeric:tabular-nums; }
+.resource-update-progress progress { width:100%; height:8px; accent-color:var(--accent); }
+.resource-update-success { display:flex; align-items:center; gap:12px; padding:16px 0; }
+.resource-update-error { margin:16px 0; color:var(--danger, #bf5546); overflow-wrap:anywhere; }
