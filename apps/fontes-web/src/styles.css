@@ -1333,11 +1333,11 @@ html.dark .note-preview .card-meta {
 /* Editorial section navigation stays distinct from the inner Meaning/Occurrences control. */
 .study-switcher-scroll { overflow-x:auto; scrollbar-width:none; margin:0 0 28px; }
 .study-switcher-scroll::-webkit-scrollbar { display:none; }
-.study-switcher { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); min-width:304px; border-bottom:1px solid var(--rule); padding-bottom:4px; }
-.study-switcher button { appearance:none; background:transparent; color:var(--muted-ink); border:0; border-radius:8px; min-height:48px; padding:8px 4px; font:500 13px/1.3 var(--font-sans); white-space:nowrap; cursor:pointer; transition:color 160ms ease, background-color 160ms ease; }
+.study-switcher { position:relative; display:flex; gap:12px; width:max-content; min-width:100%; border-bottom:1px solid var(--rule); padding-bottom:4px; }
+.study-switcher button { appearance:none; background:transparent; color:var(--muted-ink); border:0; border-radius:8px; flex:1 0 auto; min-width:max-content; min-height:48px; padding:8px 12px; font:500 13px/1.3 var(--font-sans); white-space:nowrap; cursor:pointer; transition:color 160ms ease, background-color 160ms ease; }
 .study-switcher button[aria-pressed=true] { color:var(--accent); }
 .study-switcher button:hover { background:color-mix(in srgb,var(--accent) 6%,transparent); color:var(--ink); }
 .study-switcher button:focus-visible { outline:2px solid var(--accent); outline-offset:-3px; }
-.study-switcher-line { position:absolute; left:0; bottom:-1px; height:3px; width:25%; pointer-events:none; transition:transform 200ms cubic-bezier(.2,.8,.2,1); }
+.study-switcher-line { position:absolute; left:0; bottom:-1px; height:3px; pointer-events:none; transition:transform 200ms cubic-bezier(.2,.8,.2,1), width 200ms ease; }
 .study-switcher-line::after { content:""; display:block; height:100%; margin:0 12px; border-radius:3px; background:var(--accent); }
 @media(prefers-reduced-motion:reduce) { .study-switcher-line,.study-switcher button { transition:none; } }
