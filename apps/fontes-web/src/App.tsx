@@ -1,3 +1,4 @@
+import { StudySwitcher } from "./components/StudySwitcher";
 import { ResourceUpdates } from "./components/ResourceUpdates";
 import { spotlightVerse } from "./verseArrival";
 import { LibraryResourceCard, resourceIdentity } from "./components/LibraryResourceCard";
@@ -1142,11 +1143,8 @@ export default function App({ live }: { live?: Live }) {
               )}
               {page === "Study" && (
                 <section className="page-pad page-enter">
-                  {live && <div className="study-sections" role="group" aria-label="Study resources">
-                    {[ ["words", "Words"], ["commentary", "Commentary"], ["topic", "Topics"], ["dictionary", "Dictionaries"] ].map(([key, name]) =>
-                      <Button key={key} variant={studyMode === key ? "primary" : "tertiary"} aria-pressed={studyMode === key} onPress={() => setStudyMode(key)}>{name}</Button>)}
-                  </div>}
-                  {(!live || studyMode === "words") && <>
+                  <StudySwitcher value={studyMode} onChange={setStudyMode} />
+                  {studyMode === "words" && <>
                   <div className="page-heading">
                     <div>
                       <div className="eyebrow">CLOSER TO THE WORD</div>
@@ -1488,7 +1486,7 @@ export default function App({ live }: { live?: Live }) {
                     </Tabs.Panel>
                   </Tabs>
                   </>}
-                  {live && studyMode !== "words" && <>
+                  {studyMode !== "words" && <>
                     <div className="eyebrow">{studyMode === "topic" ? "NAVE’S TOPICAL BIBLE" : studyMode === "dictionary" ? "INSTALLED DICTIONARIES" : "INSTALLED COMMENTARIES"}</div>
                     <h1>{studyMode === "topic" ? "Topics" : studyMode === "dictionary" ? "Dictionaries" : "Commentary"}</h1>
                     <p className="muted intro-line">Related to {currentRef}</p>
