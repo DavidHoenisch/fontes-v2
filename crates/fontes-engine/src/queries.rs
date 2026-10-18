@@ -184,7 +184,7 @@ impl Engine {
         })
     }
     pub(crate) fn context(&self, reference: i64) -> Result<Data> {
-        let resources=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,substr(r.content,1,260) FROM resources r JOIN resource_links l ON l.resource_id=r.id JOIN reference_ranges rr ON rr.id=l.range_id WHERE rr.start_ref_id<=?1 AND rr.end_ref_id>=?1 GROUP BY r.id,l.link_type ORDER BY CASE l.link_type WHEN 'applies_to' THEN 0 ELSE 1 END,min(rr.end_ref_id-rr.start_ref_id),r.type,r.title,r.id LIMIT 100")?.query_map([reference],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let resources=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,CASE WHEN r.id LIKE 'resource:abbott-smith:%' THEN r.content ELSE substr(r.content,1,260) END FROM resources r JOIN resource_links l ON l.resource_id=r.id JOIN reference_ranges rr ON rr.id=l.range_id WHERE rr.start_ref_id<=?1 AND rr.end_ref_id>=?1 GROUP BY r.id,l.link_type ORDER BY CASE l.link_type WHEN 'applies_to' THEN 0 ELSE 1 END,min(rr.end_ref_id-rr.start_ref_id),r.type,r.title,r.id LIMIT 100")?.query_map([reference],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
         let tokens=self.content.prepare("SELECT t.witness_id,t.position,t.surface,a.analysis_index,l.lemma,a.morph_system,a.morph_code,ts.strongs FROM original_tokens t JOIN segment_refs sr ON sr.segment_id=t.segment_id JOIN token_analyses a ON a.token_id=t.id LEFT JOIN lemmas l ON l.id=a.lemma_id LEFT JOIN token_strongs ts ON ts.token_id=a.token_id AND ts.analysis_index=a.analysis_index WHERE sr.canonical_ref_id=?1 ORDER BY t.witness_id,t.position,a.analysis_index,ts.strongs LIMIT 2000")?.query_map([reference],|r|Ok(TokenAnalysis{witness:r.get(0)?,position:r.get(1)?,surface:r.get(2)?,analysis_index:r.get(3)?,lemma:r.get(4)?,morph_system:r.get(5)?,morph_code:r.get(6)?,strongs:r.get(7)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
         let cross_references = self.content.prepare("SELECT target_range.start_ref_id,target_range.end_ref_id,min(target.resource_id),(SELECT text FROM verses_by_reference v WHERE v.canonical_ref_id=target_range.start_ref_id AND v.translation_id=?2 ORDER BY v.id LIMIT 1) FROM resource_links origin JOIN reference_ranges coverage ON coverage.id=origin.range_id JOIN resources r ON r.id=origin.resource_id JOIN resource_links target ON target.resource_id=r.id JOIN reference_ranges target_range ON target_range.id=target.range_id WHERE r.type='cross_reference' AND origin.link_type='applies_to' AND coverage.start_ref_id<=?1 AND coverage.end_ref_id>=?1 AND target.link_type='cross_reference' GROUP BY target_range.start_ref_id,target_range.end_ref_id ORDER BY min(coverage.end_ref_id-coverage.start_ref_id),target_range.start_ref_id,target_range.end_ref_id LIMIT 100")?.query_map(params![reference, self.session.translation], |r| {
             let start_ref = r.get(0)?;
@@ -211,6 +211,15 @@ impl Engine {
             resource.content =
                 fontes_data_contracts::decode_numeric_text_entities(&resource.content);
         }
+        if resource.source == "abbott-smith" {
+            let normalized = display
+                .as_deref()
+                .and_then(|s| serde_json::from_str::<serde_json::Value>(s).ok())
+                .is_some_and(|v| v["text_normalization"] == "abbott-tei-v1");
+            if !normalized {
+                resource.content = crate::dictionary_text::abbott_text(&resource.content);
+            }
+        }
         resource.links=self.content.prepare("SELECT rr.start_ref_id,rr.end_ref_id,l.strongs,l.link_type FROM resource_links l LEFT JOIN reference_ranges rr ON rr.id=l.range_id WHERE l.resource_id=?1 ORDER BY l.link_type,rr.start_ref_id,l.strongs LIMIT 500")?.query_map([id],|r|Ok(ResourceLink{start_ref:r.get(0)?,end_ref:r.get(1)?,strongs:r.get(2)?,basis:r.get(3)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
         Ok(resource)
     }
@@ -236,7 +245,7 @@ impl Engine {
                 "This Strong's code is not present. Open a study profile for dictionary data.",
             ));
         }
-        let definitions=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,substr(r.content,1,1500) FROM resources r JOIN resource_links l ON l.resource_id=r.id WHERE l.strongs=?1 AND l.link_type='definition' ORDER BY r.id")?.query_map([&code],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let definitions=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,CASE WHEN r.id LIKE 'resource:abbott-smith:%' THEN r.content ELSE substr(r.content,1,1500) END FROM resources r JOIN resource_links l ON l.resource_id=r.id WHERE l.strongs=?1 AND l.link_type='definition' ORDER BY r.id")?.query_map([&code],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
         // Read source-supplied dictionary metadata, never infer a lemma from a title or definition.
         let metadata=self.content.prepare("SELECT DISTINCT r.id,r.display_json FROM resources r JOIN resource_links l ON l.resource_id=r.id WHERE l.strongs=?1 AND l.link_type='definition' ORDER BY r.id")?.query_map([&code],|r|Ok((r.get::<_,String>(0)?,r.get::<_,Option<String>>(1)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;
         let headwords = metadata
@@ -255,13 +264,20 @@ impl Engine {
     }
 }
 fn summary(r: &rusqlite::Row<'_>) -> rusqlite::Result<ResourceSummary> {
+    let id: String = r.get(0)?;
+    let body: String = r.get(5)?;
+    let body = if id.starts_with("resource:abbott-smith:") {
+        crate::dictionary_text::abbott_text(&body)
+    } else {
+        body
+    };
     Ok(ResourceSummary {
         id: r.get(0)?,
         title: r.get(1)?,
         author: r.get(2)?,
         kind: r.get(3)?,
         basis: r.get(4)?,
-        excerpt: r.get(5)?,
+        excerpt: body.chars().take(1500).collect(),
     })
 }
 
@@ -288,7 +304,7 @@ impl Engine {
         }
         let sources=self.content.prepare("SELECT s.source_id,r.type,count(*),min(r.author) FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id GROUP BY s.source_id,r.type ORDER BY s.source_id,r.type")?.query_map([],|r|Ok(LibrarySource{id:r.get(0)?,kind:r.get(1)?,count:r.get(2)?,author:r.get(3)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
         let mut resources = if let Some(source) = source {
-            self.content.prepare("SELECT r.id,r.title,r.author,r.type,'installed',substr(r.content,1,260) FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id WHERE s.source_id=?1 ORDER BY r.title,r.id LIMIT 51 OFFSET ?2")?.query_map(params![source,offset],summary)?.collect::<std::result::Result<Vec<_>,_>>()?
+            self.content.prepare("SELECT r.id,r.title,r.author,r.type,'installed',CASE WHEN r.id LIKE 'resource:abbott-smith:%' THEN r.content ELSE substr(r.content,1,260) END FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id WHERE s.source_id=?1 ORDER BY r.title,r.id LIMIT 51 OFFSET ?2")?.query_map(params![source,offset],summary)?.collect::<std::result::Result<Vec<_>,_>>()?
         } else {
             vec![]
         };

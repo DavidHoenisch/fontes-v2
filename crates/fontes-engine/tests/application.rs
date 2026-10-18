@@ -1337,7 +1337,7 @@ fn additional_dictionaries_keep_multiple_definitions_and_cited_articles() {
     let f = Fixture::new();
     let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
     db.execute_batch("INSERT INTO source_snapshots VALUES('as-source','abbott-smith','hash','https://example.org',NULL,'review','abbott-smith-tei-v1'),('easton-source','easton','hash','https://example.org',NULL,'review','sword-dictionary-v1');
-        INSERT INTO resources VALUES('as-entry','as-source','ἀγαπάω|G25','dictionary','Abbott-Smith: ἀγαπάω','G. Abbott-Smith','To love with source attribution.','{\"type\":\"dictionary_entry\",\"headword\":\"ἀγαπάω\"}'),('easton-entry','easton-source','LOVE','dictionary','Easton: Love','M. G. Easton','A general Bible dictionary article.',NULL);
+        INSERT INTO resources VALUES('as-entry','as-source','ἀγαπάω|G25','dictionary','Abbott-Smith: ἀγαπάω','G. Abbott-Smith','<entry><form><orth>ἀγαπάω</orth></form><sense>To love with source attribution.</sense></entry>','{\"type\":\"dictionary_entry\",\"headword\":\"ἀγαπάω\"}'),('easton-entry','easton-source','LOVE','dictionary','Easton: Love','M. G. Easton','A general Bible dictionary article.',NULL);
         INSERT INTO resource_links VALUES('as-definition','as-entry',NULL,'G0025',NULL,'definition'),('as-citation','as-entry','john16',NULL,NULL,'citation'),('easton-citation','easton-entry','john16',NULL,NULL,'citation');").unwrap();
     drop(db);
     let mut engine = f.engine();
@@ -1382,5 +1382,7 @@ fn additional_dictionaries_keep_multiple_definitions_and_cited_articles() {
         panic!()
     };
     assert_eq!(resource.source, "abbott-smith");
+    assert_eq!(resource.content, "ἀγαπάω To love with source attribution.");
+    assert!(!resource.content.contains("<"));
     assert!(resource.links.iter().any(|l| l.start_ref == Some(43003016)));
 }

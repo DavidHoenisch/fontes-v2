@@ -1,6 +1,7 @@
 //! Fontes' toolkit-independent application engine. Content is read-only; user writes are transactional.
 pub mod bootstrap;
 mod commands;
+mod dictionary_text;
 mod highlights;
 mod occurrences;
 pub use highlights::*;

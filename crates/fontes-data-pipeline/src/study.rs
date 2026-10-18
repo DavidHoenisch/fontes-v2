@@ -106,7 +106,14 @@ fn text(node: Node<'_, '_>) -> String {
         }
         if matches!(
             node.tag_name().name(),
-            "item" | "note" | "strongs_derivation" | "strongs_def" | "kjv_def" | "list"
+            "item"
+                | "note"
+                | "strongs_derivation"
+                | "strongs_def"
+                | "kjv_def"
+                | "list"
+                | "sense"
+                | "etym"
         ) {
             out.push(' ');
         }
@@ -115,7 +122,14 @@ fn text(node: Node<'_, '_>) -> String {
         }
         if matches!(
             node.tag_name().name(),
-            "item" | "note" | "strongs_derivation" | "strongs_def" | "kjv_def" | "list"
+            "item"
+                | "note"
+                | "strongs_derivation"
+                | "strongs_def"
+                | "kjv_def"
+                | "list"
+                | "sense"
+                | "etym"
         ) {
             out.push(' ');
         }
@@ -228,7 +242,7 @@ pub fn import_strongs(
             &title,
             "James Strong",
             &body,
-            serde_json::json!({"type":"dictionary_entry","headword":headword,"transliteration":head.and_then(|n|n.attribute(if greek {"translit"} else {"xlit"})),"source_number":entry.attribute(if greek {"strongs"} else {"n"})}),
+            serde_json::json!({"type":"dictionary_entry","text_normalization":"abbott-tei-v1","headword":headword,"transliteration":head.and_then(|n|n.attribute(if greek {"translit"} else {"xlit"})),"source_number":entry.attribute(if greek {"strongs"} else {"n"})}),
         )?;
         tx.prepare_cached("INSERT INTO resource_links VALUES (?1,?2,NULL,?3,NULL,'definition')")?
             .execute(params![format!("{id}:definition"), id, code])?;
@@ -906,8 +920,15 @@ fn import_sword_records(
     for line in BufReader::new(File::open(normalized)?).lines() {
         let entry: SwordEntry = serde_json::from_str(&line?)?;
         report.source_records += 1;
-        let plain = plain_markup(&entry.raw)
-            .with_context(|| format!("plain text {source}:{}", entry.key))?;
+        let plain = if source == "abbott-smith" {
+            // TEI is XML, not SWORD's restricted OSIS vocabulary. Parse every
+            // text node, preserving Greek and source punctuation, never tags.
+            let document = roxmltree::Document::parse(&entry.raw)?;
+            text(document.root_element())
+        } else {
+            plain_markup(&entry.raw)
+                .with_context(|| format!("plain text {source}:{}", entry.key))?
+        };
         // MHC's locked OSIS contains numeric references escaped a second time
         // (e.g. &amp;#224;). Decode that documented layer after stripping markup.
         let plain = if source == "matthew-henry" {
@@ -1026,7 +1047,7 @@ fn import_sword_records(
                     }
                 }
                 let headword = entry.key.split('|').next().unwrap_or("");
-                let display = serde_json::json!({"type":"dictionary_entry","headword":headword,"source_key":entry.key,"raw_sha256":digest(entry.raw.as_bytes()),"unmapped_citations":unresolved,"supplied_strongs_labels":entry.key.split('|').skip(1).collect::<Vec<_>>()});
+                let display = serde_json::json!({"type":"dictionary_entry","text_normalization":"abbott-tei-v1","headword":headword,"source_key":entry.key,"raw_sha256":digest(entry.raw.as_bytes()),"unmapped_citations":unresolved,"supplied_strongs_labels":entry.key.split('|').skip(1).collect::<Vec<_>>()});
                 tx.execute(
                     "UPDATE resources SET display_json=?1 WHERE id=?2",
                     params![display.to_string(), id],
@@ -1363,6 +1384,10 @@ mod tests {
             )
             .unwrap();
         assert!(body.contains("Love & charity."));
+        assert!(
+            !body.contains("<"),
+            "TEI markup must not enter article text or FTS"
+        );
         assert!(display.contains("ἀγάπη"));
         assert_eq!(
             tx.query_row(
