@@ -40,3 +40,7 @@ The older static SVG/PNG and Figma references retain their historical appearance
 The desktop frames remain in Figma. Their export, the compact-sidebar update, and prototype interactions remain pending because of the account's Figma Starter tool limit. The local mobile SVGs are static design references, not native auto-layout Figma components or a running app.
 
 UI icons and fonts are included; Bible corpora, lexicons, commentaries, genealogy data, and a local AI model are separate application content imports.
+
+## App identity
+
+The selected [Wellspring brand kit](../brand/wellspring/README.md) holds the SVG symbol, outlined wordmark, color/monochrome logos, palette/hash manifest and adaptive app-icon masters. It is separate from the UI action-icon catalog above. Tauri desktop/Android launcher assets and the web favicon are generated from this kit; user navigation icons, saved data and reader typography are unchanged. [Identity preview](../../design/brand-wellspring/index.html).
