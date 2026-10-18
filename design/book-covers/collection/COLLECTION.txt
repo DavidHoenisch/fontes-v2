@@ -1,0 +1,16 @@
+COVENANT FORMS — FONTES / 66 ORIGINAL SVG BOOK COVERS
+
+600 × 640 vector artboards; original flat geometry and a shared six-color palette.
+Open any file under art/ directly in a browser or vector editor. No fonts, raster
+images, filters or external resources are required.
+
+All 66 book covers are included. Four retain the original approved style studies;
+62 were composed from the book-specific briefs. This is the first edition for review.
+The artwork is not yet integrated into the app. Matthew Henry introduction extraction
+is separate and remains under review; the manifest's raw excerpts are inspection
+material, not completed standalone introductions.
+
+collection/books.json maps canonical books to artwork, Scripture anchors, themes,
+composition notes and source locators. SHA-256 and byte counts describe exact SVGs.
+collection/plan.md gives the full editorial composition notes.
+build_collection.py is the reproducible generator for the 62 new compositions.

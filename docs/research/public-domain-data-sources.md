@@ -92,3 +92,11 @@ The immediate acquisition step can proceed for the clearly classified base texts
 ## 2026-10-16 owner-approved intake update
 
 The initial public-domain default now has two specific owner-approved exceptions: OSHB Hebrew annotations (CC BY 4.0) and the pinned eBible/CrossWire KJV dictionary annotations (GPL). See `data/rights/oshb-hebrew-2026-10-16.md` and `data/rights/kjv-strongs-2026-10-16.md` for exact bytes, attribution, modifications and license handling. Earlier unresolved/disabled statements describe the research stage. These decisions do not authorize unrelated conditional sources. Exact English-to-original-token identity remains distinct from supplied KJV-to-dictionary associations.
+
+### Vine’s dictionary request (2026-10-17)
+
+Requested for the complete default bundle. **Pending**: exact edition and redistribution rights have not been established; public-domain labeling on a web transcription conflicts with the publisher notice describing restored NT copyright. See [evidence and integration requirements](vines-integration.md). Not an approved locked source or implemented import.
+
+### Abbott-Smith and Easton (2026-10-17)
+
+Selected instead of Vine’s: Abbott-Smith’s 1922 TEI XML explicitly dedicated to the public domain, and CrossWire Easton 2.0.1 identifying the 1897 third edition as public domain. Both are locked default-build inputs. See [exact bytes, adapters, citation diagnostics and app integration](abbott-smith-easton.md). Abbott-Smith’s PDF and later/revised dictionaries are not imported.

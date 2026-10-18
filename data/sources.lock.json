@@ -111,6 +111,28 @@
       "rights_evidence_url": "https://crosswire.org/sword/modules/ModInfo.jsp?modName=KJV",
       "adapter": "kjv-usfm-strongs-v1",
       "upstream_revision": null
+    },
+    {
+      "source_id": "abbott-smith",
+      "url": "https://raw.githubusercontent.com/translatable-exegetical-tools/Abbott-Smith/8c00cb244761aa23659421a8cbbbf7a3b27b7d59/abbott-smith.tei.xml",
+      "sha256": "99821bee411626b4aa3e674040297b54b267eff86cb4f9b7ef69a8bdb18b6f90",
+      "bytes": 5698817,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-17-abbott-smith",
+      "rights_evidence_url": "https://github.com/translatable-exegetical-tools/Abbott-Smith#source-and-copyright",
+      "adapter": "abbott-smith-tei-v1",
+      "upstream_revision": "8c00cb244761aa23659421a8cbbbf7a3b27b7d59"
+    },
+    {
+      "source_id": "easton",
+      "url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Easton.zip",
+      "sha256": "f6dd054554764e2e97d5d189a697eb26039054578a9ccf98ce668ab810341c6e",
+      "bytes": 1437674,
+      "rights_class": "public_domain",
+      "rights_review_id": "research-2026-10-17-easton",
+      "rights_evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=Easton",
+      "adapter": "sword-dictionary-v1",
+      "upstream_revision": "2.0.1"
     }
   ]
 }

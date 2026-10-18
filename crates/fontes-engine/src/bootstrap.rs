@@ -29,8 +29,8 @@ const DOMAIN: &[u8] = b"FONTES-DATA-MANIFEST-V1\n";
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Profile {
-    #[default]
     Reading,
+    #[default]
     Study,
 }
 impl Profile {
@@ -787,3 +787,12 @@ async fn install_with(
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+#[test]
+fn default_install_is_the_full_free_resource_bundle() {
+    assert_eq!(
+        Profile::default().id(),
+        fontes_data_contracts::DEFAULT_RESOURCE_PROFILE
+    );
+}

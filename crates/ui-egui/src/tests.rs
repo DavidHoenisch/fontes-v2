@@ -147,18 +147,24 @@ fn real_library_safe_areas() {
             .find(|v| v.refs.contains(&43003016))
             .unwrap()
             .clone();
-        h.get_by_value(&verse.text).click_secondary();
+        h.query_by_value(&verse.text)
+            .unwrap_or_else(|| h.get_by_label(&verse.text))
+            .click_secondary();
         h.run_ok();
-        assert!(h.state().verse_actions.is_some());
-        assert!(safe.contains_rect(h.get_by_label("Close actions").rect()));
-        h.get_by_label("Copy verse").scroll_to_me();
-        h.run_ok();
-        assert!(safe.contains_rect(h.get_by_label("Copy verse").rect()));
+        assert!(
+            h.state()
+                .highlight_draft
+                .as_ref()
+                .is_some_and(|d| d.selecting)
+        );
+        for title in ["Add note", "Highlight", "Done selecting"] {
+            assert!(safe.contains_rect(h.get_by_label(title).rect()));
+        }
         h.render()
             .unwrap()
             .save(out.join(format!("{name}-actions.png")))
             .unwrap();
-        h.get_by_label("Close actions").click();
+        h.get_by_label("Done selecting").click();
         h.run_ok();
         h.get_by_label("Reading preferences").click();
         h.run_ok();
@@ -292,10 +298,10 @@ fn real_library_desktop_and_mobile() {
             h.run_ok();
             assert!(!h.state().reading_settings);
             for (reference, heading, capture) in [
-                ("Proverbs 16:1", "Proverbs 16", "chapter-heading"),
+                ("Proverbs 16:1", "Proverbs", "chapter-heading"),
                 (
                     "1 Thessalonians 1:1",
-                    "1 Thessalonians 1",
+                    "1 Thessalonians",
                     "long-chapter-heading",
                 ),
             ] {
@@ -351,62 +357,36 @@ fn real_library_desktop_and_mobile() {
                         range: start..start + 4,
                         text: "LORD".into(),
                     });
-                    h.get_by_value(&verse.text).click_secondary();
+                    h.query_by_value(&verse.text)
+                        .unwrap_or_else(|| h.get_by_label(&verse.text))
+                        .click_secondary();
                     h.run_ok();
-                    assert!(h.state().verse_actions.is_some());
-                    let lookup_title = if verse.strongs_links.iter().any(|l| l.strongs == "H3068") {
-                        "Look up Strong’s H3068"
-                    } else {
-                        "Look up original word…"
-                    };
-                    for title in [
-                        lookup_title,
-                        "Copy selection",
-                        "Study this verse",
-                        "Add note",
-                        "Highlight verse · amber",
-                        "Copy verse",
-                    ] {
-                        let action = h.get_by_label(title);
-                        action.scroll_to_me();
-                        h.run_ok();
-                        let rect = h.get_by_label(title).rect();
-                        assert!(rect.height() >= 44.0 && rect.width() >= 44.0);
-                        assert!(rect.left() >= 0.0 && rect.right() <= size[0]);
-                        assert!(rect.top() >= 0.0 && rect.bottom() <= size[1]);
+                    assert!(
+                        h.state()
+                            .highlight_draft
+                            .as_ref()
+                            .is_some_and(|d| d.selecting)
+                    );
+                    for title in ["Add note", "Highlight", "Done selecting"] {
+                        let r = h.get_by_label(title).rect();
+                        assert!(
+                            r.width() >= 44.0
+                                && r.height() >= 44.0
+                                && r.right() <= size[0]
+                                && r.bottom() <= size[1]
+                        );
                     }
-                    wait(&mut h);
-                    h.get_by_label(lookup_title).scroll_to_me();
-                    h.run_ok();
                     h.render()
                         .unwrap()
                         .save(out.join(format!("{name}-word-actions.png")))
                         .unwrap();
-                    h.get_by_label("Close actions").click();
-                    h.run_ok();
-                    assert!(h.state().verse_actions.is_none());
-                    h.get_by_value(&verse.text).click_secondary();
-                    h.run_ok();
-                    h.key_press(egui::Key::Escape);
-                    h.run_ok();
-                    assert!(h.state().verse_actions.is_none());
-                    h.get_by_value(&verse.text).click_secondary();
-                    h.run_ok();
-                    h.get_by_label("Add note").scroll_to_me();
-                    h.run_ok();
                     h.get_by_label("Add note").click();
                     h.run_ok();
-                    assert!(h.state().verse_actions.is_none());
                     assert_eq!(h.state().note.as_ref().unwrap().start, 20016001);
                     h.get_by_label("Cancel").click();
                     h.run_ok();
-                    h.state_mut().selected_text = None;
-                    h.state_mut().verse_actions = Some(verse.clone());
+                    h.get_by_label("Discard changes").click();
                     h.run_ok();
-                    assert!(h.query_by_label("Copy selection").is_none());
-                    h.get_by_label("Copy verse").click();
-                    h.run_ok();
-                    assert!(h.state().verse_actions.is_none());
                 }
             }
             h.state_mut().dispatch(Command::Navigate {
@@ -570,7 +550,7 @@ fn real_library_desktop_and_mobile() {
         );
         h.get_by_label("Notes").click();
         h.run_ok();
-        h.get_by_label("Add a note to selected verse").click();
+        h.get_by_label("Write your first note").click();
         h.run_ok();
         h.state_mut().note.as_mut().unwrap().text = "A render-test observation".into();
         h.run_ok();
@@ -578,7 +558,7 @@ fn real_library_desktop_and_mobile() {
             .unwrap()
             .save(out.join(format!("{name}-note.png")))
             .unwrap();
-        h.get_by_label("Save").click();
+        h.get_by_label("Save note").click();
         h.run_ok();
         wait(&mut h);
         assert_eq!(h.state().state.as_ref().unwrap().annotations.len(), 1);
@@ -830,7 +810,11 @@ fn real_library_desktop_and_mobile() {
                 .filter(|p| !p.trim().is_empty())
                 .map(str::to_owned)
                 .collect();
-            let first = h.get_by_label(&paragraphs[0]).rect();
+            let first = h
+                .query_all_by_label(&paragraphs[0])
+                .last()
+                .expect("resource paragraph")
+                .rect();
             let second = h.get_by_label(&paragraphs[1]).rect();
             assert!(
                 second.top() >= first.bottom() + 12.0,
@@ -1056,7 +1040,9 @@ fn real_library_kjv_source_word_lookup() {
                 .iter()
                 .any(|l| l.start == start && l.end == start + 4 && l.strongs == "H3068")
         );
-        h.get_by_value(&verse.text).scroll_to_me();
+        h.query_by_value(&verse.text)
+            .unwrap_or_else(|| h.get_by_label(&verse.text))
+            .scroll_to_me();
         h.run_ok();
         h.state_mut().selected_text = Some(SelectedText {
             verse_id: verse.id.clone(),
@@ -1064,16 +1050,25 @@ fn real_library_kjv_source_word_lookup() {
             range: start..start + 4,
             text: "LORD".into(),
         });
-        h.get_by_value(&verse.text).click_secondary();
+        h.query_by_value(&verse.text)
+            .unwrap_or_else(|| h.get_by_label(&verse.text))
+            .click_secondary();
         h.run_ok();
-        h.get_by_label("Look up Strong’s H3068").scroll_to_me();
-        h.run_ok();
-        h.render()
-            .unwrap()
-            .save(out.join(format!("{name}-direct-word-action.png")))
-            .unwrap();
-        h.get_by_label("Look up Strong’s H3068").click();
-        h.run_ok();
+        if name == "desktop" {
+            h.get_by_label("Look up Strong’s H3068").scroll_to_me();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join(format!("{name}-direct-word-action.png")))
+                .unwrap();
+            h.get_by_label("Look up Strong’s H3068").click();
+            h.run_ok();
+        } else {
+            h.get_by_label("Done selecting").click();
+            h.run_ok();
+            tap_word(&mut h, &verse, start + 1);
+            h.run_ok();
+        }
         wait(&mut h);
         let headword = match h.state().word.as_ref().unwrap() {
             Data::Word {
@@ -1250,7 +1245,7 @@ fn real_library_selectable_themes() {
             .unwrap();
         h.get_by_label("Done").click();
         h.run_ok();
-        h.get_by_label("Proverbs 16").scroll_to_me();
+        h.get_by_label("Proverbs").scroll_to_me();
         h.run_ok();
         h.render()
             .unwrap()
@@ -1321,7 +1316,7 @@ fn real_library_reference_fidelity() {
         h.state_mut()
             .dispatch(Command::Preferences { preferences: prefs });
         wait(&mut h);
-        h.get_by_label("Proverbs 16").scroll_to_me();
+        h.get_by_label("Proverbs").scroll_to_me();
         h.run_ok();
         h.input_mut().events.push(egui::Event::PointerGone);
         h.run_ok();
@@ -1389,7 +1384,10 @@ fn real_library_reference_fidelity() {
             .iter()
             .find(|l| l.strongs == "H3068")
             .unwrap();
-        let text_rect = h.get_by_value(&verse.text).rect();
+        let text_rect = h
+            .query_by_value(&verse.text)
+            .unwrap_or_else(|| h.get_by_label(&verse.text))
+            .rect();
         let p = h
             .state()
             .state
@@ -1414,7 +1412,7 @@ fn real_library_reference_fidelity() {
             egui::Event::PointerMoved(point),
             egui::Event::PointerButton {
                 pos: point,
-                button: egui::PointerButton::Primary,
+                button: egui::PointerButton::Secondary,
                 pressed: true,
                 modifiers: Default::default(),
             },
@@ -1422,55 +1420,29 @@ fn real_library_reference_fidelity() {
         h.step();
         h.input_mut().events.push(egui::Event::PointerButton {
             pos: point,
-            button: egui::PointerButton::Primary,
+            button: egui::PointerButton::Secondary,
             pressed: false,
             modifiers: Default::default(),
         });
         h.step();
         wait(&mut h);
-        let stamp = h.state().backdrop.stamp;
-        h.input_mut().events.push(egui::Event::Screenshot {
-            viewport_id: egui::ViewportId::ROOT,
-            user_data: egui::UserData::new(backdrop::Capture(stamp)),
-            image: clean_image.clone(),
-        });
-        h.run_ok();
-        let start = Instant::now();
-        while !h.state().backdrop.ready() {
-            assert!(start.elapsed() < Duration::from_secs(5));
-            std::thread::sleep(Duration::from_millis(10));
-            h.step();
-        }
-        h.run_ok();
         assert!(
-            h.state().verse_actions.is_some(),
-            "A tap on a verified KJV word opens its action sheet"
+            h.state()
+                .highlight_draft
+                .as_ref()
+                .is_some_and(|d| d.selecting)
         );
-        assert_eq!(h.state().selected_text.as_ref().unwrap().text, "LORD");
-        assert!(!h.state().word_previews["H3068"].is_empty());
-        assert_eq!(
-            serde_json::to_value(&h.state().word).unwrap(),
-            prior_word,
-            "Preview must not replace a study result"
-        );
-        for title in [
-            "Copy selection",
-            "Study this verse",
-            "Add note",
-            "Highlight verse · amber",
-            "Copy verse",
-        ] {
-            let rect = h.get_by_label(title).rect();
-            assert!(
-                rect.top() >= 0.0 && rect.bottom() <= size[1],
-                "{title} stays visible at reference size: {rect:?}"
-            );
+        assert_eq!(serde_json::to_value(&h.state().word).unwrap(), prior_word);
+        for title in ["Add note", "Highlight", "Done selecting"] {
+            assert!(h.get_by_label(title).rect().bottom() <= size[1]);
         }
         h.render()
             .unwrap()
             .save(out.join(format!("{name}-actions.png")))
             .unwrap();
-        h.get_by_label("Look up Strong’s H3068").click();
+        h.get_by_label("Done selecting").click();
+        h.run_ok();
+        tap_word(&mut h, &verse, span.start + 1);
         h.run_ok();
         wait(&mut h);
         assert!(matches!(&h.state().word,Some(Data::Word{code,..})if code=="H3068"));
@@ -1590,4 +1562,978 @@ fn real_library_search_controls() {
             first.ref_id.unwrap()
         );
     }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_mobile_swipe_does_not_select_or_recenter() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let dir = tempfile::tempdir().unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+    // Register the touchscreen before hit-test regions are built, as on a phone
+    // that has already been navigated by touch.
+    h.input_mut().events.push(egui::Event::Touch {
+        device_id: egui::TouchDeviceId(0),
+        id: egui::TouchId(0),
+        phase: egui::TouchPhase::End,
+        pos: egui::pos2(1.0, 1.0),
+        force: None,
+    });
+    wait(&mut h);
+    h.state_mut().dispatch(Command::Navigate {
+        reference: "Matthew 1:12".into(),
+    });
+    wait(&mut h);
+    let verse = h
+        .state()
+        .state
+        .as_ref()
+        .unwrap()
+        .passage
+        .iter()
+        .find(|v| v.refs.contains(&40001012))
+        .unwrap()
+        .text
+        .clone();
+    assert!(
+        h.query_by_role(egui::accesskit::Role::TextInput).is_none(),
+        "Mobile Scripture must not acquire editable cursor/drag focus"
+    );
+    let before = h.get_by_label(&verse).rect();
+    let start = egui::pos2(before.center().x, before.center().y.clamp(180.0, 600.0));
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::Start,
+            pos: start,
+            force: None,
+        },
+        egui::Event::PointerMoved(start),
+        egui::Event::PointerButton {
+            pos: start,
+            button: egui::PointerButton::Primary,
+            pressed: true,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.step();
+    for step in 1..=12 {
+        let pos = start - egui::vec2(0.0, step as f32 * 12.0);
+        h.input_mut().events.extend([
+            egui::Event::Touch {
+                device_id: egui::TouchDeviceId(0),
+                id: egui::TouchId(1),
+                phase: egui::TouchPhase::Move,
+                pos,
+                force: None,
+            },
+            egui::Event::PointerMoved(pos),
+        ]);
+        h.step();
+    }
+    let end = start - egui::vec2(0.0, 144.0);
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::End,
+            pos: end,
+            force: None,
+        },
+        egui::Event::PointerButton {
+            pos: end,
+            button: egui::PointerButton::Primary,
+            pressed: false,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.step();
+    assert!(
+        h.get_by_label(&verse).rect().top() < before.top() - 60.0,
+        "Swipe must move the page rather than a text cursor: before={before:?}, after={:?}, start={start:?}",
+        h.get_by_label(&verse).rect()
+    );
+    assert_eq!(
+        h.state().state.as_ref().unwrap().session.selected_ref,
+        40001012
+    );
+    assert!(h.state().verse_actions.is_none());
+    assert!(h.state().selected_text.is_none());
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_one_tap_word_study() {
+    fn tap(h: &mut Harness<'_, FontesApp>, verse: &Verse, index: usize) {
+        let rect = h.get_by_label(&verse.text).rect();
+        let p = &h.state().state.as_ref().unwrap().session.preferences;
+        let mut job = egui::text::LayoutJob::simple(
+            verse.text.clone(),
+            egui::FontId::new(p.text_size, egui::FontFamily::Name("scripture".into())),
+            theme::palette(&h.ctx).ink,
+            rect.width(),
+        );
+        job.sections[0].format.line_height = Some(p.text_size * p.line_spacing);
+        job.sections[0].format.extra_letter_spacing = -0.25;
+        let galley = h.ctx.fonts_mut(|f| f.layout_job(job));
+        let point = rect.min
+            + galley
+                .pos_from_cursor(egui::text::CCursor::new(index))
+                .center()
+                .to_vec2()
+            + egui::vec2(3.0, 0.0);
+        h.input_mut().events.extend([
+            egui::Event::PointerMoved(point),
+            egui::Event::PointerButton {
+                pos: point,
+                button: egui::PointerButton::Primary,
+                pressed: true,
+                modifiers: Default::default(),
+            },
+        ]);
+        h.step();
+        h.input_mut().events.push(egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: false,
+            modifiers: Default::default(),
+        });
+        h.step();
+        wait(h);
+    }
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let dir = tempfile::tempdir().unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+    wait(&mut h);
+    for (reference, id, code) in [
+        ("Proverbs 16:1", 20016001, "H3068"),
+        ("John 3:16", 43003016, "G2316"),
+    ] {
+        h.state_mut().choose(Destination::Read);
+        h.state_mut().dispatch(Command::Navigate {
+            reference: reference.into(),
+        });
+        wait(&mut h);
+        let verse = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .passage
+            .iter()
+            .find(|v| v.refs.contains(&id))
+            .unwrap()
+            .clone();
+        let index = verse
+            .strongs_links
+            .iter()
+            .find(|l| l.strongs == code)
+            .unwrap()
+            .start;
+        tap(&mut h, &verse, index);
+        assert!(h.state().destination == Destination::Study);
+        assert!(h.state().verse_actions.is_none());
+        assert!(
+            h.state().resource.is_none(),
+            "Inline definition must retain the word-study context"
+        );
+        let Some(Data::Word {
+            code: actual,
+            definitions,
+            ..
+        }) = &h.state().word
+        else {
+            panic!("One tap must open a definition")
+        };
+        assert_eq!(actual, code);
+        assert!(!definitions.is_empty());
+        assert!(
+            definitions
+                .iter()
+                .all(|d| h.state().word_entries.contains_key(&d.id)),
+            "Full entries must load without another tap"
+        );
+        assert!(h.query_by_label("Read full dictionary entry").is_none());
+    }
+    h.state_mut().choose(Destination::Read);
+    h.state_mut().dispatch(Command::Translation {
+        id: "translation:web".into(),
+    });
+    wait(&mut h);
+    let verse = h
+        .state()
+        .state
+        .as_ref()
+        .unwrap()
+        .passage
+        .iter()
+        .find(|v| v.refs.contains(&43003016))
+        .unwrap()
+        .clone();
+    tap(&mut h, &verse, 2);
+    assert!(h.state().destination == Destination::Study);
+    assert!(
+        h.state().word.is_none(),
+        "Untagged translation must not invent a word alignment"
+    );
+    assert!(matches!(
+        h.state().context,
+        Some(Data::Context {
+            ref_id: 43003016,
+            ..
+        })
+    ));
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_exact_highlight_handles_styles_and_removal() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let dir = tempfile::tempdir().unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+    wait(&mut h);
+    let verse = h
+        .state()
+        .state
+        .as_ref()
+        .unwrap()
+        .passage
+        .iter()
+        .find(|v| v.refs.contains(&43003016))
+        .unwrap()
+        .clone();
+    let point = h.get_by_label(&verse.text).rect().center();
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::Start,
+            pos: point,
+            force: None,
+        },
+        egui::Event::PointerMoved(point),
+        egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: true,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.step();
+    for _ in 0..5 {
+        h.step();
+    }
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::End,
+            pos: point,
+            force: None,
+        },
+        egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: false,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.step();
+    wait(&mut h);
+    assert!(
+        h.state().destination == Destination::Read,
+        "Releasing a long press must not navigate to word study"
+    );
+    assert!(h.state().verse_actions.is_none());
+    assert!(
+        h.state()
+            .highlight_draft
+            .as_ref()
+            .is_some_and(|d| d.selecting)
+    );
+    h.get_by_label("Highlight").click();
+    h.run_ok();
+
+    if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+        let out = PathBuf::from(out);
+        std::fs::create_dir_all(&out).unwrap();
+        h.render()
+            .unwrap()
+            .save(out.join("highlight-styles.png"))
+            .unwrap();
+    }
+    h.get_by_label("Adjust selection").click();
+    h.run_ok();
+    let start = h.get_by_label("Selection end").rect().center();
+    h.drag_at(start);
+    h.step();
+    h.input_mut()
+        .events
+        .push(egui::Event::PointerMoved(start + egui::vec2(-65.0, 0.0)));
+    h.step();
+    h.drop_at(start + egui::vec2(-65.0, 0.0));
+    h.step();
+    let selected = h
+        .state()
+        .highlight_draft
+        .as_ref()
+        .unwrap()
+        .selection
+        .clone()
+        .unwrap();
+    assert!(selected.spans[0].end > selected.spans[0].start);
+    assert!(selected.spans[0].quote.chars().count() < verse.text.chars().count());
+    if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+        h.render()
+            .unwrap()
+            .save(PathBuf::from(out).join("highlight-handles.png"))
+            .unwrap();
+    }
+    h.get_by_label("Highlight").click();
+    h.run_ok();
+    h.get_by_label("Purple").click();
+    h.run_ok();
+    h.get_by_label("Double underline").scroll_to_me();
+    h.run_ok();
+    h.get_by_label("Double underline").click();
+    h.run_ok();
+    assert!(h.get_by_label("Apply highlight").rect().bottom() <= 844.0);
+    h.get_by_label("Apply highlight").click();
+    wait(&mut h);
+    assert!(h.state().error.is_none(), "{:?}", h.state().error);
+    let state = h.state().state.as_ref().unwrap();
+    assert_eq!(state.highlights.len(), 1);
+    let saved = state.highlights[0].clone();
+    assert_eq!(saved.selection, Some(selected));
+    assert_eq!(saved.style.kind, MarkKind::DoubleUnderline);
+    assert_eq!(highlights::marks(state, &verse).len(), 1);
+    if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+        h.render()
+            .unwrap()
+            .save(PathBuf::from(out).join("highlight-saved.png"))
+            .unwrap();
+    }
+    h.state_mut()
+        .begin_highlight(&verse, Some(saved.annotation_id.clone()));
+    h.run_ok();
+    h.get_by_label("Remove highlight").click();
+    wait(&mut h);
+    assert!(h.state().state.as_ref().unwrap().highlights.is_empty());
+    assert!(highlights::marks(h.state().state.as_ref().unwrap(), &verse).is_empty());
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_occurrence_chart_filter_paging_and_return() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    for size in [[320.0, 640.0], [390.0, 844.0]] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.state_mut().dispatch(Command::Navigate {
+            reference: "Proverbs 16:1".into(),
+        });
+        wait(&mut h);
+        h.state_mut().open_study(20016001, StudyTab::Words);
+        h.state_mut().lookup_word("H3068");
+        wait(&mut h);
+        let Some(Data::Word { total, .. }) = h.state().word.clone() else {
+            panic!()
+        };
+        let tab = format!("Occurrences · {total}");
+        h.get_by_label(&tab).scroll_to_me();
+        h.run_ok();
+        h.get_by_label(&tab).click();
+        wait(&mut h);
+        let data = h.state().occurrence_data.clone().unwrap();
+        assert!(
+            data.total > 100,
+            "Distribution must cover more than the old 100-verse sample"
+        );
+        assert_eq!(data.books.iter().map(|b| b.verses).sum::<u32>(), data.total);
+        assert!(data.verses.len() <= 6);
+        let top = data.books.iter().max_by_key(|b| b.verses).unwrap().clone();
+        let bar = format!("Filter occurrences: {}, {} verses", top.label, top.verses);
+        h.get_by_label(&bar).scroll_to_me();
+        h.run_ok();
+        assert!(
+            h.get_by_label(&bar).rect().width() >= 44.0
+                && h.get_by_label(&bar).rect().height() >= 44.0
+        );
+        assert!(h.get_by_label(&bar).rect().right() <= size[0]);
+        if size[0] == 390.0
+            && let Ok(out) = std::env::var("FONTES_CAPTURE_DIR")
+        {
+            let out = PathBuf::from(out);
+            std::fs::create_dir_all(&out).unwrap();
+            h.render()
+                .unwrap()
+                .save(out.join("occurrence-chart.png"))
+                .unwrap();
+        }
+        h.get_by_label(&bar).click();
+        wait(&mut h);
+        let filtered = h.state().occurrence_data.as_ref().unwrap();
+        assert_eq!(filtered.book_id, Some(top.book_id));
+        assert_eq!(filtered.filtered_total, top.verses);
+        assert!(
+            filtered
+                .verses
+                .iter()
+                .all(|v| v.ref_id / 1_000_000 == i64::from(top.book_id))
+        );
+        h.query_all_by_label("Next verses")
+            .next()
+            .unwrap()
+            .scroll_to_me();
+        h.run_ok();
+        h.query_all_by_label("Next verses").next().unwrap().click();
+        wait(&mut h);
+        let page = h.state().occurrence_data.clone().unwrap();
+        assert_eq!(page.offset, 6);
+        let verse = page.verses.first().unwrap();
+        let read = format!("{}  →", verse.label);
+        h.get_by_label(&read).scroll_to_me();
+        h.run_ok();
+        if size[0] == 390.0
+            && let Ok(out) = std::env::var("FONTES_CAPTURE_DIR")
+        {
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(out).join("occurrence-verses.png"))
+                .unwrap();
+        }
+        h.get_by_label(&read).click();
+        wait(&mut h);
+        assert!(h.state().destination == Destination::Read);
+        assert_eq!(
+            h.state().state.as_ref().unwrap().session.selected_ref,
+            verse.ref_id
+        );
+        h.get_by_label("← Return to word study").click();
+        wait(&mut h);
+        assert!(h.state().destination == Destination::Study && h.state().occurrences_open);
+        let returned = h.state().occurrence_data.as_ref().unwrap();
+        assert_eq!(returned.code, "H3068");
+        assert_eq!(returned.book_id, Some(top.book_id));
+        assert_eq!(returned.offset, 6);
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_pointer_only_hold_does_not_open_word_study() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let dir = tempfile::tempdir().unwrap();
+    let mut h = Harness::builder()
+        .with_size([390.0, 844.0])
+        .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+    wait(&mut h);
+    let verse = h
+        .state()
+        .state
+        .as_ref()
+        .unwrap()
+        .passage
+        .iter()
+        .find(|v| v.refs.contains(&43003016))
+        .unwrap()
+        .clone();
+    let point = h.get_by_label(&verse.text).rect().center();
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::Start,
+            pos: point,
+            force: None,
+        },
+        egui::Event::PointerMoved(point),
+        egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: true,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.input_mut()
+        .events
+        .retain(|e| !matches!(e, egui::Event::Touch { .. }));
+    h.step();
+    for _ in 0..40 {
+        h.step();
+    }
+    h.input_mut().events.extend([
+        egui::Event::Touch {
+            device_id: egui::TouchDeviceId(0),
+            id: egui::TouchId(1),
+            phase: egui::TouchPhase::End,
+            pos: point,
+            force: None,
+        },
+        egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: false,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.input_mut()
+        .events
+        .retain(|e| !matches!(e, egui::Event::Touch { .. }));
+    h.step();
+    wait(&mut h);
+    assert!(
+        h.state().destination == Destination::Read,
+        "Releasing a long press must not navigate to word study"
+    );
+    assert!(h.state().verse_actions.is_none());
+    assert!(
+        h.state()
+            .highlight_draft
+            .as_ref()
+            .is_some_and(|d| d.selecting)
+    );
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_flipping_word_card() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    for width in [390.0, 320.0] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size([width, 844.0])
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.state_mut().open_study(43003016, StudyTab::Words);
+        h.state_mut().lookup_word("G0025");
+        wait(&mut h);
+        let front = h.get_by_label("Tap for meaning").rect();
+        if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+            std::fs::create_dir_all(&out).unwrap();
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(out).join("word-front.png"))
+                .unwrap();
+        }
+        h.get_by_label("Tap for meaning").click();
+        h.run_ok();
+        for _ in 0..30 {
+            h.step();
+        }
+        assert!(h.state().word_card_back);
+        let back = h.get_by_label("Flip word card").rect();
+        assert_eq!(front.size(), back.size(), "Flip must not move the page");
+        assert!(h.get_by_label("Read full entry →").rect().height() >= 44.0);
+        if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(out).join("word-back.png"))
+                .unwrap();
+        }
+        h.get_by_label("Read full entry →").click();
+        wait(&mut h);
+        assert!(
+            h.state().resource.is_some(),
+            "Full entry must remain accessible"
+        );
+        h.state_mut().resource = None;
+        h.step();
+        h.get_by_label("Back to word").click();
+        h.run_ok();
+        for _ in 0..30 {
+            h.step();
+        }
+        assert!(!h.state().word_card_back);
+        h.state_mut().lookup_word("H3068");
+        wait(&mut h);
+        assert!(!h.state().word_card_back, "A new word starts on its front");
+        h.state_mut().lookup_word("H0430");
+        wait(&mut h);
+        h.state_mut().reduce_card_motion = true;
+        let y = h.get_by_label("Look up a Strong’s number").rect().top();
+        h.get_by_label("Tap for meaning").click();
+        h.run_ok();
+        for _ in 0..30 {
+            h.step();
+        }
+        assert!(h.state().word_card_back);
+        assert!(
+            (h.get_by_label("Look up a Strong’s number").rect().top() - y).abs() < 1.0,
+            "Long definition must retain card height"
+        );
+        if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(out).join("long-definition.png"))
+                .unwrap();
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY"]
+fn real_library_highlight_patterns_and_live_preview() {
+    for size in [[390.0, 844.0], [320.0, 640.0]] {
+        let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        let verse = h
+            .state()
+            .state
+            .as_ref()
+            .unwrap()
+            .passage
+            .iter()
+            .find(|v| v.refs.contains(&43003016))
+            .unwrap()
+            .clone();
+        let count = h.state().state.as_ref().unwrap().annotations.len();
+        h.state_mut().begin_highlight(&verse, None);
+        h.run_ok();
+        h.get_by_label("Purple").scroll_to_me();
+        h.run_ok();
+        h.get_by_label("Purple").click();
+        h.run_ok();
+        h.get_by_label("Study symbols").scroll_to_me();
+        h.run_ok();
+        h.get_by_label("Study symbols").click();
+        h.run_ok();
+        h.get_by_label("Bless").scroll_to_me();
+        h.run_ok();
+        h.get_by_label("Bless").click();
+        h.run_ok();
+        assert_eq!(
+            h.state()
+                .highlight_draft
+                .as_ref()
+                .unwrap()
+                .style
+                .symbol
+                .as_deref(),
+            Some("Bless")
+        );
+        assert_eq!(
+            h.state().state.as_ref().unwrap().annotations.len(),
+            count,
+            "Preview must not save changes"
+        );
+        let selected = h.get_by_label("Selected: Bless · Purple").rect();
+        let preview = h.get_by_label("Highlight preview").rect();
+        let apply = h.get_by_label("Apply highlight").rect();
+        assert!(
+            selected.top() >= 0.0 && preview.bottom() <= apply.top() && apply.bottom() <= size[1],
+            "Preview and Apply remain visible: {selected:?} {preview:?} {apply:?}"
+        );
+        if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+            std::fs::create_dir_all(&out).unwrap();
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(&out).join(format!("pattern-picker-{}.png", size[0])))
+                .unwrap();
+        }
+        h.get_by_label("Apply highlight").click();
+        wait(&mut h);
+        assert!(
+            h.state()
+                .state
+                .as_ref()
+                .unwrap()
+                .highlights
+                .iter()
+                .any(|h| h.style.symbol.as_deref() == Some("Bless"))
+        );
+        if let Ok(out) = std::env::var("FONTES_CAPTURE_DIR") {
+            h.render()
+                .unwrap()
+                .save(PathBuf::from(out).join(format!("pattern-reader-{}.png", size[0])))
+                .unwrap();
+        }
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY and a working wgpu adapter"]
+fn real_library_book_openings() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    for size in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.state_mut().open_picker();
+        h.run_ok();
+        h.get_by_label("About John · artwork & introduction")
+            .click();
+        h.run_ok();
+        assert!(h.state().book_opening.is_some());
+        h.render()
+            .unwrap()
+            .save(format!("/tmp/book-opening-{}.png", size[0]))
+            .unwrap();
+        for label in ["Start reading", "Choose a chapter"] {
+            let rect = h.get_by_label(label).rect();
+            assert!(rect.right() <= size[0] && rect.bottom() <= size[1]);
+        }
+        h.get_by_label("Choose a chapter").click();
+        h.run_ok();
+        assert!(h.state().picker);
+        assert_eq!(h.state().picker_stage, PickerStage::Chapter);
+        h.state_mut().picker = false;
+        h.state_mut().book_opening = Some(66);
+        h.run_ok();
+        h.get_by_label("Start reading").click();
+        wait(&mut h);
+        assert_eq!(
+            h.state().state.as_ref().unwrap().session.selected_ref,
+            66_001_001
+        );
+        assert!(h.state().book_opening.is_none());
+    }
+}
+
+#[test]
+#[ignore = "requires FONTES_TEST_LIBRARY and a working wgpu adapter"]
+fn real_library_notebook_selection_and_scrapbook() {
+    let library = PathBuf::from(std::env::var("FONTES_TEST_LIBRARY").unwrap());
+    let out = PathBuf::from(std::env::var("FONTES_CAPTURE_DIR").unwrap());
+    std::fs::create_dir_all(&out).unwrap();
+    for size in [[320.0, 640.0], [390.0, 844.0], [1440.0, 960.0]] {
+        let dir = tempfile::tempdir().unwrap();
+        let mut h = Harness::builder()
+            .with_size(size)
+            .build_eframe(|cc| FontesApp::new(cc, Some(library.clone()), dir.path().to_owned()));
+        wait(&mut h);
+        h.state_mut().choose(Destination::Notes);
+        h.run_ok();
+        assert!(h.query_by_label("New note").is_none());
+        h.get_by_label("Write your first note").click();
+        h.run_ok();
+        h.state_mut().note.as_mut().unwrap().text = "A thought worth keeping".into();
+        h.state_mut().note.as_mut().unwrap().document.title = "Trust and work".into();
+        h.get_by_label("Add to note").click();
+        h.run_ok();
+        h.get_by_label("Current passage").click();
+        wait(&mut h);
+        h.render()
+            .unwrap()
+            .save(out.join(format!("insert-{}.png", size[0])))
+            .unwrap();
+        h.get_by_label("Add passage").click();
+        h.run_ok();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("editor-{}.png", size[0])))
+            .unwrap();
+        h.get_by_label("Save note").click();
+        wait(&mut h);
+        assert!(h.state().note.is_none());
+        assert_eq!(
+            h.state().state.as_ref().unwrap().notes[0]
+                .document
+                .blocks
+                .len(),
+            2
+        );
+        if size[0] == 390.0 {
+            h.state_mut().dispatch(Command::Resource {
+                id: "resource:matthew-henry:Gen.1.1".into(),
+            });
+            wait(&mut h);
+            let resource = h.state().resource.clone().unwrap();
+            let quote = resource
+                .content
+                .lines()
+                .find(|line| line.starts_with("We have before us the first and longest"))
+                .unwrap()
+                .to_owned();
+            h.state_mut().collect_resource(resource);
+            h.run_ok();
+            h.get_by_label("Trust and work · John 3:16").click();
+            h.run_ok();
+            h.state_mut().notes_state.excerpt = quote;
+            h.step();
+            h.run_ok();
+            h.get_by_label("Add resource excerpt").click();
+            h.run_ok();
+            h.render()
+                .unwrap()
+                .save(out.join("scrapbook-with-resource.png"))
+                .unwrap();
+            h.get_by_label("Save note").click();
+            wait(&mut h);
+            assert_eq!(
+                h.state().state.as_ref().unwrap().notes[0]
+                    .document
+                    .blocks
+                    .len(),
+                3
+            );
+            let note_id = h.state().state.as_ref().unwrap().notes[0]
+                .annotation_id
+                .clone();
+            h.state_mut().edit_note(&note_id);
+            h.run_ok();
+            h.get_by_label("Add to note").click();
+            h.run_ok();
+            h.get_by_label("Word definition").click();
+            h.run_ok();
+            h.state_mut().notes_state.word_code = "H3068".into();
+            h.step();
+            h.get_by_label("Look up definition").click();
+            wait(&mut h);
+            let title = match h.state().word.as_ref().unwrap() {
+                Data::Word { definitions, .. } => definitions[0].title.clone(),
+                _ => panic!(),
+            };
+            h.get_by_label(&title).scroll_to_me();
+            h.run_ok();
+            h.get_by_label(&title).click();
+            wait(&mut h);
+            assert!(!h.state().notes_state.excerpt.is_empty());
+            h.get_by_label("Add resource excerpt").click();
+            h.run_ok();
+            h.get_by_label("Save note").click();
+            wait(&mut h);
+            assert_eq!(
+                h.state().state.as_ref().unwrap().notes[0]
+                    .document
+                    .blocks
+                    .len(),
+                4
+            );
+        }
+        let fab = h.get_by_label("New note").rect();
+        assert!(fab.bottom() <= size[1]);
+        h.get_by_role_and_label(egui::accesskit::Role::Button, "Bookmarks")
+            .click();
+        h.run_ok();
+        assert_eq!(h.get_by_label("New note").rect(), fab);
+        h.state_mut().choose(Destination::Read);
+        h.run_ok();
+        let state = h.state().state.as_ref().unwrap().clone();
+        let verse = state
+            .passage
+            .iter()
+            .find(|v| v.refs.contains(&state.session.selected_ref))
+            .unwrap()
+            .clone();
+        let selection = TextSelection {
+            translation_id: state.session.translation.clone(),
+            spans: vec![TextSpan {
+                verse_id: verse.id.clone(),
+                start: 0,
+                end: 3,
+                quote: verse.text.chars().take(3).collect(),
+            }],
+        };
+        h.state_mut().begin_highlight(&verse, None);
+        {
+            let d = h.state_mut().highlight_draft.as_mut().unwrap();
+            d.selecting = true;
+            d.selection = Some(selection.clone());
+        }
+        h.run_ok();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("context-{}.png", size[0])))
+            .unwrap();
+        h.get_by_label("Add note").click();
+        h.run_ok();
+        assert_eq!(
+            h.state().note.as_ref().unwrap().document.selection,
+            Some(selection.clone())
+        );
+        h.state_mut().note.as_mut().unwrap().text = "First selected note".into();
+        h.get_by_label("Save note").click();
+        wait(&mut h);
+        h.state_mut().note_from_selection(
+            verse.refs[0],
+            *verse.refs.last().unwrap(),
+            Some(selection),
+        );
+        h.run_ok();
+        h.state_mut().note.as_mut().unwrap().text = "Second selected note".into();
+        h.get_by_label("Save note").click();
+        wait(&mut h);
+        h.get_by_label("Open 2 notes on this selection").click();
+        h.run_ok();
+        assert!(h.query_all_by_label("First selected note").next().is_some());
+        assert!(
+            h.query_all_by_label("Second selected note")
+                .next()
+                .is_some()
+        );
+        h.render()
+            .unwrap()
+            .save(out.join(format!("modal-{}.png", size[0])))
+            .unwrap();
+        h.get_by_label("Close notes").click();
+        h.run_ok();
+        h.state_mut().choose(Destination::Notes);
+        h.state_mut().notes_state.filter = 0;
+        h.run_ok();
+        h.step();
+        h.render()
+            .unwrap()
+            .save(out.join(format!("notebook-{}.png", size[0])))
+            .unwrap();
+    }
+}
+
+fn tap_word(h: &mut Harness<FontesApp>, verse: &Verse, index: usize) {
+    let rect = h
+        .query_by_value(&verse.text)
+        .unwrap_or_else(|| h.get_by_label(&verse.text))
+        .rect();
+    let p = h
+        .state()
+        .state
+        .as_ref()
+        .unwrap()
+        .session
+        .preferences
+        .clone();
+    let mut job = egui::text::LayoutJob::simple(
+        verse.text.clone(),
+        egui::FontId::new(p.text_size, egui::FontFamily::Name("scripture".into())),
+        theme::palette(&h.ctx).ink,
+        rect.width(),
+    );
+    job.sections[0].format.line_height = Some(p.text_size * p.line_spacing);
+    job.sections[0].format.extra_letter_spacing = -0.25;
+    let g = h.ctx.fonts_mut(|f| f.layout_job(job));
+    let c = g.pos_from_cursor(egui::text::CCursor::new(index));
+    let point = rect.min + c.center().to_vec2() + egui::vec2(3.0, 0.0);
+    h.input_mut().events.extend([
+        egui::Event::PointerMoved(point),
+        egui::Event::PointerButton {
+            pos: point,
+            button: egui::PointerButton::Primary,
+            pressed: true,
+            modifiers: Default::default(),
+        },
+    ]);
+    h.step();
+    h.input_mut().events.push(egui::Event::PointerButton {
+        pos: point,
+        button: egui::PointerButton::Primary,
+        pressed: false,
+        modifiers: Default::default(),
+    });
+    h.step();
 }

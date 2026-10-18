@@ -46,13 +46,15 @@ target/release/fontes-data validate dist/reading/library.sqlite
 
 The output directory must be new or empty. A verified content-addressed source cache lives in `.data-cache/`. Use `--offline` to rebuild from that cache without any network access. If upstream replaces a locked archive, the pipeline can recover that exact archive from its retained assets on earlier data releases. It fails if the required locked bytes cannot be recovered; it never substitutes a changed download.
 
-The reading profile contains **31,102 canonical anchors and 62,204 verse rows**, across 66 books and two translations. `verses_by_reference` links source verse records to canonical IDs. The WEB Romans doxology is mapped from source Romans 14:24–26 to canonical Romans 16:25–27. Four empty WEB verses are represented explicitly as source omissions. The reviewed rules are in `data/mappings/reading-v1.json`; no text is invented to fill those entries.
+The current reading profile contains **31,102 canonical anchors and 62,204 verse rows**, across 66 books and two translations, plus **31,153 TSK cross-reference entries**. Building it now requires the SWORD extraction bridge described below. Legacy signed reading-only packages remain supported; newly compiled TSK data requires a new signed release to reach installed Reading libraries. `verses_by_reference` links source verse records to canonical IDs. The WEB Romans doxology is mapped from source Romans 14:24–26 to canonical Romans 16:25–27. Four empty WEB verses are represented explicitly as source omissions. The reviewed rules are in `data/mappings/reading-v1.json`; no text is invented to fill those entries.
 
 The first adapter imports verse-per-line XML. It preserves verse text after trimming surrounding whitespace, including KJV paragraph symbols, but does not yet import USFM paragraph, poetry, or footnote structure. User notes and highlights belong in a separate database defined by `data/schema/user-v1.sql`.
 
-## Build the study data
+## Build the complete default free resources
 
-The study profile includes reading plus Strong’s Greek (5,624 entries), Strong’s Hebrew (8,674), Robinson TR Greek morphology (all 7,957 NT verses), Matthew Henry (5,360 articles), Nave’s (5,322 entries), and TSK (31,153 entries). It contains 64,090 resources, 281,240 Greek tokens across both source reading streams, 281,307 analyses, and 385,194 TSK target ranges. The updated Study profile additionally includes 305,507 OSHB Hebrew words and 349,297 edition-bound KJV dictionary-tag spans. The locally verified download is approximately 136 MB; SQLite occupies approximately 733 MB (publication builds record their exact sizes).
+New installations use this complete bundle with one **Install free resources** prompt. The `study` ID is retained internally for compatibility; users do not choose between Reading and Study. Compiler and setup defaults select this full bundle. Explicit reduced-profile builds remain available for historical clients and maintenance.
+
+Before the additional dictionaries below, the study profile included reading plus Strong’s Greek (5,624 entries), Strong’s Hebrew (8,674), Robinson TR Greek morphology (all 7,957 NT verses), Matthew Henry (5,360 articles), Nave’s (5,322 entries), and TSK (31,153 entries). That baseline contains 64,090 resources, 281,240 Greek tokens across both source reading streams, 281,307 analyses, and 385,194 TSK target ranges. The updated Study profile additionally includes 305,507 OSHB Hebrew words and 349,297 edition-bound KJV dictionary-tag spans. The locally verified download is approximately 136 MB; SQLite occupies approximately 733 MB (publication builds record their exact sizes).
 
 Install **SWORD 1.9.0** as a build dependency and compile the small extraction bridge. Applications only need SQLite, zstd, and the shared update contracts.
 
@@ -118,14 +120,14 @@ For TSK, first select its resource through an `applies_to` link for the origin v
 
 [Data releases](https://github.com/DavidHoenisch/fontes-v2/releases) use tags such as `data-v1-stable-1`. Pushing a relevant compiler, source, schema, or workflow change to `main` runs `.github/workflows/data-release.yml`; the workflow can also be dispatched manually.
 
-The workflow tests the workspace, builds both real profiles twice, compares SQLite and compressed bytes, and passes checked outputs to a separate publishing job. Only that job receives the signing secret and repository write permission. The publisher allocates the next data sequence, signs the manifest, creates a draft release, verifies every uploaded asset, publishes, and downloads/verifies the published assets again. It never overwrites published releases and sets `make_latest=false` to keep data releases separate from app releases. Identical content from the same compiler commit is a no-op.
+The workflow tests the workspace, builds the complete default bundle twice, compares SQLite, compressed bytes and audit reports, and passes checked outputs to a separate publishing job. Only that job receives the signing secret and repository write permission. The publisher allocates the next data sequence, signs the manifest, creates a draft release, verifies every uploaded asset, publishes, and downloads/verifies the published assets again. It never overwrites published releases and sets `make_latest=false` to keep data releases separate from app releases. Identical content from the same compiler commit is a no-op.
 
 Published assets include:
 
-- `fontes-reading.sqlite.zst` and `fontes-study.sqlite.zst`, each a complete content snapshot.
+- `fontes-study.sqlite.zst`: one complete free-resource snapshot. The internal `study` name is retained for compatibility; no separate Reading download is built by the release workflow.
 - `release-manifest.json` and its raw Ed25519 signature, covering the database hashes, lengths, versions, source identities, and capabilities.
-- `sources.lock.json`, `NOTICE.txt`, both profile validation reports, and `study-imports.json`. Study also retains `GPL-3.0.txt` and `KJV-ANNOTATIONS-NOTICE.md`.
-- `changes.json`, including per-profile verse/resource additions, changes, and removals.
+- `sources.lock.json`, `NOTICE.txt`, the complete bundle validation report, and `study-imports.json`. The bundle also retains `GPL-3.0.txt` and `KJV-ANNOTATIONS-NOTICE.md`.
+- `changes.json`, including verse/resource changes, the default profile and explicit retirement of the separate Reading download.
 - All ten exact source inputs, named by SHA-256 (`.xml` dictionaries and `.zip` archives), for future rebuilds.
 
 Verify a downloaded release using the public key committed in this repository:
@@ -145,3 +147,7 @@ The publisher expects the `FONTES_DATA_SIGNING_KEY` GitHub repository secret. It
 ## Further development
 
 Reading and study are published together so a new study release preserves the reading update channel. The publisher accepts `publish --dir dist/reading --additional-dir dist/study` with the usual trust and repository arguments. Scheduled source discovery, reviewed update PRs, and mobile/desktop installation are specified in the [architecture](docs/architecture/data-pipeline.md). See [source research](docs/research/public-domain-data-sources.md) for content and rights decisions.
+
+### Additional default dictionaries
+
+New default builds also include **Abbott-Smith’s Greek Lexicon (1922), 6,153 entries**, and **Easton’s Bible Dictionary (1897 third edition), 3,963 entries**. Source bytes, rights statements, import behavior and unresolved-citation limits are documented in [the dictionary integration review](docs/research/abbott-smith-easton.md). Existing published bundles remain compatible; these additions reach existing users through a new data snapshot, not an APK alone.

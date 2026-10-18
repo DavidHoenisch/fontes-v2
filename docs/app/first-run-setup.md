@@ -1,4 +1,14 @@
-# First-run library setup
+# First-run free resources and cold start
+
+Current Tauri flow (D043, 2026-10-17): new users get one **Install free resources** action. It installs the complete default bundle (Bibles, dictionaries, original-language data, Matthew Henry, Nave’s and TSK). There is no Reading/Study choice. The internal `study` artifact ID remains for compatibility; `data/profiles.json.default_profile`, bootstrap defaults and CLI defaults select it. The older Reading artifact remains supported for existing signed clients and explicit maintenance tooling.
+
+An existing-library cold start renders no welcome/installer/database-loading content while verification and opening occur. Desktop starts with its window hidden and reveals it after the reader has committed, or after a genuine setup/error state is ready. Android uses a quiet background while its WebView opens the library. Only a typed `missing` response reveals first-run installation. Validation/storage failures reveal Retry and do not offer to replace existing content. An explicit installation shows progress text; normal launches do not. No timing delay guesses whether setup is needed, and no saved reader HTML or private notes are cached into a splash.
+
+## Retained legacy egui wizard
+
+The following describes the older frontend retained for compatibility and rollback, not the new Tauri first-run experience.
+
+### Legacy first-run library setup
 
 Open Fontes, choose **Reading** or **Study**, and select **Continue**. Fontes checks published library releases and shows the signed download size, installed size and estimated temporary free-space requirement. Select **Download and open**. The app downloads, verifies and prepares the library, then opens Scripture automatically. The bottom action stays reachable while the screen scrolls. No account, compiler, filesystem path or storage picker is needed on desktop or Android.
 
@@ -6,7 +16,7 @@ Reading contains KJV and WEB. Study adds Strong’s dictionaries, Robinson Greek
 
 ## Service and trust boundary
 
-The toolkit-independent [`fontes-engine::bootstrap`](../../crates/fontes-engine/src/bootstrap.rs) service owns setup. Its operation identity is `library.setup`; both the GUI and `fontes-cli setup --data-dir DIRECTORY --profile reading|study` use it. This is a bootstrap lifecycle operation before an Engine exists, alongside explicit local Open. It is not a new member of the initialized engine’s 13-command registry or an advertised JSON/MCP tool. A future pre-initialization remote transport needs an explicit contract.
+The toolkit-independent [`fontes-engine::bootstrap`](../../crates/fontes-engine/src/bootstrap.rs) service owns setup. Its operation identity is `library.setup`; both the GUI and `fontes-cli setup --data-dir DIRECTORY --profile reading|study` use it. This is a bootstrap lifecycle operation before an Engine exists, alongside explicit local Open. It is not a new member of the initialized engine’s command registry or an advertised JSON/MCP tool. A future pre-initialization remote transport needs an explicit contract.
 
 The background job sends bounded progress/offer/completion events and requests UI repaint through a callback. A current-thread Tokio runtime and reqwest/rustls perform cancellable HTTP requests on the setup worker. No HTTP, signature processing, decompression or SQLite validation runs in the render loop. Cancelling pending HTTP futures is polled at 100 ms; connect/read timeouts are 10/20 seconds, metadata requests are bounded to 30 seconds, and an artifact transfer to 20 minutes. SQLite integrity checks must finish before cancellation can leave their validation phase; the UI stays responsive.
 

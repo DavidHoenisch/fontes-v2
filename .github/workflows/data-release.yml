@@ -1,4 +1,4 @@
-name: Reading and study data release
+name: Free resources data release
 
 on:
   push:
@@ -46,42 +46,34 @@ jobs:
           cargo clippy --locked -p fontes-data-contracts -p fontes-data-pipeline -p fontes-resource --all-targets -- -D warnings
       - name: Compile the pipeline
         run: cargo build --release --locked -p fontes-data-pipeline
-      - name: Compile real reading and study sources
+      - name: Compile the complete default free-resource package
         env:
           FONTES_BUILDER_COMMIT: ${{ github.sha }}
           FONTES_REPOSITORY: ${{ github.repository }}
         run: |
-          for profile in reading study; do
-            target/release/fontes-data build --profile "$profile" --output "dist/$profile" --builder-commit "$FONTES_BUILDER_COMMIT" --mirror-repository "$FONTES_REPOSITORY"
-          done
+          target/release/fontes-data build --profile study --output dist/free-resources --builder-commit "$FONTES_BUILDER_COMMIT" --mirror-repository "$FONTES_REPOSITORY"
       - name: Prove reproducibility from the verified offline cache
         env:
           FONTES_BUILDER_COMMIT: ${{ github.sha }}
         run: |
-          for profile in reading study; do
-            target/release/fontes-data build --profile "$profile" --output "dist/repro-$profile" --builder-commit "$FONTES_BUILDER_COMMIT" --offline
-            cmp "dist/$profile/library.sqlite" "dist/repro-$profile/library.sqlite"
-            cmp "dist/$profile/fontes-$profile.sqlite.zst" "dist/repro-$profile/fontes-$profile.sqlite.zst"
-            cmp "dist/$profile/validation-report.json" "dist/repro-$profile/validation-report.json"
-          done
+          target/release/fontes-data build --profile study --output dist/repro-free-resources --builder-commit "$FONTES_BUILDER_COMMIT" --offline
+          cmp dist/free-resources/library.sqlite dist/repro-free-resources/library.sqlite
+          cmp dist/free-resources/fontes-study.sqlite.zst dist/repro-free-resources/fontes-study.sqlite.zst
+          cmp dist/free-resources/validation-report.json dist/repro-free-resources/validation-report.json
+          cmp dist/free-resources/study-imports.json dist/repro-free-resources/study-imports.json
       - name: Retain checked outputs for the publisher
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: content-build
           path: |
             target/release/fontes-data
-            dist/reading/*.sqlite
-            dist/reading/*.zst
-            dist/reading/*.json
-            dist/reading/*.txt
-            dist/reading/source-*.zip
-            dist/study/*.sqlite
-            dist/study/*.zst
-            dist/study/*.json
-            dist/study/*.txt
-            dist/study/KJV-ANNOTATIONS-NOTICE.md
-            dist/study/source-*.zip
-            dist/study/source-*.xml
+            dist/free-resources/*.sqlite
+            dist/free-resources/*.zst
+            dist/free-resources/*.json
+            dist/free-resources/*.txt
+            dist/free-resources/KJV-ANNOTATIONS-NOTICE.md
+            dist/free-resources/source-*.zip
+            dist/free-resources/source-*.xml
           if-no-files-found: error
           retention-days: 7
           compression-level: 1
@@ -108,4 +100,4 @@ jobs:
           FONTES_REPOSITORY: ${{ github.repository }}
         run: |
           chmod +x checked-build/target/release/fontes-data
-          checked-build/target/release/fontes-data publish --dir checked-build/dist/reading --additional-dir checked-build/dist/study --trust data/trust/data-release-1.json --repository "$FONTES_REPOSITORY"
+          checked-build/target/release/fontes-data publish --dir checked-build/dist/free-resources --trust data/trust/data-release-1.json --repository "$FONTES_REPOSITORY"

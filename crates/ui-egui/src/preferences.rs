@@ -159,6 +159,22 @@ fn preview(ui: &mut egui::Ui, p: &Preferences, s: &Workspace) {
     }
 }
 impl FontesApp {
+    pub(super) fn card_motion_control(&mut self, ui: &mut egui::Ui) {
+        if ui
+            .add_sized(
+                [ui.available_width(), 44.0],
+                egui::Checkbox::new(&mut self.reduce_card_motion, "Reduce word-card motion"),
+            )
+            .changed()
+            && let Err(error) = std::fs::write(
+                self.data_dir.join("reduce-card-motion-v1.txt"),
+                self.reduce_card_motion.to_string(),
+            )
+        {
+            self.error = Some(format!("Could not save motion preference: {error}"));
+        }
+    }
+
     pub(super) fn reading_controls(ui: &mut egui::Ui, p: &mut Preferences, s: &Workspace) {
         typeface_controls(ui, p);
         ui.add_space(24.0);
@@ -255,6 +271,7 @@ impl FontesApp {
                         // Explicit label remains stable when the disclosure indicator changes.
                         if self.reading_advanced {
                             typeface_controls(ui, &mut preferences);
+                            self.card_motion_control(ui);
                             ui.add_space(16.0);
                             manage_library = ui
                                 .add_sized(
@@ -283,4 +300,31 @@ impl FontesApp {
             self.choose(Destination::Preferences);
         }
     }
+}
+
+/// Keep attribution/source access in settings rather than the study reading flow.
+pub(super) fn source_credits(ui: &mut egui::Ui) {
+    ui.collapsing("Source credits & licenses", |ui| {
+        ui.collapsing("Chapter heading typeface", |ui| {
+            ui.label("Cormorant Garamond Italic — Christian Thalmann and the Cormorant Project Authors. SIL Open Font License 1.1.");
+            ui.hyperlink_to("Typeface source", "https://github.com/google/fonts/tree/main/ofl/cormorantgaramond");
+            ui.collapsing("Font license", |ui| { ui.label(include_str!("../../../assets/ui/licenses/CORMORANT-GARAMOND-OFL.txt")); });
+        });
+        ui.label("Credits for resources distributed with the Study library.");
+            ui.collapsing("Hebrew source and license", |ui| {
+                ui.label("Original work of the Open Scriptures Hebrew Bible available at https://github.com/openscriptures/morphhb");
+                ui.hyperlink_to("Open Scriptures Hebrew Bible", "https://github.com/openscriptures/morphhb");
+                ui.hyperlink_to("CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/");
+                caption(ui,"Word forms and analyses are retained from OSHB. Verse numbering is adapted to the reading edition; variants in source notes are not shown. No endorsement implied.");
+            });
+            ui.collapsing("KJV annotation source and license", |ui| {
+                ui.label("Strong’s tags: Bible Foundation (OT), KJV2003/CrossWire and Maurice Robinson (NT). Formatting: Michael Paul Johnson/eBible.org. Copyright © 2003–2023 CrossWire Bible Society. Distributed under GNU GPL version 3.");
+                ui.hyperlink_to("Source and credits", "https://wiki.crosswire.org/CrossWire_KJV");
+                ui.hyperlink_to("Editable USFM source", "https://ebible.org/Scriptures/eng-kjv_usfm.zip?x=1");
+                caption(ui, "Tags are checked against this KJV text; mismatched verses are withheld. A dictionary tag does not identify a Hebrew or Greek verse token.");
+                ui.collapsing("GNU General Public License", |ui| {
+                    ui.label(include_str!("../../../data/rights/GPL-3.0.txt"));
+                });
+            });
+    });
 }

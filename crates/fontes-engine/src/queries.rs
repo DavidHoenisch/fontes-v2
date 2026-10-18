@@ -100,8 +100,34 @@ impl Engine {
                 verse.word_links.push(link);
             }
         }
+        let encoded=self.user.prepare("SELECT annotation_id,style_json,selection_json FROM fontes_highlights_v1 ORDER BY annotation_id")?.query_map([],|r|Ok((r.get::<_,String>(0)?,r.get::<_,String>(1)?,r.get::<_,Option<String>>(2)?)))?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let highlights = encoded
+            .into_iter()
+            .map(|(annotation_id, style, selection)| {
+                Ok(crate::RichHighlight {
+                    annotation_id,
+                    style: serde_json::from_str(&style)?,
+                    selection: selection.map(|s| serde_json::from_str(&s)).transpose()?,
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
         let annotations=self.user.prepare("SELECT a.id,r.start_ref_id,r.end_ref_id,a.type,a.color,a.content,a.updated_at FROM annotations a JOIN reference_ranges r ON r.id=a.range_id ORDER BY a.updated_at DESC,a.id")?.query_map([],|r|Ok(Annotation{id:r.get(0)?,start_ref:r.get(1)?,end_ref:r.get(2)?,kind:if r.get::<_,String>(3)?=="note"{AnnotationKind::Note}else{AnnotationKind::Highlight},color:r.get(4)?,content:r.get(5)?,updated_at:r.get(6)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
         let saved=self.user.prepare("SELECT r.start_ref_id,s.type FROM saved_references s JOIN reference_ranges r ON r.id=s.range_id ORDER BY s.type,s.last_used_at DESC,s.id")?.query_map([],|r|{let id=r.get(0)?;Ok(SavedReference{ref_id:id,label:label(&self.books,id),kind:r.get(1)?})})?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let notes = self
+            .user
+            .prepare(
+                "SELECT annotation_id,document_json FROM fontes_notes_v1 ORDER BY annotation_id",
+            )?
+            .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
+            .collect::<std::result::Result<Vec<_>, _>>()?
+            .into_iter()
+            .map(|(annotation_id, json)| {
+                Ok(crate::RichNote {
+                    annotation_id,
+                    document: serde_json::from_str(&json)?,
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
         Ok(Workspace {
             content_id: self.content_id.clone(),
             profile: self.profile.clone(),
@@ -110,6 +136,8 @@ impl Engine {
             translations: self.translations.clone(),
             passage,
             annotations,
+            highlights,
+            notes,
             saved,
             has_study: self.has_study,
         })
@@ -251,4 +279,26 @@ fn dictionary_headword(resource_id: String, display: Option<String>) -> Option<D
         text: text.to_owned(),
         transliteration: metadata["transliteration"].as_str().map(str::to_owned),
     })
+}
+
+impl Engine {
+    pub(crate) fn library_catalog(&self, source: Option<&str>, offset: u32) -> Result<Data> {
+        if offset > 100000 || source.is_some_and(|s| s.len() > 512) {
+            return Err(Error::invalid("Invalid library page."));
+        }
+        let sources=self.content.prepare("SELECT s.source_id,r.type,count(*),min(r.author) FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id GROUP BY s.source_id,r.type ORDER BY s.source_id,r.type")?.query_map([],|r|Ok(LibrarySource{id:r.get(0)?,kind:r.get(1)?,count:r.get(2)?,author:r.get(3)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
+        let mut resources = if let Some(source) = source {
+            self.content.prepare("SELECT r.id,r.title,r.author,r.type,'installed',substr(r.content,1,260) FROM resources r JOIN source_snapshots s ON s.id=r.source_snapshot_id WHERE s.source_id=?1 ORDER BY r.title,r.id LIMIT 51 OFFSET ?2")?.query_map(params![source,offset],summary)?.collect::<std::result::Result<Vec<_>,_>>()?
+        } else {
+            vec![]
+        };
+        let has_more = resources.len() > 50;
+        resources.truncate(50);
+        Ok(Data::Library {
+            sources,
+            resources,
+            offset,
+            has_more,
+        })
+    }
 }

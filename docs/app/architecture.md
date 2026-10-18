@@ -1,6 +1,8 @@
 # Engine-first application architecture
 
-Accepted direction: Rust application logic, egui on eframe/winit, wgpu rendering, and a replaceable UI. The [PhotoCraft architecture reference](https://raw.githubusercontent.com/storytold/photocraft/main/docs/architecture.md) informed the command/layer boundary; Fontes implements its own Scripture/reference behavior against its existing data contracts. The [eframe 0.35 API](https://docs.rs/eframe/0.35.0/eframe/) documents the selected native startup/rendering integration.
+Current direction (D041): Rust engine with a React/HeroUI presentation in Tauri 2. See [migration implementation and verification](tauri-migration.md). The following egui architecture remains the retained legacy frontend; its statements about no JavaScript/WebView describe that frontend, not the Tauri replacement.
+
+Legacy direction: Rust application logic, egui on eframe/winit, wgpu rendering, and a replaceable UI. The [PhotoCraft architecture reference](https://raw.githubusercontent.com/storytold/photocraft/main/docs/architecture.md) informed the command/layer boundary; Fontes implements its own Scripture/reference behavior against its existing data contracts. The [eframe 0.35 API](https://docs.rs/eframe/0.35.0/eframe/) documents the selected native startup/rendering integration.
 
 ## Layers and ownership
 
@@ -111,3 +113,15 @@ The native presentation follows the owner-approved HTML geometry rather than rel
 Word-action previews use the same bounded serial worker and `study.word` command, with FIFO UI-local reply purposes. Preview headwords are cached within a bounded session cache and never replace an existing word or article result. A single tap resolves only the supplied scalar span of the exact displayed edition; it does not infer a link from spelling.
 
 Backdrop blur requests one clean frame through eframe/wgpu's application-frame readback, downscales to at most 512 pixels per dimension and runs three bounded blur passes on a background thread. Input is capped at 16 million pixels. Only the app frame is involved; no OS desktop capture, storage or transmission. Stale replies are generation-tagged and ignored; closing a sheet releases the texture/result receiver. Resizing recaptures; a palette switch discards stale-colored blur. Unsupported readback leaves an interactive tinted scrim. Native Metal readback is observed separately from injected readback events in the egui harness; Android runtime validation remains separate.
+
+Rich highlights add the [documented app-owned v1 extension](../../specs/app/highlights-v1.md) without altering published user/content SQL. `highlight.save` validates typed styles, exact scalar offsets/quotes, edition membership and contiguous span coverage before an atomic annotation/extension transaction. Legacy `annotation.save` remains supported. The UI renders styles on text rather than reinstating the removed selection card; free selection has an explicit handle-edit mode, and normal text taps/swipes retain their separate word-study/scroll behavior.
+
+Occurrence exploration uses additive `study.occurrences`: full distinct canonical verse aggregation is independent of page/filter, unlike the retained legacy `study.word` first-100 sample. Counts deduplicate source analyses and witnesses and describe installed original-token associations. Active-edition previews may be absent; they are not fabricated. Native rendering uses five proportional book bars and six-result pages; reading navigation retains a transient return context. No SQL or content migration is required.
+
+## Bundled book openings
+
+Reader book headings open Covenant Forms artwork and public-domain Henry introductions. The reference picker also exposes About [book], so access does not require scrolling to the chapter heading. Back preserves the reading reference; Start reading uses the existing Select command at book 1:1; Choose a chapter opens the existing staged picker. No SQL or engine command contract changes. Static data and SVGs are bundled under assets/ui/book-covers; provenance, continuator credits and extraction boundaries are documented there. This does not implement the separate structured book-overview database requirement.
+
+## Approved Notes flows
+
+The native notebook and scrapbook editor implement the Notes, selection-note and scrapbook prototypes. Durable document/source validation is engine-owned; egui never queries SQLite. The new app extension and 17-command catalog preserve published user-v1 and annotation fallback compatibility. See [notes v1](../../specs/app/notes-v1.md) for source retention, selection behavior, limits and remaining verification boundaries.

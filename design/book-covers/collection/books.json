@@ -1,0 +1,2382 @@
+{
+  "style": "Covenant Forms",
+  "status": "Complete 66-book first-edition SVG art collection; introduction boundaries still under review",
+  "books": [
+    {
+      "id": 1,
+      "osis": "Gen",
+      "name": "Genesis",
+      "testament": "OT",
+      "title": "Beginnings & promise",
+      "themes": [
+        "Creation",
+        "human failure",
+        "covenant"
+      ],
+      "motifs": [
+        "Garden tree",
+        "branching river",
+        "covenant stars"
+      ],
+      "references": [
+        "Gen 1–3",
+        "12:1–3",
+        "15:1–6"
+      ],
+      "composition": "A garden tree at the meeting of land and water; a field of stars opens above it.",
+      "art": "../art/genesis-geometric.svg",
+      "art_status": "SVG cover · retained style study",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Gen.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface precedes the book introduction; the previously verified paragraph is available.",
+        "source_opening": "Genesis to Deuteronomy\nPREFACE\nGenesis to Deuteronomy\nThough it is most my concern, that I be able to give a good account to God and my own conscience, yet, perhaps, it will be expected that I give the world also some account of this bold undertaking; which I shall endeavour to do with all plainness, and as one who believes, that if men must be reckoned with in the great day, for every vain and idle word they speak, much more for every vain and idle line they write. And it may be of use, in the first place, to lay down those great and sacred principles which I go upon, and am governed by, in this endeavour to explain and improve these portions of holy writ; which endeavour I humbly offer to ",
+        "source_sha256": "f826e8f615b6f4e291f283158c3e3d2367479f953c7ad8982398aa84496990eb"
+      },
+      "art_sha256": "566887d59e8946541c8427d255fb35ac4902833a657226b7995223d6212a0303",
+      "art_bytes": 2078
+    },
+    {
+      "id": 2,
+      "osis": "Exod",
+      "name": "Exodus",
+      "testament": "OT",
+      "title": "A way through",
+      "themes": [
+        "Deliverance",
+        "presence",
+        "covenant"
+      ],
+      "motifs": [
+        "Parted waters",
+        "open path",
+        "pillar of fire"
+      ],
+      "references": [
+        "Exod 12–14",
+        "19–20",
+        "40:34–38"
+      ],
+      "composition": "Two walls of water frame a path toward a mountain, guided by a vertical flame.",
+      "art": "../art/exodus-geometric.svg",
+      "art_status": "SVG cover · retained style study",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Exod.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Exodus\nMoses (the servant of the Lord in writing for him as well as in acting for him—with the pen of God as well as with the rod of God in his hand) having, in the first book of his history, preserved and transmitted the records of the church, while it existed in private families, comes, in this second book, to give us an account of its growth into a great nation; and, as the former furnishes us with the best economics, so this with the best politics. The beginning of the former book shows us how God formed the world for himself; the beginning of this shows us how he formed Israel for himself, and both to show forth his praise, Isa. xliii. 21. There we have the creation of the world in hist",
+        "source_sha256": "671ca48d635d29dd7a765f90cd01dce000eab1ccfcdbf730b51af7f8ec5244a6"
+      },
+      "art_sha256": "3e99dc392ccfd90c2ade24d121893f5ed224e2ea86c96b20da907989f3acf09e",
+      "art_bytes": 755
+    },
+    {
+      "id": 3,
+      "osis": "Lev",
+      "name": "Leviticus",
+      "testament": "OT",
+      "title": "Draw near in holiness",
+      "themes": [
+        "Holiness",
+        "atonement",
+        "worship"
+      ],
+      "motifs": [
+        "Sanctuary veil",
+        "altar",
+        "cleansing basin"
+      ],
+      "references": [
+        "Lev 1",
+        "16",
+        "19:1–2"
+      ],
+      "composition": "A parted sanctuary curtain frames a restrained altar and a small basin; no human figure represents God.",
+      "art": "../art/lev-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Lev.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Leviticus\nThere is nothing historical in all this book of Leviticus except the account which it gives us of the consecration of the priesthood (ch. viii.-ix.), of the punishment of Nadab and Abihu, by the hand of God, for offering strange fire (ch. x), and of Shelomith's son, by the hand of the magistrate, for blasphemy (ch. xxiv). All the rest of the book is taken up with the laws, chiefly the ecclesiastical laws, which God gave to Israel by Moses, concerning their sacrifices and offerings, their meats and drinks, and divers washings, and the other peculiarities by which God set that people apart for himself, and distinguished them from other nations, all which were shadows of good things t",
+        "source_sha256": "c01afdc37122538467512bd230517edf5113f0106fbc0510633ee9411a194c03"
+      },
+      "art_sha256": "e75453754e9bb307bd8b5b34c52e1594cc829e7e449a6a00ae11af2d64e2b708",
+      "art_bytes": 2082
+    },
+    {
+      "id": 4,
+      "osis": "Num",
+      "name": "Numbers",
+      "testament": "OT",
+      "title": "Through the wilderness",
+      "themes": [
+        "Wilderness testing",
+        "faithfulness",
+        "guidance"
+      ],
+      "motifs": [
+        "Camp tents",
+        "winding path",
+        "cloud"
+      ],
+      "references": [
+        "Num 9:15–23",
+        "13–14",
+        "21:4–9"
+      ],
+      "composition": "A camp of small tents follows a long path under a sheltering cloud, with the destination beyond the horizon.",
+      "art": "../art/num-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Num.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Numbers\nThe titles of the five books of Moses, which we use in our Bibles, are all borrowed from the Greek translation of the Seventy, the most ancient version of the Old Testament that we know of. But the title of this book only we turn into English; in all the rest we retain the Greek word itself, for which difference I know no reason but that the Latin translators have generally done the same. Otherwise this book might as well have been called Arithmoi, the Greek title, as the first Genesis, and the second Exodus; or these might as well have been translated, and called, the first the Generation, or Original, the second the Out-let, or Escape, as this Numbers.—This book was thus entitled b",
+        "source_sha256": "aa31c7e13ff105ddcf4e1aa30dd1658b1ac26a8c1b779cd93e2f3d080cd73015"
+      },
+      "art_sha256": "2f8023d6364cce6bf3042b540922544366b8c02cf867bfddacd57c3fc6c778d4",
+      "art_bytes": 1919
+    },
+    {
+      "id": 5,
+      "osis": "Deut",
+      "name": "Deuteronomy",
+      "testament": "OT",
+      "title": "Remember & choose life",
+      "themes": [
+        "Remembrance",
+        "covenant renewal",
+        "obedience"
+      ],
+      "motifs": [
+        "Open scroll",
+        "mountain",
+        "branching path"
+      ],
+      "references": [
+        "Deut 6:4–9",
+        "8",
+        "30:15–20"
+      ],
+      "composition": "An open scroll rests before a mountain; a path forks toward dry and flourishing ground.",
+      "art": "../art/deut-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Deut.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Deuteronomy\nThis book is a repetition of very much both of the history and of the laws contained in the three foregoing books, which repetition Moses delivered to Israel (both by word of mouth, that it might affect, and by writing, that it might abide) a little before his death. There is no new history in it but that of the death of Moses in the last chapter, nor any new revelation to Moses, for aught that appears, and therefore the style here is not, as before, The Lord spoke unto Moses, saying. But the former laws are repeated and commented upon, explained and enlarged, and some particular precepts added to them, with copious reasonings for the enforcing of them: in this Moses was divinely",
+        "source_sha256": "7ac26f86a3ef2f5bde1ff7c0d4b7aca8ffa485412b4dbabc1d58c7893655eac9"
+      },
+      "art_sha256": "6b09b1a19146d8eba0eedebc282f18340cd831ccf9bc189bcf4fb65a418512a4",
+      "art_bytes": 1587
+    },
+    {
+      "id": 6,
+      "osis": "Josh",
+      "name": "Joshua",
+      "testament": "OT",
+      "title": "Across into promise",
+      "themes": [
+        "Faithfulness",
+        "inheritance",
+        "courageous obedience"
+      ],
+      "motifs": [
+        "River crossing",
+        "memorial stones",
+        "distant hills"
+      ],
+      "references": [
+        "Josh 3–4",
+        "21:43–45",
+        "24:14–24"
+      ],
+      "composition": "Twelve simple stones mark an open river crossing, with settled hills beyond.",
+      "art": "../art/josh-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Josh.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface precedes the book introduction.",
+        "source_opening": "Joshua to Esther\nPREFACE\nJoshua to Esther\nThis second volume of methodized and practical expositions of the inspired writings ventures abroad with fear and trembling in the same plain and homely dress with the former on the Pentateuch. Ornari res ipsa negat; contenta doceri—the subject requires no ornament; to have it apprehended is all. But I trust, through grace, it proceeds from the same honest design to promote the knowledge of the scripture, in order to the reforming of men's hearts and lives. If I may but be instrumental to make my readers wise and good, wiser and better, more watchful against sin and more careful of their duty both to God and man, and, in order thereto, more in love w",
+        "source_sha256": "632ddc703d02f3ba696b9da10b9f221257d8eafd91aef489bdcd20beaad5a562"
+      },
+      "art_sha256": "3001d125cf633a1363a33d44cbf8d3a0b9cbb7a43e23e0ca8245d805b43bb4be",
+      "art_bytes": 2200
+    },
+    {
+      "id": 7,
+      "osis": "Judg",
+      "name": "Judges",
+      "testament": "OT",
+      "title": "The turning cycle",
+      "themes": [
+        "Repeated failure",
+        "oppression",
+        "deliverance"
+      ],
+      "motifs": [
+        "Broken circle",
+        "dark valley",
+        "returning light"
+      ],
+      "references": [
+        "Judg 2:10–19",
+        "21:25"
+      ],
+      "composition": "An interrupted circular path descends into a valley and turns toward a small shaft of light.",
+      "art": "../art/judg-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Judg.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Judges\nThis is called the Hebrew Shepher Shophtim, the Book of Judges, which the Syriac and Arabic versions enlarge upon, and call it, The Book of the Judges of the Children of Israel; the judgments of that nation being peculiar, so were their judges, whose office differed vastly from that of the judges of other nations. The LXX. entitles it only Kritai, Judges. It is the history of the commonwealth of Israel, during the government of the judges from Othniel to Eli, so much of it as God saw fit to transmit to us. It contains the history (according to Dr. Lightfoot's computation) of 299 years, reckoning to Othniel of Judah forty years, to Ehud of Benjamin eighty years, to Barak of Naphtali fo",
+        "source_sha256": "57c75d4c9aecbc63d55601beafe9e694afb9bc681afecd6ba3fd5e9ddd92ea9a"
+      },
+      "art_sha256": "0dc1c4807444b5e87e1dc58751773d007a0fedfd11b3481299a5dc4a595b6541",
+      "art_bytes": 1139
+    },
+    {
+      "id": 8,
+      "osis": "Ruth",
+      "name": "Ruth",
+      "testament": "OT",
+      "title": "Under these wings",
+      "themes": [
+        "Loyalty",
+        "provision",
+        "redemption"
+      ],
+      "motifs": [
+        "Barley",
+        "sheltering wings",
+        "joined fields"
+      ],
+      "references": [
+        "Ruth 1:16–17",
+        "2:12",
+        "4:13–17"
+      ],
+      "composition": "Sheltering wings stretch above barley and two adjoining fields, suggesting belonging without depicting God.",
+      "art": "../art/ruth-geometric.svg",
+      "art_status": "SVG cover · retained style study",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Ruth.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Ruth\nThis short history of the domestic affairs of one particular family fitly follows the book of Judges (the events related here happening in the days of the judges), and fitly goes before the books of Samuel, because in the close it introduces David; yet the Jews, in their Bibles, separate it from both, and make it one of the five Megilloth, or Volumes, which they put together towards the latter end, in this order: Solomon's Song, Ruth, Lamentations, Ecclesiastes, and Esther. It is probable that Samuel was the penman of it. It relates not miracles nor laws, wars nor victories, nor the revolutions of states, but the affliction first and afterwards the comfort of Naomi, the conversion first",
+        "source_sha256": "4376be0a30ae27a41b2598c521aa6acb578c4937781dc11d606fd5d77f3c93c1"
+      },
+      "art_sha256": "c767a5074ca05ac6c9c2628af54accc4083354b427ad34c624fb83a4e90da4e9",
+      "art_bytes": 1337
+    },
+    {
+      "id": 9,
+      "osis": "1Sam",
+      "name": "1 Samuel",
+      "testament": "OT",
+      "title": "A king, a listening heart",
+      "themes": [
+        "Listening",
+        "kingship",
+        "the heart"
+      ],
+      "motifs": [
+        "Listening lamp",
+        "crown",
+        "shepherd staff"
+      ],
+      "references": [
+        "1 Sam 3",
+        "8",
+        "16:1–13"
+      ],
+      "composition": "A small lamp and shepherd staff stand beneath a crown whose open center receives light.",
+      "art": "../art/1sam-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Sam.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Samuel\nThis book, and that which follows it, bear the name of Samuel in the title, not because he was the penman of them (except of so much of them as fell within his own time, to the twenty-fifth chapter of the first book, in which we have an account of his death), but because the first book begins with a large account of him, his birth and childhood, his life and government; and the rest of these two volumes that are denominated from him contains the history of the reigns of Saul and David, who were both anointed by him. And, because the history of these two kings takes up the greatest part of these books, the Vulgar Latin calls them the First and Second Books of the Kings, and the t",
+        "source_sha256": "56f374e83de3ef3dde392918fda2442b96d6abaea8b1b3121454997526a0863d"
+      },
+      "art_sha256": "ee5bc50797047175f276c2cb95cd5eadcc1a37cbf85de2b82bdebcea9031f526",
+      "art_bytes": 2215
+    },
+    {
+      "id": 10,
+      "osis": "2Sam",
+      "name": "2 Samuel",
+      "testament": "OT",
+      "title": "The promise & the fracture",
+      "themes": [
+        "Davidic covenant",
+        "failure",
+        "mercy"
+      ],
+      "motifs": [
+        "Crown",
+        "split foundation",
+        "growing branch"
+      ],
+      "references": [
+        "2 Sam 7:8–16",
+        "11–12",
+        "22"
+      ],
+      "composition": "A crown rests above a visibly fractured base, while a living branch crosses the break.",
+      "art": "../art/2sam-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Sam.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Samuel\nThis book is the history of the reign of king David. We had in the foregoing book an account of his designation to the government, and his struggles with Saul, which ended at length in the death of his persecutor. This book begins with his accession to the throne, and is entirely taken up with the affairs of the government during the forty years he reigned, and therefore is entitled by the LXX. The Third Book of the Kings. It gives us an account of David's triumphs and his troubles. I. His triumphs over the house of Saul (ch. i.-iv.), over the Jebusites and Philistines (ch. v.), at the bringing up of the ark (ch. vi. and vii.), over the neighbouring nations that opposed him (ch",
+        "source_sha256": "cacee37e498d221511dfd4b9ae203f4a56fdc864030404c334b23c9d56b42ef3"
+      },
+      "art_sha256": "4c7b872894405ee0f5a109e40bc934741a537d5c40966a9f66851f4d38067d60",
+      "art_bytes": 2070
+    },
+    {
+      "id": 11,
+      "osis": "1Kgs",
+      "name": "1 Kings",
+      "testament": "OT",
+      "title": "A divided house",
+      "themes": [
+        "Worship",
+        "divided allegiance",
+        "prophetic witness"
+      ],
+      "motifs": [
+        "Temple",
+        "divided crown",
+        "mountain flame"
+      ],
+      "references": [
+        "1 Kgs 8",
+        "11–12",
+        "18:20–39"
+      ],
+      "composition": "A temple and split crown occupy opposite slopes; one small flame anchors the center.",
+      "art": "../art/1kgs-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Kgs.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Kings\nMany histories are books of kings and their reigns, to which the affairs of their kingdoms are reduced; this is a piece of honour that has commonly been paid to crowned heads. The holy Scripture is the history of the kingdom of God among men, under the several administrations of it; but there the King is one and his name one. The particular history now before us accounts for the affairs of the kingdoms of Judah and Israel, yet with special regard to the kingdom of God among them; for still it is a sacred history, much more instructive and not less entertaining than any of the histories of the kings of the earth, to which (those of them that are of any certainty) it is prior in ti",
+        "source_sha256": "1ff8eb32539a38a9328725e00db72dc2c575c0d81a0d7daf8690ebd0d8b25aff"
+      },
+      "art_sha256": "de6a4f562d32fc891c1a8b54907fac8e2635ae07c5091dd92e438b1d12088873",
+      "art_bytes": 2207
+    },
+    {
+      "id": 12,
+      "osis": "2Kgs",
+      "name": "2 Kings",
+      "testament": "OT",
+      "title": "Beyond the broken walls",
+      "themes": [
+        "Unfaithfulness",
+        "exile",
+        "a surviving promise"
+      ],
+      "motifs": [
+        "Broken gate",
+        "departing path",
+        "living shoot"
+      ],
+      "references": [
+        "2 Kgs 17",
+        "24–25"
+      ],
+      "composition": "A path leaves a broken city gate; a single green shoot remains beside the fallen stone.",
+      "art": "../art/2kgs-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Kgs.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Kings\nThis second book of the Kings (which the LXX., numbering from Samuel, called the fourth) is a continuation of the former book; and, some think, might better have been made to begin with the fifty-first verse of the foregoing chapter, where the reign of Ahaziah begins. The former book had an illustrious beginning, in the glories of the kingdom of Israel, when it was entire; this has a melancholy conclusion, in the desolations of the kingdoms of Israel first, and then of Judah, after they had been long broken into two: for a kingdom divided against itself cometh to destruction. But, as Elijah's mighty works were very much the glory of the former book, towards the latter end of it,",
+        "source_sha256": "baf3c2644f05a0c87426f5b683a1aaf3458b98f759bf94195a9c1470dea7e7a5"
+      },
+      "art_sha256": "3cff9b53175499d691db5bceb581de924bd3ed36e298a0aae97bed738b7272bb",
+      "art_bytes": 1828
+    },
+    {
+      "id": 13,
+      "osis": "1Chr",
+      "name": "1 Chronicles",
+      "testament": "OT",
+      "title": "Remembered & gathered",
+      "themes": [
+        "Genealogy",
+        "worship",
+        "preparation"
+      ],
+      "motifs": [
+        "Branching roots",
+        "harp",
+        "gathered stones"
+      ],
+      "references": [
+        "1 Chr 1–9",
+        "16",
+        "28–29"
+      ],
+      "composition": "Branching roots gather into a harp-like central form above stones prepared for a house.",
+      "art": "../art/1chr-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Chr.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Chronicles\nIn common things repetition is thought needless and nauseous; but, in sacred things, precept must be upon precept and line upon line. To me, says the apostle, to write the same things is not grievous, but for you it is safe, Phil. iii. 1. These books of Chronicles are in a great measure repetition; so are much of the second and third of the four evangelists: and yet there are no tautologies either here or there no vain repetitions. We may be ready to think that of all the books of holy scripture we could best spare these two books of Chronicles. Perhaps we might, and yet we could ill spare them: for there are many most excellent useful things in them, which we find not elsew",
+        "source_sha256": "5af8b0a42213049e8eecfe8bfdfa9c5635a4ffb61a3048c4ad134aa3018a8c44"
+      },
+      "art_sha256": "dec6382c82e214f2c5fac2fa78350a19827eff823e648376c1d360f104b10d74",
+      "art_bytes": 2640
+    },
+    {
+      "id": 14,
+      "osis": "2Chr",
+      "name": "2 Chronicles",
+      "testament": "OT",
+      "title": "Seek & return",
+      "themes": [
+        "Temple worship",
+        "reform",
+        "restoration"
+      ],
+      "motifs": [
+        "Temple doorway",
+        "returning path",
+        "dawn"
+      ],
+      "references": [
+        "2 Chr 6–7",
+        "29–30",
+        "36:22–23"
+      ],
+      "composition": "A temple doorway faces a returning path; dawn reaches through the opening after a dark foreground.",
+      "art": "../art/2chr-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Chr.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Chronicles\nThis book begins with the reign of Solomon and the building of the temple, and continues the history of the kings of Judah thenceforward to the captivity and so concludes with the fall of that illustrious monarchy and the destruction of the temple. That monarchy of the house of David, as it was prior in time, so it was superior in worth and dignity to all those four celebrated ones of which Nebuchadnezzar dreamed. The Babylonian monarchy I reckon to begin in Nebuchadnezzar himself—Thou art that head of gold, and that lasted but about seventy years; The Persian monarchy, in several families, about 130; the Grecian, in their several branches, about 300; and 300 more went far ",
+        "source_sha256": "670a9655777279b45d5955a07666618f9d0fa3100903bfa0e27e9a54faffc609"
+      },
+      "art_sha256": "76300020652ee07bced8d0a4f27ed9784e029159c3f8040445eb9d20b8156881",
+      "art_bytes": 1422
+    },
+    {
+      "id": 15,
+      "osis": "Ezra",
+      "name": "Ezra",
+      "testament": "OT",
+      "title": "Building again",
+      "themes": [
+        "Return",
+        "restored worship",
+        "Scripture"
+      ],
+      "motifs": [
+        "Foundation stones",
+        "altar",
+        "open scroll"
+      ],
+      "references": [
+        "Ezra 1",
+        "3",
+        "7:10"
+      ],
+      "composition": "New foundation stones surround a small altar; an open scroll rises above the rebuilding work.",
+      "art": "../art/ezra-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Ezra.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Ezra\nThe Jewish church puts on quite another face in this book from what it had appeared with; its state much better, and more pleasant, than it was of late in Babylon, and yet far inferior to what it had been formerly. The dry bones here live again, but in the form of a servant; the yoke of their captivity is taken off, but the marks of it in their galled necks remain. Kings we hear no more of; the crown has fallen from their heads. Prophets they are blessed with, to direct them in their re-establishment, but, after a while, prophecy ceases among them, till the great prophet appears, and his fore-runner. The history of this book is the accomplishment of Jeremiah's prophecy concerning the re",
+        "source_sha256": "ed1af1770ae111b57524f8a5c930506e97b02bafb0efc00a17f9ded763b64f8b"
+      },
+      "art_sha256": "a6941b5c5633cd855bffba852afd163fe917d9027d523b9efca168b2e95ef712",
+      "art_bytes": 3003
+    },
+    {
+      "id": 16,
+      "osis": "Neh",
+      "name": "Nehemiah",
+      "testament": "OT",
+      "title": "Stone by stone",
+      "themes": [
+        "Rebuilding",
+        "communal faithfulness",
+        "renewal"
+      ],
+      "motifs": [
+        "City wall",
+        "open gate",
+        "joined stones"
+      ],
+      "references": [
+        "Neh 2–6",
+        "8–10"
+      ],
+      "composition": "A rising wall is built from distinct joined stones, leaving an inviting open gate at its center.",
+      "art": "../art/neh-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Neh.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Nehemiah\nThis book continues the history of the children of the captivity, the poor Jews, that had lately returned out of Babylon to their own land. At this time not only the Persian monarchy flourished in great pomp and power, but Greece and Rome began to be very great and to make a figure. Of the affairs of those high and mighty states we have authentic accounts extant; but the sacred and inspired history takes cognizance only of the state of the Jews, and makes no mention of other nations but as the Israel of God had dealings with them: for the Lord's portion is his people; they are his peculiar treasure, and, in comparison with them, the rest of the world is but as lumber. In my esteem, ",
+        "source_sha256": "c86358e4e10d6dc947777be5b85b3debe84d551953682d628fc948db6b017ee1"
+      },
+      "art_sha256": "0f247ac95897ca763d877b752d413298e76815c993b43bde576ea33e95f2fc88",
+      "art_bytes": 3574
+    },
+    {
+      "id": 17,
+      "osis": "Esth",
+      "name": "Esther",
+      "testament": "OT",
+      "title": "Courage in the hidden story",
+      "themes": [
+        "Providence",
+        "courage",
+        "deliverance"
+      ],
+      "motifs": [
+        "Royal doorway",
+        "extended scepter",
+        "sealed scroll"
+      ],
+      "references": [
+        "Esth 4:13–16",
+        "5:1–3",
+        "8–9"
+      ],
+      "composition": "An extended scepter bridges a dark royal doorway and a sealed decree; light comes indirectly from the edge.",
+      "art": "../art/esth-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Esth.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Esther\nHow the providence of God watched over the Jews that had returned out of captivity to their own land, and what great and kind things were done for them, we read in the two foregoing books; but there were many who staid behind, having not zeal enough for God's house, and the holy land and city, to carry them through the difficulties of a removal thither. These, one would think, should have been excluded the special protection of Providence, as unworthy the name of Israelites; but our God deals not with us according to our folly and weakness. We find in this book that even those Jews who were scattered in the provinces of the heathen were taken care of, as well as those who were gathere",
+        "source_sha256": "805cbece0906eb752de731f2b677eafa72bac081dd660d03e1f502988a2eedca"
+      },
+      "art_sha256": "8fb04a4970efcc71d8d687a61d21cc95d382e12cd79ef19b83d137b91c78b5f6",
+      "art_bytes": 2467
+    },
+    {
+      "id": 18,
+      "osis": "Job",
+      "name": "Job",
+      "testament": "OT",
+      "title": "Faith beyond the answer",
+      "themes": [
+        "Suffering",
+        "lament",
+        "divine wisdom"
+      ],
+      "motifs": [
+        "Ash mound",
+        "whirlwind",
+        "stars"
+      ],
+      "references": [
+        "Job 1–2",
+        "19:23–27",
+        "38–42"
+      ],
+      "composition": "A small ash-colored mound sits beneath a vast geometric whirlwind and ordered stars.",
+      "art": "../art/job-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Job.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface precedes the book introduction.",
+        "source_opening": "Job to Song of Solomon\nThese five books of scripture which are contained in this third volume and which I have here endeavoured, according to the measure of the gift given to me, to explain and improve, for the use of those who desire to read them, not only with understanding, but to their edification—though they have the same divine origin, design, and authority, as those that went before, yet, upon some accounts, are of a very different nature from them, and from the rest of the sacred writings, such variety of methods has Infinite Wisdom seen fit to take in conveying the light of divine revelation to the children of men, that this heavenly food might have (as the Jews say of the manna) so",
+        "source_sha256": "3befbba4a1698227dc0133736a35662884eba4194d056f4eefe99cfbe564222f"
+      },
+      "art_sha256": "00a35e3090a301edae839e84b95fcb71fe281a9735b02fa36e90872b30e2c66d",
+      "art_bytes": 1987
+    },
+    {
+      "id": 19,
+      "osis": "Ps",
+      "name": "Psalms",
+      "testament": "OT",
+      "title": "Every season, a song",
+      "themes": [
+        "Praise",
+        "lament",
+        "trust"
+      ],
+      "motifs": [
+        "Harp",
+        "flowing water",
+        "day and night"
+      ],
+      "references": [
+        "Ps 1",
+        "23",
+        "42",
+        "150"
+      ],
+      "composition": "A harp bridges a dark and light sky; a stream flows beneath it, holding lament and praise together.",
+      "art": "../art/ps-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Ps.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Psalms\nWe have now before us one of the choicest and most excellent parts of all the Old Testament; nay, so much is there in it of Christ and his gospel, as well as of God and his law, that it had been called the abstract, or summary, of both Testaments. The History of Israel, which we were long upon, let us to camps and council-boards, and there entertained and instructed us in the knowledge of God. The book of Job brought us into the schools, and treated us with profitable disputations concerning God and his providence. But this book brings us into the sanctuary, draws us off from converse with men, with the politicians, philosophers, or disputers of this world, and directs us into communi",
+        "source_sha256": "4367b2c59be14580f5b171b8b9c7aa5da83fdcd5354a1371ebef76c382805bb8"
+      },
+      "art_sha256": "55f7dd18e3f2a1619e90af810d9f5edc0e5623e61bc4987be203d1d06d36a342",
+      "art_bytes": 1804
+    },
+    {
+      "id": 20,
+      "osis": "Prov",
+      "name": "Proverbs",
+      "testament": "OT",
+      "title": "The way of wisdom",
+      "themes": [
+        "Wisdom",
+        "daily character",
+        "the fear of the Lord"
+      ],
+      "motifs": [
+        "Branching paths",
+        "fruitful tree",
+        "balanced scales"
+      ],
+      "references": [
+        "Prov 1:1–7",
+        "3:5–18",
+        "8"
+      ],
+      "composition": "Two paths diverge below a flourishing tree; small balanced scales hang in its open center.",
+      "art": "../art/prov-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Prov.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Proverbs\nWe have now before us, I. A new author, or penman rather, or pen (if you will) made use of by the Holy Ghost for making known the mind of God to us, writing as moved by the finger of God (so the Spirit of God is called), and that is Solomon; through his hand came this book of Scripture and the two that follow it, Ecclesiastes and Canticles, a sermon and a song. Some think he wrote Canticles when he was very young, Proverbs in the midst of his days, and Ecclesiastes when he was old. In the title of his song he only writes himself Solomon, perhaps because he wrote it before his accession to the throne, being filled with the Holy Ghost when he was young. In the title of his Proverbs he",
+        "source_sha256": "b19b8f9e0ab5b7927a16fb3de00d7a09f9d1d8dbed04d48ea68498652985c456"
+      },
+      "art_sha256": "c3110182d44c362dfbea18a80fdeaf374707691ea1d13c1aacb94ac77434f731",
+      "art_bytes": 2252
+    },
+    {
+      "id": 21,
+      "osis": "Eccl",
+      "name": "Ecclesiastes",
+      "testament": "OT",
+      "title": "Under the sun",
+      "themes": [
+        "Transience",
+        "human limits",
+        "reverence"
+      ],
+      "motifs": [
+        "Sun",
+        "seasonal circle",
+        "empty vessel"
+      ],
+      "references": [
+        "Eccl 1",
+        "3:1–14",
+        "12:13–14"
+      ],
+      "composition": "A sun stands above a spare turning circle and an open vessel, emphasizing limits rather than despair alone.",
+      "art": "../art/eccl-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Eccl.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Ecclesiastes\nWe are still among Solomon's happy men, his happy servants, that stood continually before him to hear his wisdom; and they are the choicest of all the dictates of his wisdom, such as were more immediately given by divine inspiration, that are here transmitted to us, not to be heard, as by them, but once, and then liable to be mistaken or forgotten, and by repetition to lose their beauty, but to be read, reviewed, revolved, and had in everlasting remembrance. The account we have of Solomon's apostasy from God, in the latter end of his reign (1 Kings xi. 1), is the tragical part of his story; we may suppose that he spoke his Proverbs in the prime of his time, while he kept his int",
+        "source_sha256": "7290bfb52c21ed80bfe23efd7cb7e18be968e491052b98ff9fb80955eb1bd219"
+      },
+      "art_sha256": "a2d104aa280f385e40d6ab62602f9b7a38d9be38c5315db3ed640023436fcf7c",
+      "art_bytes": 1322
+    },
+    {
+      "id": 22,
+      "osis": "Song",
+      "name": "Song of Solomon",
+      "testament": "OT",
+      "title": "Love in the garden",
+      "themes": [
+        "Mutual love",
+        "desire",
+        "delight"
+      ],
+      "motifs": [
+        "Paired vines",
+        "garden gate",
+        "blossoms"
+      ],
+      "references": [
+        "Song 2:10–17",
+        "4:12–16",
+        "8:6–7"
+      ],
+      "composition": "Two vines grow toward each other around an open garden gate, with a few restrained blossoms.",
+      "art": "../art/song-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Song.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Song of Solomon\nAll scripture, we are sure, is given by inspiration of God, and is profitable for the support and advancement of the interests of his kingdom among men, and it is never the less so for there being found in it some things dark and hard to be understood, which those that are unlearned and unstable wrest to their own destruction. In our belief both of the divine extraction and of the spiritual exposition of this book we are confirmed by the ancient, constant, and concurring testimony both of the church of the Jews, to whom were committed the oracles of God, and who never made any doubt of the authority of this book, and of the Christian church, which happily succeeds them in tha",
+        "source_sha256": "2bf9f76c5583a7e9666162387e8d09411c7448bd13d6aea4358af86f4d57336f"
+      },
+      "art_sha256": "306afe6847a5745d5b31fb5bf46f5b3810fe2ee4444cbc2234fc5fb6ec38c07a",
+      "art_bytes": 2638
+    },
+    {
+      "id": 23,
+      "osis": "Isa",
+      "name": "Isaiah",
+      "testament": "OT",
+      "title": "Judgment & a living hope",
+      "themes": [
+        "Holiness",
+        "judgment",
+        "restoration"
+      ],
+      "motifs": [
+        "Burning coal",
+        "stump and shoot",
+        "returning road"
+      ],
+      "references": [
+        "Isa 6",
+        "11:1–10",
+        "40",
+        "53"
+      ],
+      "composition": "A shoot rises from a cut stump; a coal-like ember glows above a road returning through the hills.",
+      "art": "../art/isa-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Isa.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface precedes the book introduction.",
+        "source_opening": "Isaiah to Malachi\nThose books of scripture are all prophetical of which here, in weakness, and in fear, and in much trembling, we have endeavoured a methodical explication and a practical improvement. I call them prophetical because so they are for the main, though we have some histories (here and there brought in for the illustration of the prophecies) and a book of Lamentations. Our Saviour often puts the Law and the Prophets for all the Old Testament. The prophets, by waiving the ceremonial precepts, and not insisting on them, but only on the weightier matters of the law, plainly intimated the abolishing of that part of the law of Moses by the gospel; and by their many predictions of Chri",
+        "source_sha256": "c5b0a1fcdd9acd15998b6a4d72e466637df892522a2edfe22c1afcec21c01c25"
+      },
+      "art_sha256": "813665bbee583be49731875dd6b2306c7178a639895149a05f89edcbfc28858a",
+      "art_bytes": 1967
+    },
+    {
+      "id": 24,
+      "osis": "Jer",
+      "name": "Jeremiah",
+      "testament": "OT",
+      "title": "A word that will not break",
+      "themes": [
+        "Warning",
+        "grief",
+        "new covenant"
+      ],
+      "motifs": [
+        "Cracked vessel",
+        "almond branch",
+        "inscribed heart"
+      ],
+      "references": [
+        "Jer 1:11–12",
+        "18–19",
+        "31:31–34"
+      ],
+      "composition": "An almond branch crosses a cracked clay vessel; a simple heart-shaped inset suggests covenant renewal.",
+      "art": "../art/jer-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Jer.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Jeremiah\nThe Prophecies of the Old Testament, as the Epistles of the New, are placed rather according to their bulk than their seniority—the longest first, not the oldest. There were several prophets, and writing ones, that were contemporaries with Isaiah, as Micah, or a little before him, as Hosea, and Joel, and Amos, or soon after him, as Habakkuk and Nahum are supposed to have been; and yet the prophecy of Jeremiah, who began many years after Isaiah finished, is placed next to his, because there is so much in it. Where we meet with most of God's word, there let the preference be given; and yet those of less gifts are not to be despised nor excluded. Nothing now occurs to be observed furth",
+        "source_sha256": "bd2623e21dcda5ec703144ab9131d1d206092f34717785cfc969aa6e3fe884a5"
+      },
+      "art_sha256": "2547e9f128b73748bda6d53814024c5bb91c6b53f004556740e0b07e58b496e6",
+      "art_bytes": 1919
+    },
+    {
+      "id": 25,
+      "osis": "Lam",
+      "name": "Lamentations",
+      "testament": "OT",
+      "title": "Mercies at morning",
+      "themes": [
+        "Lament",
+        "destruction",
+        "persistent mercy"
+      ],
+      "motifs": [
+        "Ruined wall",
+        "tear-shaped stream",
+        "dawn"
+      ],
+      "references": [
+        "Lam 1",
+        "3:19–33",
+        "5"
+      ],
+      "composition": "A ruined wall meets a narrow stream shaped like a tear, with a restrained dawn at the far edge.",
+      "art": "../art/lam-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Lam.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Lamentations\nSince what Solomon says, though contrary to the common opinion of the world, is certainly true, that sorrow is better than laughter, and it is better to go to the house of mourning than to the house of feasting, we should come to the reading and consideration of the melancholy chapters of this book, not only willingly, but with an expectation to edify ourselves by them; and, that we may do this, we must compose ourselves to a holy sadness and resolve to weep with the weeping prophet. Let us consider, I. The title of this book; in the Hebrew it has one, but is called (as the books of Moses are) from the first word Ecah—How; but the Jewish commentators call it, as the Greeks do, a",
+        "source_sha256": "df52c763bb3215d75943d1faf7c2f8b2a6fc2057f9ebbe04f71cb8897a12d422"
+      },
+      "art_sha256": "3eaad1f38cc0994e02c10f4fa81bdb7a7e3293390e8d9990a1f78e1b4b3c8489",
+      "art_bytes": 1316
+    },
+    {
+      "id": 26,
+      "osis": "Ezek",
+      "name": "Ezekiel",
+      "testament": "OT",
+      "title": "Breath in the valley",
+      "themes": [
+        "Glory",
+        "judgment",
+        "renewed life"
+      ],
+      "motifs": [
+        "Dry bones",
+        "new breath",
+        "living river"
+      ],
+      "references": [
+        "Ezek 1",
+        "36:24–28",
+        "37",
+        "47:1–12"
+      ],
+      "composition": "A dry valley opens toward a living river; white bone-like branches become green near the water.",
+      "art": "../art/ezek-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Ezek.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Ezekiel\nWhen we entered upon the writings of the prophets, which speak of the things that should be hereafter, we seemed to have the same call that St. John had (Rev. iv. 1), Come up hither; but, when we enter upon the prophecy of this book, it is as if the voice said, Come up higher; as we go forward in time (for Ezekiel prophesied in the captivity, as Jeremiah prophesied just before it), so we soar upward in discoveries yet more sublime of the divine glory. These waters of the sanctuary still grow deeper; so far are they from being fordable that in some places they are scarcely fathomable; yet, deep as they are, out of them flow streams which make glad the city of our God, the holy place o",
+        "source_sha256": "a482b7c3a4f652fbe24bdba057eb412fd9bd336d13a81fcd1fa62b5f75ae0b3b"
+      },
+      "art_sha256": "18996da8d84738dd3477d32154f4578f7ed012a9b022c249740c5b818e84a7ba",
+      "art_bytes": 2562
+    },
+    {
+      "id": 27,
+      "osis": "Dan",
+      "name": "Daniel",
+      "testament": "OT",
+      "title": "Faithful in the kingdoms",
+      "themes": [
+        "Faithfulness",
+        "sovereignty",
+        "enduring kingdom"
+      ],
+      "motifs": [
+        "Lion silhouettes",
+        "furnace flame",
+        "uncut stone"
+      ],
+      "references": [
+        "Dan 3",
+        "6",
+        "7",
+        "2:44–45"
+      ],
+      "composition": "Two restrained lion profiles frame an uncut stone, with a flame behind rather than a human divine likeness.",
+      "art": "../art/dan-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Dan.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Daniel\nThe book of Ezekiel left the affairs of Jerusalem under a doleful aspect, all in ruins, but with a joyful prospect of all in glory again. This of Daniel fitly follows. Ezekiel told us what was seen, and what was foreseen, by him in the former years of the captivity: Daniel tells us what was seen, and foreseen, in the latter years of the captivity. When God employs different hands, yet it is about the same work. And it was a comfort to the poor captives that they had first one prophet among them and then another, to show them how long, and a sign that God had not quite cast them off. Let us enquire, I. Concerning this prophet His Hebrew name was Daniel, which signifies the judgment of ",
+        "source_sha256": "0a17ac10358ac620becaccd544dd974c62d99a8c027d8c053f10270f9c2c446c"
+      },
+      "art_sha256": "28abc5cd62122b4e294c7fe2c31afaa84cb82d54c9d991e2304776002e000947",
+      "art_bytes": 2438
+    },
+    {
+      "id": 28,
+      "osis": "Hos",
+      "name": "Hosea",
+      "testament": "OT",
+      "title": "Love that calls home",
+      "themes": [
+        "Unfaithfulness",
+        "steadfast love",
+        "return"
+      ],
+      "motifs": [
+        "Tangled vine",
+        "open doorway",
+        "renewed blossom"
+      ],
+      "references": [
+        "Hos 2:14–23",
+        "11",
+        "14"
+      ],
+      "composition": "A tangled vine resolves into a blossom beside an open homeward doorway.",
+      "art": "../art/hos-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Hos.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Hosea\nI. We have now before us the twelve minor prophets, which some of the ancients, in reckoning up the books of the Old Testament, put all together, and reckon but as one book. They are called the minor prophets, not because their writings are of any less authority or usefulness than those of the greater prophets, or as if these prophets were less in God's account or might be so in ours than the other, but only because they are shorter, and less in bulk, than the other. We have reason to think that these prophets preached as much as the others, but that they did not write so much, nor is so much of their preaching kept upon record. Many excellent prophets wrote nothing, and others but lit",
+        "source_sha256": "5b3b134e63cce1dc9206b6045b25a83ae1a62be793bae5b6cbe69474da4906a0"
+      },
+      "art_sha256": "e1b76d702d6e063069b7dbcf00f99736a52b03253706cc39f1571a89bd2eaa96",
+      "art_bytes": 1994
+    },
+    {
+      "id": 29,
+      "osis": "Joel",
+      "name": "Joel",
+      "testament": "OT",
+      "title": "After the desolation",
+      "themes": [
+        "Judgment",
+        "repentance",
+        "renewal"
+      ],
+      "motifs": [
+        "Stripped field",
+        "rain",
+        "new shoots"
+      ],
+      "references": [
+        "Joel 1",
+        "2:12–32",
+        "3:18"
+      ],
+      "composition": "A stripped field gives way to rain and new shoots across one continuous horizon.",
+      "art": "../art/joel-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Joel.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Joel\nWe are altogether uncertain concerning the time when this prophet prophesied; it is probable that it was about the same time Amos prophesied, not for the reason that the rabbin give, \"Because Amos begins his prophecy with that wherewith Joel concludes his, The Lord shall roar out of Zion,\" but for the reason Dr. Lightfoot gives, \"Because he speaks of the same judgments of locusts, and drought, and fire, that Amos laments, which is an intimation that they appeared about the same time, Amos in Israel and Joel in Judah. Hosea and Obadiah prophesied about the same time; and it appears that Amos prophesied in the days of Jeroboam, the second king of Israel, Amos vii. 10. God sent a variety o",
+        "source_sha256": "877234b547ee23b167643333eba448da5bbf6dd9c501e5372964a66d21b145fa"
+      },
+      "art_sha256": "f225ac11bc2c247fe1b950c6d4215f05f640618c4d0b119a12c2882ac0e8561f",
+      "art_bytes": 2498
+    },
+    {
+      "id": 30,
+      "osis": "Amos",
+      "name": "Amos",
+      "testament": "OT",
+      "title": "Let justice roll",
+      "themes": [
+        "Justice",
+        "false security",
+        "restoration"
+      ],
+      "motifs": [
+        "Plumb line",
+        "flowing river",
+        "repaired shelter"
+      ],
+      "references": [
+        "Amos 5:21–24",
+        "7:7–9",
+        "9:11–15"
+      ],
+      "composition": "A plumb line descends beside an abundant river; a repaired shelter rests beyond it.",
+      "art": "../art/amos-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Amos.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Amos\nThough this prophet appeared a little before Isaiah, yet he was not, as some have mistaken, that Amos who was the father of Isaiah (Isa. i. 1), for in the Hebrew their names are very different; their families too were of a different character, for Isaiah was a courtier, Amos a country-farmer. Amos signifies a burden, whence the Jews have a tradition that he was of a slow tongue and spoke with stammering lips; we may rather, in allusion to his name, say that his speech was weighty and his word the burden of the Lord. He was (as most think) of Judah, yet prophesied chiefly against Israel, and at Bethel, ch. vii. 13. Some think his style savours of his extraction, and is more plain and rus",
+        "source_sha256": "0b09cb21f1d8e2abdd0ece029cb1af27d7f3a35e8e869bc97576a1eeb5b12571"
+      },
+      "art_sha256": "25cf3a9955e2ce6d2ec37e4d78bbb840db6a8c8186113fea128f401b68177f90",
+      "art_bytes": 1965
+    },
+    {
+      "id": 31,
+      "osis": "Obad",
+      "name": "Obadiah",
+      "testament": "OT",
+      "title": "Pride brought low",
+      "themes": [
+        "Pride",
+        "violence",
+        "justice"
+      ],
+      "motifs": [
+        "High cliff",
+        "fallen nest",
+        "lowered crown"
+      ],
+      "references": [
+        "Obad 1:3–4",
+        "10–15",
+        "21"
+      ],
+      "composition": "A lofty cliff and nest descend toward a lowered crown; avoid ethnic caricature or modern political symbols.",
+      "art": "../art/obad-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Obad.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Resource begins with verse commentary; distinct book introduction not confirmed.",
+        "source_opening": "The Doom of Edom. (b. c. 587.)\n1 The vision of Obadiah. Thus saith the Lord God concerning Edom; We have heard a rumour from the Lord , and an ambassador is sent among the heathen, Arise ye, and let us rise up against her in battle. 2 Behold, I have made thee small among the heathen: thou art greatly despised. 3 The pride of thine heart hath deceived thee, thou that dwellest in the clefts of the rock, whose habitation is high; that saith in his heart, Who shall bring me down to the ground? 4 Though thou exalt thyself as the eagle, and though thou set thy nest among the stars, thence will I bring thee down, saith the Lord . 5 If thieves came to thee, if robbers by night, (how art thou cut off",
+        "source_sha256": "a271715ad645133eebb70ca1a35006aaf447ebbb97894a06eeb0d6851fcecc1d"
+      },
+      "art_sha256": "99c5ee1f86b2344ed15fb0a8cbd978c902fdaac200324bfcbf8cf011c7ba4fc3",
+      "art_bytes": 1524
+    },
+    {
+      "id": 32,
+      "osis": "Jonah",
+      "name": "Jonah",
+      "testament": "OT",
+      "title": "Mercy beyond the boundary",
+      "themes": [
+        "Mercy",
+        "reluctant obedience",
+        "compassion"
+      ],
+      "motifs": [
+        "Great fish",
+        "city gate",
+        "sheltering plant"
+      ],
+      "references": [
+        "Jonah 1–4"
+      ],
+      "composition": "A great fish curves below the horizon while a plant bends toward a distant city gate.",
+      "art": "../art/jonah-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Jonah.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Jonah\nThis book of Jonah, though it be placed here in the midst of the prophetical books of scripture, is yet rather a history than a prophecy; one line of prediction there is in it, Yet forty days, and Nineveh shall be overthrown; the rest of the book is a narrative of the preface to and the consequences of that prediction. In the midst of the obscure prophecies before and after this book, wherein are many things dark and hard to be understood, which are puzzling to the learned, and are strong meat for strong men, comes in this plain and pleasant story, which is entertaining to the weakest, and milk for babes. Probably Jonah was himself the penman of this book, and he, as Moses and other in",
+        "source_sha256": "0029b19f8ca8a7a19cce54d4d1516c2fd83180c68b0a36a535f789fff8335c75"
+      },
+      "art_sha256": "185b4e61242ac28302eda647cdd51d16a6500b3e6a2a493f2485b256d1858ccf",
+      "art_bytes": 1856
+    },
+    {
+      "id": 33,
+      "osis": "Mic",
+      "name": "Micah",
+      "testament": "OT",
+      "title": "Justice, mercy, humility",
+      "themes": [
+        "Justice",
+        "faithful leadership",
+        "peace"
+      ],
+      "motifs": [
+        "Balanced scales",
+        "shepherd staff",
+        "vine"
+      ],
+      "references": [
+        "Mic 4:1–5",
+        "5:2–5",
+        "6:6–8"
+      ],
+      "composition": "Scales and a shepherd staff share one center, with a vine extending toward a peaceful horizon.",
+      "art": "../art/mic-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Mic.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Micah\nWe shall have some account of this prophet in the first verse of the book of his prophecy; and therefore shall here only observe that, being contemporary with the prophet Isaiah (only that he began to prophesy a little after him), there is a near resemblance between that prophet's prophecy and this; and there is a prediction of the advancement and establishment of the gospel-church, which both of them have, almost in the same words, that out of the mouth of two such witnesses so great a word might be established. Compare Isa. ii. 2, 3, with Mic. iv. 1, 2. Isaiah's prophecy is said to be concerning Judah and Jerusalem, but Micah's concerning Samaria and Jerusalem; for, though this proph",
+        "source_sha256": "f371faf829a44ddc86db233d0bd82eccfc9a26f8a74a39c58d4fbba009f518eb"
+      },
+      "art_sha256": "e3348ad799b1a8abaaa1cf902a4f83c4816b4c6b758fdcd001725acf8b9f2376",
+      "art_bytes": 2553
+    },
+    {
+      "id": 34,
+      "osis": "Nah",
+      "name": "Nahum",
+      "testament": "OT",
+      "title": "The end of oppression",
+      "themes": [
+        "Judgment",
+        "refuge",
+        "release from oppression"
+      ],
+      "motifs": [
+        "Broken yoke",
+        "dark fortress",
+        "open path"
+      ],
+      "references": [
+        "Nah 1:7–15",
+        "2–3"
+      ],
+      "composition": "A broken yoke opens before a dark fortress; the forward path stays clear and untriumphalist.",
+      "art": "../art/nah-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Nah.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Nahum\nThe name of this prophet signifies a comforter; for it was a charge given to all the prophets, Comfort you, comfort you, my people: and even this prophet, though wholly taken up in foretelling the destruction of Nineveh, which speaks terror to the Assyrians, is, even in that, comforter to the ten tribes of Israel, who, it is probable, were now lately carried captives into Assyria. It is very uncertain at what time he lived and prophesied, but it is most probable that he lived in the time of Hezekiah, and prophesied against Nineveh, after the captivity of Israel by the king of Assyria, which was in the ninth year of Hezekiah, and before Sennacherib's invading Judah, which was in the fou",
+        "source_sha256": "cc6a9881c5c0d9fbd40bb25b60595694cc138d021f1d383f9ba606a982f29206"
+      },
+      "art_sha256": "b26f253d3b5227a0754a19b7a870e274e8b1fa588a562b639ea44cca7b9f6417",
+      "art_bytes": 2589
+    },
+    {
+      "id": 35,
+      "osis": "Hab",
+      "name": "Habakkuk",
+      "testament": "OT",
+      "title": "Watch, wait, trust",
+      "themes": [
+        "Honest questioning",
+        "waiting",
+        "faith"
+      ],
+      "motifs": [
+        "Watchtower",
+        "empty field",
+        "dawn"
+      ],
+      "references": [
+        "Hab 1",
+        "2:1–4",
+        "3:17–19"
+      ],
+      "composition": "A watchtower rises above a bare field, oriented toward a narrow dawn rather than visible abundance.",
+      "art": "../art/hab-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Hab.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Habakkuk\nIt is a very foolish fancy of some of the Jewish rabbin that this prophet was the son of the Shunamite woman that was at first miraculously given, and afterwards raised to life, by Elisha (2 Kings iv.), as they say also that the prophet Jonah was the son of the widow of Zarephath, which Elijah raised to life. It is a more probable conjecture of their modern chronologers that he lived and prophesied in the reign of king Manasseh, when wickedness abounded, and destruction was hastening on, destruction by the Chaldeans, whom this prophet mentions as the instruments of God's judgments; and Manasseh was himself carried to Babylon, as an earnest of what should come afterwards. In the apoc",
+        "source_sha256": "65945105556a77b843ba1eeb5100336b565adaf39ddaa25cf443bbe46ed59db0"
+      },
+      "art_sha256": "76c55bd73d9f10f7886e709d1f0b8505ec13c5c23f4cb40883cd9a84509593a0",
+      "art_bytes": 1748
+    },
+    {
+      "id": 36,
+      "osis": "Zeph",
+      "name": "Zephaniah",
+      "testament": "OT",
+      "title": "A remnant, a song",
+      "themes": [
+        "Judgment",
+        "humility",
+        "restoration"
+      ],
+      "motifs": [
+        "Dark city",
+        "sheltered seed",
+        "circling song"
+      ],
+      "references": [
+        "Zeph 1",
+        "2:3",
+        "3:9–20"
+      ],
+      "composition": "A small sheltered seed occupies the foreground of a dark city; curved musical lines open above it.",
+      "art": "../art/zeph-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Zeph.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Zephaniah\nThis prophet is placed last, as he was last in time, of all the minor prophets before the captivity, and not long before Jeremiah, who lived at the time of the captivity. He foretels the general destruction of Judah and Jerusalem by the Chaldeans, and sets their sins in order before them, which had provoked God to bring their ruin upon them, calls them to repentance, threatens the neighbouring nations with the like destructions, and gives encouraging promises of their joyful return out of captivity in due time, which have a reference to the grace of the gospel. We have, in the first verse, an account of the prophet and the date of his prophecy, which supersedes our enquiry concerni",
+        "source_sha256": "5b3192e4185f1187a5cf6eb62fcdd774a0a2917cdecf01c73c753b49ebea14f3"
+      },
+      "art_sha256": "0deaedd37f10119825ce2f7a0ad6ea7fd5be0421bc77ec071641b043b1c15fe0",
+      "art_bytes": 2354
+    },
+    {
+      "id": 37,
+      "osis": "Hag",
+      "name": "Haggai",
+      "testament": "OT",
+      "title": "Consider & rebuild",
+      "themes": [
+        "Priorities",
+        "rebuilding",
+        "divine presence"
+      ],
+      "motifs": [
+        "Unfinished house",
+        "foundation stone",
+        "rising beam"
+      ],
+      "references": [
+        "Hag 1",
+        "2:1–9"
+      ],
+      "composition": "An unfinished sanctuary takes shape around a foundation stone; a rising beam leads the eye upward.",
+      "art": "../art/hag-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Hag.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Haggai\nThe captivity in Babylon gave a very remarkable turn to the affairs of the Jewish church both in history and prophecy. It is made a signal epocha in our Saviour's genealogy, Matt. i. 17. Nine of the twelve minor prophets, whose oracles we have been hitherto consulting, lived and preached before that captivity, and most of them had an eye to it in their prophecies, foretelling it as the just punishment of Jerusalem's wickedness. But the last three (in whom the Spirit of prophecy took its period, until it revived in Christ's forerunner) lived and preached after the return out of captivity, not immediately upon it, but some time after. Haggai and Zechariah appeared much about the same ti",
+        "source_sha256": "336e856f53276e0f4103655e52117fb26e7536826489709b8613966d6c4b22ea"
+      },
+      "art_sha256": "81bea15283ed2a5d41c5674572471c11b7bb7c8939a1ceee24fa7b897174a49e",
+      "art_bytes": 2051
+    },
+    {
+      "id": 38,
+      "osis": "Zech",
+      "name": "Zechariah",
+      "testament": "OT",
+      "title": "Return to hope",
+      "themes": [
+        "Restoration",
+        "faithful kingship",
+        "divine provision"
+      ],
+      "motifs": [
+        "Lampstand",
+        "olive branches",
+        "open gate"
+      ],
+      "references": [
+        "Zech 4",
+        "9:9–10",
+        "14:8–9"
+      ],
+      "composition": "A central lampstand receives two olive branches; an open gate occupies the lower horizon.",
+      "art": "../art/zech-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Zech.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Zechariah\nThis prophet was colleague with the prophet Haggai, and a worker together with him in forwarding the building of the second temple (Ezra v. 1); for two are better than one. Christ sent forth his disciples two and two. Zechariah began to prophesy some time after Haggai. But he continued longer, soared higher in visions and revelations, wrote more, and prophesied more particularly concerning Christ, than Haggai had done; so the last shall be first: the last in time sometimes proves first in dignity. He begins with a plain practical sermon, expressive of that which was the scope of his prophesying, in the first five verses; but afterwards, to the end of ch. vi., he relates the visions",
+        "source_sha256": "9c2308edce03911b7b2443b2502f83f612655c8621f9867a020a16eb5b8b7aa6"
+      },
+      "art_sha256": "f9b705f5cd60ef6b735e1e360c1e42e685c82d8563dc1aabb1476d3fdaf942e6",
+      "art_bytes": 3864
+    },
+    {
+      "id": 39,
+      "osis": "Mal",
+      "name": "Malachi",
+      "testament": "OT",
+      "title": "A refining dawn",
+      "themes": [
+        "Covenant faithfulness",
+        "refining",
+        "coming renewal"
+      ],
+      "motifs": [
+        "Refining crucible",
+        "dawn",
+        "healing rays"
+      ],
+      "references": [
+        "Mal 1:6–14",
+        "3:1–4",
+        "4:2"
+      ],
+      "composition": "A refining vessel sits beneath a low sun whose rays open like sheltering wings.",
+      "art": "../art/mal-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Mal.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Malachi\nGod's prophets were his witnesses to his church, each in his day, for several ages, witnesses for him and his authority, witnesses against sin and sinners, attesting the true intents of God's providences in his dealings with his people then and the kind intentions of his grace concerning his church in the days of the Messiah, to whom all the prophets bore witness, for they all agreed in their testimony; and now we have only one witness more to call, and we have done with our evidence; and though he be the last, and in him prophecy ceased, yet the Spirit of prophecy shines as clearly, as strongly, as brightly in him as in any that went before, and his testimony challenges an equal reg",
+        "source_sha256": "f6f4b50bd4943c4fc8286a3eb7f3144821b153ba7c0761b456194929d21f7068"
+      },
+      "art_sha256": "4568baf95549dd230ddf95455109c98d8f1446768b9670fcfef0a7bf6098a3fd",
+      "art_bytes": 2219
+    },
+    {
+      "id": 40,
+      "osis": "Matt",
+      "name": "Matthew",
+      "testament": "NT",
+      "title": "The kingdom draws near",
+      "themes": [
+        "Messiah",
+        "kingdom",
+        "discipleship"
+      ],
+      "motifs": [
+        "Crown",
+        "mountain path",
+        "open gate"
+      ],
+      "references": [
+        "Matt 1:1",
+        "5–7",
+        "28:16–20"
+      ],
+      "composition": "A crown rises above a mountain path that widens outward through an open gate.",
+      "art": "../art/matt-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Matt.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface precedes the book introduction.",
+        "source_opening": "Matthew to John\nThe one half of our undertaking upon the New TestamentIt may be proper to apprise the reader that the volume to which this preface was originally prefixed included the Acts of the Apostles, which in the present edition will commence the second volume, in order to secure a more equal division of the New Testament—the commentary on the remaining books being less extended than the author contemplated.—Ed . is now, by the assistance of divine grace, finished, and presented to the reader, who, it is hoped, the Lord working with it, may hereby be somewhat helped in understanding and improving the sacred history of Christ and his apostles, and in making it, as it certainly is, the b",
+        "source_sha256": "7a7963be4b2aaf3aab19f8b6755924d13fb56fd9bd5c547dac7205722c1f3af8"
+      },
+      "art_sha256": "bf5d22ca53a08280ad8cc12e7af2f7371804233ebd877022df2fa8d684b9be09",
+      "art_bytes": 1391
+    },
+    {
+      "id": 41,
+      "osis": "Mark",
+      "name": "Mark",
+      "testament": "NT",
+      "title": "Along the servant’s way",
+      "themes": [
+        "Jesus’ authority",
+        "service",
+        "costly discipleship"
+      ],
+      "motifs": [
+        "Open road",
+        "serving basin",
+        "cross"
+      ],
+      "references": [
+        "Mark 1:14–20",
+        "8:34–35",
+        "10:45",
+        "15–16"
+      ],
+      "composition": "An urgent diagonal road passes a serving basin and leads toward a spare cross at the horizon.",
+      "art": "../art/mark-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Mark.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Mark\nWe have heard the evidence given in by the first witness to the doctrine and miracles of our Lord Jesus; and now here is another witness produced, who calls for our attention. The second living creature saith, Come, and see, Rev. vi. 3. Now let us enquire a little,\nI. Concerning this witness. His name is Mark. Marcus was a Roman name, and a very common one, and yet we have no reason to think, but that he was by birth a Jew; but as Saul, when he went among the nations, took the Roman name of Paul, so he of Mark, his Jewish name perhaps being Mardocai; so Grotius. We read of John whose surname was Mark, sister's son to Barnabas, whom Paul was displeased with (Acts xv. 37, 38), but afterwa",
+        "source_sha256": "1ed9cb4c0efd62a8713257bd9127380f09af10bfb405931a5376aeb82af69bdf"
+      },
+      "art_sha256": "1deaf19da14b084f143166bcdb6d699f198520323b743d37298ff26d0289a56f",
+      "art_bytes": 1807
+    },
+    {
+      "id": 42,
+      "osis": "Luke",
+      "name": "Luke",
+      "testament": "NT",
+      "title": "Good news for the overlooked",
+      "themes": [
+        "Mercy",
+        "reversal",
+        "salvation for all"
+      ],
+      "motifs": [
+        "Open table",
+        "welcoming doorway",
+        "lamp"
+      ],
+      "references": [
+        "Luke 4:16–21",
+        "15",
+        "19:1–10",
+        "24"
+      ],
+      "composition": "An open table sits in a wide doorway, with an extra place suggested by negative space and a steady lamp.",
+      "art": "../art/luke-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Luke.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Luke\nWe are now entering into the labours of another evangelist; his name Luke, which some take to be a contraction of Lucilius; born at Antioch, so St. Jerome. Some think that he was the only one of all the penmen of the scripture that was not of the seed of Israel. He was a Jewish proselyte, and, as some conjecture, converted to Christianity by the ministry of St. Paul at Antioch; and after his coming into Macedonia (Acts xvi. 10) he was his constant companion. He had employed himself in the study and practice of physic; hence, Paul calls him Luke the beloved Physician, Col. iv. 14. Some of the pretended ancients tell you that he was a painter, and drew a picture of the virgin Mary. But Dr",
+        "source_sha256": "f1524ddac3f267cce81ecbad19fdf93314e43de5cba2fd01c09db65a90f0f122"
+      },
+      "art_sha256": "8a9030cb14ec3bb6db82973d97d65337dc38c02ad05205e7083d154b26e6ab94",
+      "art_bytes": 2210
+    },
+    {
+      "id": 43,
+      "osis": "John",
+      "name": "John",
+      "testament": "NT",
+      "title": "Light & life",
+      "themes": [
+        "Light",
+        "life",
+        "abiding in Christ"
+      ],
+      "motifs": [
+        "Light shaft",
+        "living water",
+        "vine"
+      ],
+      "references": [
+        "John 1:1–18",
+        "4:10–14",
+        "15:1–11",
+        "20:30–31"
+      ],
+      "composition": "A single light breaks into a dark arch above living water and a vine.",
+      "art": "../art/john-geometric.svg",
+      "art_status": "SVG cover · retained style study",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:John.1.1",
+        "attribution": "Matthew Henry",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "John\nIt is not material to enquire when and where this gospel was written; we are sure that it was given by inspiration of God to John, the brother of James, one of the twelve apostles, distinguished by the honourable character of that disciple whom Jesus loved, one of the first three of the worthies of the Son of David, whom he took to be the witnesses of his retirements, particularly of his transfiguration and his agony. The ancients tell us that John lived longest of all the twelve apostles, and was the only one of them that died a natural death, all the rest suffering martyrdom; and some of them say that he wrote this gospel at Ephesus, at the request of the ministers of the several chur",
+        "source_sha256": "bbcd17c42270a16c34b78a687ab21f73f7d036f81d0e73ea94e9924000caca68"
+      },
+      "art_sha256": "228a55a5b5214a1df0627be52fc08f602f7d02583bf414092af1880f819ce659",
+      "art_bytes": 898
+    },
+    {
+      "id": 44,
+      "osis": "Acts",
+      "name": "Acts",
+      "testament": "NT",
+      "title": "To the ends of the earth",
+      "themes": [
+        "Spirit-empowered witness",
+        "expanding community"
+      ],
+      "motifs": [
+        "Flame",
+        "branching roads",
+        "horizon"
+      ],
+      "references": [
+        "Acts 1:8",
+        "2",
+        "10–11",
+        "28:30–31"
+      ],
+      "composition": "A flame opens into branching roads crossing a broad horizon; no modern national map or borders.",
+      "art": "../art/acts-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Acts.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Volume preface and continuator credits precede the introduction.",
+        "source_opening": "Acts to Revelation\nPREFACE\nActs to Revelation\nAfter much expectation, and many enquiries, the last volume of the late reverend Mr. Henry's Exposition now appears in the world. The common disadvantages that attend posthumous productions will doubtless be discerned in this; but we hope, though there are diversities of gifts, there will be found to be the same spirit. Some of the relations and hearers of that excellent person have been at the pains of transcribing the notes they took in short-hand of this part of the holy scripture, when expounded by him in his family or in the congregation; they have furnished us with very good materials for the finishing of this great work, and we doubt not b",
+        "source_sha256": "30abc48e0cc6c618ccd9a8f772ff204ed3b84327e8c50c31c87ac54f6a38703b"
+      },
+      "art_sha256": "ccf08b256d5cbc8a523a44707ba3c440e6c42e1b1a4a4fa1579ce7c133cdc142",
+      "art_bytes": 1085
+    },
+    {
+      "id": 45,
+      "osis": "Rom",
+      "name": "Romans",
+      "testament": "NT",
+      "title": "Grace that makes new",
+      "themes": [
+        "Sin",
+        "justification",
+        "transformed life"
+      ],
+      "motifs": [
+        "Broken chain",
+        "open path",
+        "grafted branch"
+      ],
+      "references": [
+        "Rom 3:21–26",
+        "5",
+        "8",
+        "11:17–24",
+        "12:1–2"
+      ],
+      "composition": "A broken chain lies across an open path; two branches graft into a single living trunk.",
+      "art": "../art/rom-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Rom.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Romans\nCompleted by John Evans .\nIf we may compare scripture with scripture, and take the opinion of some devout and pious persons, in the Old Testament David's Psalms, and in the New Testament Paul's Epistles, are stars of the first magnitude, that differ from the other stars in glory. The whole scripture is indeed an epistle from heaven to earth: but in it we have upon record several particular epistles, more of Paul's than of any other, for he was the chief of the apostles, and laboured more abundantly than they all. His natural parts, I doubt not, were very pregnant; his apprehension was quick and piercing; his expressions were fluent and copious; his affections, wherever he took, very w",
+        "source_sha256": "4cd817d9ea65f24c0d59f9691ee06850b3893a03bb2def0b652228ceadee7825"
+      },
+      "art_sha256": "f1ef2711264de3bd748e751d037d9a564465b0714288e34b911bab3615fedc9d",
+      "art_bytes": 2259
+    },
+    {
+      "id": 46,
+      "osis": "1Cor",
+      "name": "1 Corinthians",
+      "testament": "NT",
+      "title": "Many members, one body",
+      "themes": [
+        "Unity",
+        "love",
+        "resurrection"
+      ],
+      "motifs": [
+        "Joined stones",
+        "shared cup",
+        "rising seed"
+      ],
+      "references": [
+        "1 Cor 1:10–13",
+        "10:16–17",
+        "12–13",
+        "15"
+      ],
+      "composition": "Different stones form one vessel around a shared cup, with a seed rising in the foreground.",
+      "art": "../art/1cor-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Cor.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Opening source heading is malformed (<); preserve raw text and review.",
+        "source_opening": "<\nCorinth was a principal city of Greece, in that particular division of it which was called Achaia. It was situated on the isthmus (or neck of land) that joined Peloponnesus to the rest of Greece, on the southern side, and had two ports adjoining, one at the bottom of the Corinthian Gulf, called Lechæum, not far from the city, whence they traded to Italy and the west, the other at the bottom of the Sinus Saronicus, called Cenchrea, at a more remote distance, whence they traded to Asia. From this situation, it is no wonder that Corinth should be a place of great trade and wealth; and, as affluence is apt to produce luxury of all kinds, neither is it to be wondered at if a place so famous for",
+        "source_sha256": "00c6d41068ffaf1e16b2589aecadf7507fbe1993bae541b03fc24e406c653c21"
+      },
+      "art_sha256": "a0c6d706ce0eacf76c890d2c3642825e5bd0beb302a6e82eeb27add855582527",
+      "art_bytes": 2447
+    },
+    {
+      "id": 47,
+      "osis": "2Cor",
+      "name": "2 Corinthians",
+      "testament": "NT",
+      "title": "Treasure in fragile vessels",
+      "themes": [
+        "Weakness",
+        "reconciliation",
+        "generosity"
+      ],
+      "motifs": [
+        "Cracked jar",
+        "inner light",
+        "open hands"
+      ],
+      "references": [
+        "2 Cor 4:7–12",
+        "5:17–21",
+        "8–9",
+        "12:9"
+      ],
+      "composition": "A cracked clay vessel holds a bright inner light; two open geometric hands support it.",
+      "art": "../art/2cor-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Cor.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Corinthians\nIn his former epistle the apostle had signified his intentions of coming to Corinth, as he passed through Macedonia (xvi. 5), but, being providentially hindered for some time, he writes this second epistle to them about a year after the former; and there seem to be these two urgent occasions:—1. The case of the incestuous person, who lay under censure, required that with all speed he should be restored and received again into communion. This therefore he gives directions about (ch. ii.), and afterwards (ch. vii.) he declares the satisfaction he had upon the intelligence he received of their good behaviour in that affair. 2. There was a contribution now making for the poor ",
+        "source_sha256": "3402e3091e10efd2f4b80b54b46fb2c33582c8686f8ed6f45746b2e75e932ce5"
+      },
+      "art_sha256": "9f8b10119b626896608701a03c7d62ae07571ffc99bb0bdea2ac371eb577d313",
+      "art_bytes": 2139
+    },
+    {
+      "id": 48,
+      "osis": "Gal",
+      "name": "Galatians",
+      "testament": "NT",
+      "title": "Free to bear fruit",
+      "themes": [
+        "Freedom",
+        "faith",
+        "life in the Spirit"
+      ],
+      "motifs": [
+        "Broken yoke",
+        "fruitful branch",
+        "open sky"
+      ],
+      "references": [
+        "Gal 2:15–21",
+        "3:26–29",
+        "5:1–25"
+      ],
+      "composition": "A fruitful branch grows through a broken yoke toward an expansive open sky.",
+      "art": "../art/gal-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Gal.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Galatians\nThis epistle of Paul is directed not to the church or churches of a single city, as some others are, but of a country or province, for so Galatia was. It is very probable that these Galatians were first converted to the Christian faith by his ministry; or, if he was not the instrument of planting, yet at least he had been employed in watering these churches, as is evident from this epistle itself, and also from Acts xviii. 23, where we find him going over all the country of Galatia and Phrygia in order, strengthening all the disciples. While he was with them, they had expressed the greatest esteem and affection both for his person and ministry; but he had not been long absent from ",
+        "source_sha256": "ef1603ad28030cd7e867c8e1b6e62aecc9e87e587b81e9b426225fd88031e248"
+      },
+      "art_sha256": "4098820f8b9374674b5757f4bd48275e50b26c13b6dd12be24e7dd039440ddf3",
+      "art_bytes": 2188
+    },
+    {
+      "id": 49,
+      "osis": "Eph",
+      "name": "Ephesians",
+      "testament": "NT",
+      "title": "Built together",
+      "themes": [
+        "Unity in Christ",
+        "grace",
+        "a shared dwelling"
+      ],
+      "motifs": [
+        "Joined cornerstone",
+        "living house",
+        "light"
+      ],
+      "references": [
+        "Eph 1:3–14",
+        "2:11–22",
+        "4:1–16"
+      ],
+      "composition": "Different blocks join at one cornerstone to form a house filled by a single light.",
+      "art": "../art/eph-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Eph.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Ephesians\nSome think that this epistle to the Ephesians was a circular letter sent to several churches, and that the copy directed to the Ephesians happened to be taken into the canon, and so it came to bear that particular inscription. And they have been induced the rather to think this because it is the only one of all Paul's epistles that has nothing in it peculiarly adapted to the state or case of that particular church; but it has much of common concernment to all Christians, and especially to all who, having been Gentiles in times past, were converted to Christianity. But then it may be observed, on the other hand, that the epistle is expressly inscribed (1.1) to the saints which are a",
+        "source_sha256": "0db9ba90c9d79e23a989bdb2081ada7472854757590c92a9dc903d37aeb3c9ef"
+      },
+      "art_sha256": "5fad16f3bd70ffaaeb1733689919de91aea2b211f65e5c3a906103c5a7ece648",
+      "art_bytes": 2041
+    },
+    {
+      "id": 50,
+      "osis": "Phil",
+      "name": "Philippians",
+      "testament": "NT",
+      "title": "Joy along the way",
+      "themes": [
+        "Joy",
+        "Christlike humility",
+        "perseverance"
+      ],
+      "motifs": [
+        "Open road",
+        "descending steps",
+        "rising light"
+      ],
+      "references": [
+        "Phil 1:12–26",
+        "2:1–11",
+        "3:12–14",
+        "4:4–9"
+      ],
+      "composition": "A road descends through humble steps and rises toward light, with no prosperity imagery.",
+      "art": "../art/phil-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Phil.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Philippians\nPhilippi was a chief city of the western part of Macedonia, prote tes meridos tes Makedonias polis, Acts xvi. 12. It took its name from Philip, the famous king of Macedon, who repaired and beautified it, and it was afterwards made a Roman colony. Near this place were the Campi Philippici, remarkable for the famous battles between Julius Cæsar and Pompey the Great, and that between Augustus and Antony on one side and Cassius and Brutus on the other. But it is most remarkable among Christians for this epistle, which was written when Paul was a prisoner at Rome, A.D. 62. Paul seems to have had a very particular kindness for the church at Philippi, which he himself had been instrumen",
+        "source_sha256": "e6f5d57b91573698787831da30251198021a499765127f213ef6dea8aed9bb28"
+      },
+      "art_sha256": "0481121fec1675fada727185f463902365a00e4ab41533f4ae9b720410f33a14",
+      "art_bytes": 1193
+    },
+    {
+      "id": 51,
+      "osis": "Col",
+      "name": "Colossians",
+      "testament": "NT",
+      "title": "Rooted in Christ",
+      "themes": [
+        "Christ’s supremacy",
+        "fullness",
+        "rooted living"
+      ],
+      "motifs": [
+        "Deep roots",
+        "central crown",
+        "growing branches"
+      ],
+      "references": [
+        "Col 1:15–23",
+        "2:6–15",
+        "3:1–17"
+      ],
+      "composition": "A central crown grows from deeply rooted branches, gathering the composition into one focal point.",
+      "art": "../art/col-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Col.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Colossians\nColosse was a considerable city of Phrygia, and probably not far from Laodicea and Hierapolis; we find these mentioned together, iv. 13. It is now buried in ruins, and the memory of it chiefly preserved in this epistle. The design of the epistle is to warn them of the danger of the Jewish zealots, who pressed the necessity of observing the ceremonial law; and to fortify them against the mixture of the Gentile philosophy with their Christian principles. He professes a great satisfaction in their stedfastness and constancy, and encourages them to perseverance. It was written about the same time with the epistles to the Ephesians and Philippians, A.D. 62, and in the same place, while",
+        "source_sha256": "da9758bf4d2b1ca06bfbb91572cd29416a673222a25aa1c444b4bb0a4127123d"
+      },
+      "art_sha256": "3ec18020359ce5b3a656a983d39a4fe6cd4cd03401435cec1fa3cbbbb2950f3b",
+      "art_bytes": 2722
+    },
+    {
+      "id": 52,
+      "osis": "1Thess",
+      "name": "1 Thessalonians",
+      "testament": "NT",
+      "title": "Hope that keeps watch",
+      "themes": [
+        "Faith",
+        "love",
+        "hopeful expectation"
+      ],
+      "motifs": [
+        "Steady lamp",
+        "open horizon",
+        "shared shelter"
+      ],
+      "references": [
+        "1 Thess 1:2–10",
+        "4:9–18",
+        "5:1–11"
+      ],
+      "composition": "A steady lamp illuminates a shared shelter facing an open horizon, without a speculative end-times timetable.",
+      "art": "../art/1thess-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Thess.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Thessalonians\nThessalonica was formerly the metropolis of Macedonia; it is now called Salonichi, and is the best peopled, and one of the best towns for commerce, in the Levant. The apostle Paul, being diverted from his design of going into the provinces of Asia, properly so called, and directed after an extraordinary manner to preach the gospel in Macedonia (Acts xvi. 9, 10), in obedience to the call of God went from Troas to Samothracia, thence to Neapolis, and thence to Philippi, where he had good success in his ministry, but met with hard usage, being cast into prison with Silas his companion in travel and labour, from which being wonderfully delivered, they comforted the brethren t",
+        "source_sha256": "7332ff2bd8b6adf874f29c70f340f441b13904a55655cb07d840de36af4a79eb"
+      },
+      "art_sha256": "95b0c2f7e3db04eb9c276a63a861e4ad23f7d0bd7f51027fc701be24d4e9046d",
+      "art_bytes": 1601
+    },
+    {
+      "id": 53,
+      "osis": "2Thess",
+      "name": "2 Thessalonians",
+      "testament": "NT",
+      "title": "Stand firm, work quietly",
+      "themes": [
+        "Steadfast hope",
+        "discernment",
+        "faithful work"
+      ],
+      "motifs": [
+        "Anchored lamp",
+        "woven field",
+        "distant dawn"
+      ],
+      "references": [
+        "2 Thess 1",
+        "2:1–17",
+        "3:6–13"
+      ],
+      "composition": "An anchored lamp stands beside cultivated rows; dawn stays distant and uncluttered.",
+      "art": "../art/2thess-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Thess.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Thessalonians\nThis Second Epistle was written soon after the former, and seems to have been designed to prevent a mistake, which might arise from some passages in the former epistle, concerning the second coming of Christ, as if it were near at hand. The apostle in this epistle is careful to prevent any wrong use which some among them might make of those expressions of his that were agreeable to the dialect of the prophets of the Old Testament, and informs them that there were many intermediate counsels yet to be fulfilled before that day of the Lord should come, though, because it is sure, he had spoken of it as near. There are other things that he writes about for their consolation ",
+        "source_sha256": "933c6e6ca57fa50d1f4f6068f45eec8eb5fbe8b0002ca09833b268afca0f2aff"
+      },
+      "art_sha256": "8c215d2b41bd149c064faeadb008d229fe33d670b67574d2662417b17e1a4f95",
+      "art_bytes": 2380
+    },
+    {
+      "id": 54,
+      "osis": "1Tim",
+      "name": "1 Timothy",
+      "testament": "NT",
+      "title": "Care for the household",
+      "themes": [
+        "Sound teaching",
+        "communal care",
+        "godliness"
+      ],
+      "motifs": [
+        "Open book",
+        "household doorway",
+        "guiding lamp"
+      ],
+      "references": [
+        "1 Tim 1:3–7",
+        "3:14–16",
+        "4:6–16",
+        "6:6–19"
+      ],
+      "composition": "A book and lamp rest inside a broad household doorway, suggesting care rather than institutional grandeur.",
+      "art": "../art/1tim-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Tim.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Timothy\nHitherto Paul's epistles were directed to churches; now follow some to particular persons: two to Timothy, one to Titus, and another to Philemon—all three ministers. Timothy and Titus were evangelists, an inferior order to the apostles, as appears by Eph. iv. 11, Some prophets, some apostles, some evangelists. Their commission and work was much the same with that of the apostles, to plant churches, and water the churches that were planted; and accordingly they were itinerants, as we find Timothy was. Timothy was first converted by Paul, and therefore he calls him his own son in the faith: we read of his conversion, Acts xvi. 3.\nThe scope of these two epistles is to direct Timot",
+        "source_sha256": "b5a89a18c304184485b4054b965ef0d880fac55424cb750219ec55efefec2593"
+      },
+      "art_sha256": "9f6c7fc3a26a4f6658ff6a2270232a2d722c6f2c302d677cc02f20883a72cc59",
+      "art_bytes": 3058
+    },
+    {
+      "id": 55,
+      "osis": "2Tim",
+      "name": "2 Timothy",
+      "testament": "NT",
+      "title": "Keep the flame",
+      "themes": [
+        "Faithfulness",
+        "Scripture",
+        "endurance"
+      ],
+      "motifs": [
+        "Guarded flame",
+        "scroll",
+        "finish-line path"
+      ],
+      "references": [
+        "2 Tim 1:6–14",
+        "3:14–17",
+        "4:6–8"
+      ],
+      "composition": "A guarded flame rises from an open scroll beside a path reaching its final marker.",
+      "art": "../art/2tim-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Tim.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Timothy\nThis second epistle Paul wrote to Timothy from Rome, when he was a prisoner there and in danger of his life; this is evident from these words, I am now ready to be offered, and the time of my departure is at hand, ch. iv. 6. It appears that his removal out of this world, in his own apprehension, was not far off, especially considering the rage and malice of his persecutors; and that he had been brought before the emperor Nero, which he calls his first answer, when no man stood with him, but all men forsook him, ch. iv. 16. And interpreters agree that this was the last epistle he wrote. Where Timothy now was is not certain. The scope of this epistle somewhat differs from that o",
+        "source_sha256": "fbe094ae46a672017a56a0b96b1e284d0c63634aa4845855aa71da54da5caf9a"
+      },
+      "art_sha256": "8d2e554077245e1ef5dd0adb7402b1a06f3eed643adbaa1d9ae220c7617e2a7f",
+      "art_bytes": 2184
+    },
+    {
+      "id": 56,
+      "osis": "Titus",
+      "name": "Titus",
+      "testament": "NT",
+      "title": "Grace made visible",
+      "themes": [
+        "Sound teaching",
+        "good works",
+        "renewal"
+      ],
+      "motifs": [
+        "Living spring",
+        "sturdy house",
+        "fruitful branch"
+      ],
+      "references": [
+        "Titus 1:5–9",
+        "2:11–14",
+        "3:3–8"
+      ],
+      "composition": "A spring nourishes a fruitful branch beside a simple well-built house.",
+      "art": "../art/titus-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Titus.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Titus\nCompleted by Jeremiah Smith .\nThis Epistle of Paul to Titus is much of the same nature with those to Timothy; both were converts of Paul, and his companions in labours and sufferings; both were in the office of evangelists, whose work was to water the churches planted by the apostles, and to set in order the things that were wanting in them: they were vice-apostles, as it were, working the work of the Lord, as they did, and mostly under their direction, though not despotic and arbitrary, but with the concurring exercise of their own prudence and judgment, 1 Cor. xvi. 10, 12. We read much of this Titus, his titles, character, and active usefulness, in many places—he was a Greek, Gal. ii",
+        "source_sha256": "d53dd0dfa77b18a10e9273634a4338d65148a661973eb7a1159e53bc18748526"
+      },
+      "art_sha256": "3e9621a47b73d7f051cb284850aacafa3b17ce0637eb40ce74d3212a1ee2732d",
+      "art_bytes": 1993
+    },
+    {
+      "id": 57,
+      "osis": "Phlm",
+      "name": "Philemon",
+      "testament": "NT",
+      "title": "Receive as a brother",
+      "themes": [
+        "Reconciliation",
+        "costly love",
+        "restored relationship"
+      ],
+      "motifs": [
+        "Two doorways",
+        "broken chain",
+        "shared table"
+      ],
+      "references": [
+        "Phlm 8–21"
+      ],
+      "composition": "Two doorways open onto one shared table with a broken chain below; do not romanticize slavery.",
+      "art": "../art/phlm-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Phlm.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Completed by Jeremiah Smith .\nThis epistle to Philemon is placed the last of those with the name of Paul to them, perhaps because the shortest, and of an argument peculiar and different from all the others; yet such as the Spirit of God, who indited it, saw would, in its kind, be very instructive and useful in the churches. The occasion of it was this:—Philemon, one of note and probably a minister in the church of Colosse, a city of Phrygia, had a servant named Onesimus, who, having purloined his goods, ran away from him, and in his rambles came to Rome, where Paul was then a prisoner for the gospel, and, providentially coming under his preaching there, was, by the blessing of God, converted",
+        "source_sha256": "0534272cb5c2cdf31216f743f5bce83d5638b2b60cd39ee84e980c7b1667f03f"
+      },
+      "art_sha256": "52c97111f1d34e27e8f17c114ad94893b6028f301802675c31fa3b00adffbe5c",
+      "art_bytes": 2552
+    },
+    {
+      "id": 58,
+      "osis": "Heb",
+      "name": "Hebrews",
+      "testament": "NT",
+      "title": "A better hope",
+      "themes": [
+        "Christ’s priesthood",
+        "access",
+        "persevering faith"
+      ],
+      "motifs": [
+        "Parted veil",
+        "anchor",
+        "open sanctuary"
+      ],
+      "references": [
+        "Heb 4:14–16",
+        "6:19–20",
+        "9–10",
+        "12:1–3"
+      ],
+      "composition": "A parted veil reveals an open sanctuary; a firm anchor holds the foreground.",
+      "art": "../art/heb-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Heb.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Hebrews\nConcerning this epistle we must enquire, I. Into the divine authority of it; for this has been questioned by some, whose distempered eyes could not bear the light of it, or whose errors have been confuted by it; such as the Arians, who deny the Godhead and self-existence of Christ; and the Socinians, who deny his satisfaction; but, after all the attempts of such men to disparage this epistle, the divine original of it shines forth with such strong and unclouded rays that he who runs may read it is an eminent part of the canon of scripture. The divinity of the matter, the sublimity of the style, the excellency of the design, the harmony of this with other parts of scripture, and its g",
+        "source_sha256": "d8dff25c644e7767bfe7c3565e60f04f734ae56dd19759422a4ca0a2346e525d"
+      },
+      "art_sha256": "0b48511dcf682cb144ace4b612cf3b5eb5795deffe25b129b42c70eef53faed3",
+      "art_bytes": 2683
+    },
+    {
+      "id": 59,
+      "osis": "Jas",
+      "name": "James",
+      "testament": "NT",
+      "title": "Faith takes root",
+      "themes": [
+        "Lived faith",
+        "wisdom",
+        "integrity"
+      ],
+      "motifs": [
+        "Rooted tree",
+        "spring",
+        "paired paths"
+      ],
+      "references": [
+        "Jas 1:22–27",
+        "2:14–26",
+        "3:1–18"
+      ],
+      "composition": "A rooted tree grows beside a spring; two paths meet beneath its fruit-bearing branches.",
+      "art": "../art/jas-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Jas.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Opening source heading is truncated (ames); preserve raw text and review.",
+        "source_opening": "ames\nThe writer of this epistle was not James the son of Zebedee; for he was put to death by Herod (Acts xii.) before Christianity had gained so much ground among the Jews of the dispersion as is here implied. But it was the other James, the son of Alpheus, who was cousin-german to Christ, and one of the twelve apostles, Matt. x. 3. He is called a pillar (Gal. ii. 9), and this epistle of his cannot be disputed, without loosening a foundation-stone. It is called a general epistle, because (as some think) not directed to any particular person or church, but such a one as we call a circular letter. Others think it is called general, or catholic, to distinguish it from the epistles of Ignatius, ",
+        "source_sha256": "4cbb7cf14ab6125d4276fa019f116c0a078649d74586c5fe060b5c5be1363e64"
+      },
+      "art_sha256": "a40c2f58e72654e9874d8771d2fd02307296d88a02534fbb815a3d4668f36d79",
+      "art_bytes": 1796
+    },
+    {
+      "id": 60,
+      "osis": "1Pet",
+      "name": "1 Peter",
+      "testament": "NT",
+      "title": "Hope away from home",
+      "themes": [
+        "Living hope",
+        "exile",
+        "faithful suffering"
+      ],
+      "motifs": [
+        "Living stones",
+        "shelter",
+        "distant light"
+      ],
+      "references": [
+        "1 Pet 1:3–9",
+        "2:4–12",
+        "4:12–19"
+      ],
+      "composition": "Living stones form a temporary shelter oriented toward light across an unfamiliar landscape.",
+      "art": "../art/1pet-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1Pet.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First Peter\nTwo epistles we have enrolled in the sacred canon of the scripture written by Peter, who was a most eminent apostle of Jesus Christ, and whose character shines brightly as it is described in the four Gospels and in the Acts of the Apostles, but, as it is painted by the papists and legendary writers, it represents a person of extravagant pride and ambition. It is certain from scripture that Simon Peter was one of the first of those whom our Lord called to be his disciples and followers, that he was a person of excellent endowments, both natural and gracious, of great parts and ready elocution, quick to apprehend and bold to execute whatever he knew to be his duty. When our Saviour",
+        "source_sha256": "7ee6a612910ae668889068083fc7e833fe1ea02319abc06c09033cb11a50a7de"
+      },
+      "art_sha256": "030041c04a17d7bcca3b9d654d03dbf771c896bdf3cdd5076a5476280be2095f",
+      "art_bytes": 1535
+    },
+    {
+      "id": 61,
+      "osis": "2Pet",
+      "name": "2 Peter",
+      "testament": "NT",
+      "title": "Grow in the light",
+      "themes": [
+        "Growth",
+        "discernment",
+        "steadfast hope"
+      ],
+      "motifs": [
+        "Growing branch",
+        "morning star",
+        "clear water"
+      ],
+      "references": [
+        "2 Pet 1:3–21",
+        "3:8–18"
+      ],
+      "composition": "A growing branch reaches toward a morning star above clear water; the sky remains open rather than apocalyptic spectacle.",
+      "art": "../art/2pet-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2Pet.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Second Peter\nThe penman of this epistle appears plainly to be the same who wrote the foregoing; and, whatever difference some learned men apprehend they discern in the style of this epistle from that of the former, this cannot be a sufficient argument to assert that it was written by Simon who succeeded the apostle James in the church at Jerusalem, inasmuch as he who wrote this epistle calls himself Simon Peter, and an apostle (v. 1), and says that he was one of the three apostles that were present at Christ's transfiguration (v. 18), and says expressly that he had written a former epistle to them, ch. iii. 1. The design of this second epistle is the same with that of the former, as is evide",
+        "source_sha256": "3624e94e0b373ecc46279baebaa21a70a35ca49f65ce29a111f42d643738d8f2"
+      },
+      "art_sha256": "7d25a58f9f97307afd574eacd1d86a0dfd85b96927712e3436f4710b54d406fd",
+      "art_bytes": 1433
+    },
+    {
+      "id": 62,
+      "osis": "1John",
+      "name": "1 John",
+      "testament": "NT",
+      "title": "Walk in love & light",
+      "themes": [
+        "Fellowship",
+        "love",
+        "assurance"
+      ],
+      "motifs": [
+        "Lighted path",
+        "joined hands",
+        "living heart"
+      ],
+      "references": [
+        "1 John 1:5–9",
+        "3:11–24",
+        "4:7–21",
+        "5:11–13"
+      ],
+      "composition": "A lighted path passes through joined geometric hands and a restrained heart-shaped opening.",
+      "art": "../art/1john-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:1John.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "First John\nThough the continued tradition of the church attests that this epistle came from John the apostle, yet we may observe some other evidence that will confirm (or with some perhaps even outweigh) the certainty of that tradition. It should seem that the penman was one of the apostolical college by the sensible palpable assurance he had of the truth of the Mediator's person in his human nature: That which we have heard, which we have seen with our eyes, which we have looked upon, and our hands have handled, of the Word of life, v. 1. Here he takes notice of the evidence the Lord gave to Thomas of his resurrection, by calling him to feel the prints of the nails and of the spear, which i",
+        "source_sha256": "92c49bb4e4fa67b42f97291545521f2b45ae1fa34c88e729bdcf152f6a0ff5f1"
+      },
+      "art_sha256": "ec0365f164c602bff6baef774cb2cea7339c57b06d074fde0b8531234930cdd4",
+      "art_bytes": 1295
+    },
+    {
+      "id": 63,
+      "osis": "2John",
+      "name": "2 John",
+      "testament": "NT",
+      "title": "Truth & love together",
+      "themes": [
+        "Truth",
+        "love",
+        "discernment"
+      ],
+      "motifs": [
+        "Paired woven bands",
+        "doorway",
+        "lamp"
+      ],
+      "references": [
+        "2 John 4–11"
+      ],
+      "composition": "Two bands weave into one doorway with a steady lamp at the threshold.",
+      "art": "../art/2john-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:2John.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Resource begins with salutation commentary; distinct book introduction not confirmed.",
+        "source_opening": "Salutation. (a. d. 90.)\n1 The elder unto the elect lady and her children, whom I love in the truth; and not I only, but also all they that have known the truth; 2 For the truth's sake, which dwelleth in us, and shall be with us for ever. 3 Grace be with you, mercy, and peace, from God the Father, and from the Lord Jesus Christ, the Son of the Father, in truth and love. 4 I rejoiced greatly that I found of thy children walking in truth, as we have received a commandment from the Father.\nAncient epistles began, as here, with salutation and good wishes: religion consecrates, as far as may be, old forms, and turns compliments into real expressions of life and love. Here we have, as usually,\nI. T",
+        "source_sha256": "70d0ef5bf69132667d323d3ca7168c309daad3351adfc9cc975c8c54cd60d727"
+      },
+      "art_sha256": "a22908fe02810c118caff8c4d8bcebd5e10426c571c299afdbd46e3afdbb1c5d",
+      "art_bytes": 2328
+    },
+    {
+      "id": 64,
+      "osis": "3John",
+      "name": "3 John",
+      "testament": "NT",
+      "title": "A welcome on the way",
+      "themes": [
+        "Hospitality",
+        "truth",
+        "faithful partnership"
+      ],
+      "motifs": [
+        "Open door",
+        "travelling path",
+        "table"
+      ],
+      "references": [
+        "3 John 3–8",
+        "11–12"
+      ],
+      "composition": "An open door welcomes a travelling path toward a small table inside.",
+      "art": "../art/3john-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:3John.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Completed by John Reynolds, of Shrewsbury .\nChristian communion is exerted and cherished by letter. Christians are to be commended in the practical proof of their professed subjection to the gospel of Christ. The animating and countenancing of generous and public-spirited persons is doing good to many—to this end the apostle sends this encouraging epistle to his friend Gaius, in which also he complains of the quite opposite spirit and practice of a certain minister, and confirms the good report concerning another more worthy to be imitated.\nIn this epistle the apostle congratulates Gaius upon the prosperity of his soul (ver. 1, 2), upon the fame he had among good Christians (ver. 3, 4), and ",
+        "source_sha256": "32a2a339efdcd3e584b30fe5f11e8ae8d486028e70e8b612ec3d251e076ddea8"
+      },
+      "art_sha256": "499baf3c0178f1b85e3e55bb5a696bac471b35644323ae0f2929e55267f4429e",
+      "art_bytes": 1741
+    },
+    {
+      "id": 65,
+      "osis": "Jude",
+      "name": "Jude",
+      "testament": "NT",
+      "title": "Kept in love",
+      "themes": [
+        "Faithfulness",
+        "discernment",
+        "divine keeping"
+      ],
+      "motifs": [
+        "Guarded flame",
+        "rooted boundary",
+        "open light"
+      ],
+      "references": [
+        "Jude 3",
+        "20–25"
+      ],
+      "composition": "A flame stands within a firm but open boundary, with light reaching beyond it.",
+      "art": "../art/jude-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Jude.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Completed by John Billingsley .\nThis epistle is styled (as are some few others) general or Catholic, because it is not immediately directed to any particular person, family, or church, but to the whole society of Christians of that time, lately converted to the faith of Christ, whether from Judaism or paganism: and it is, and will be, of standing, lasting, and special use in and to the church as long as Christianity, that is, as time, shall last. The general scope of it is much the same with that of the second chapter of the second epistle of Peter, which having been already explained, the less will need to be said on this. It is designed to warn us against seducers and their seduction, to i",
+        "source_sha256": "1e457211398914f638ccdbe7b705aeec6c8c63c566dc0d801be898c5baced6f3"
+      },
+      "art_sha256": "4bfb1703cd84b38492efa7c7f8ceb3121ed8d6a0d9c0cc1d0aafdbf8c3a86718",
+      "art_bytes": 1859
+    },
+    {
+      "id": 66,
+      "osis": "Rev",
+      "name": "Revelation",
+      "testament": "NT",
+      "title": "All things made new",
+      "themes": [
+        "Faithful witness",
+        "judgment",
+        "final renewal"
+      ],
+      "motifs": [
+        "Lamb emblem",
+        "city gate",
+        "river and tree"
+      ],
+      "references": [
+        "Rev 5",
+        "21–22"
+      ],
+      "composition": "A small lamb emblem faces an open city gate; a river and life-giving tree lead outward. No speculative beast charts or depictions of God as a human figure.",
+      "art": "../art/rev-covenant-forms.svg",
+      "art_status": "SVG cover · first edition",
+      "introduction": {
+        "resource_id": "resource:matthew-henry:Rev.1.1",
+        "attribution": "Matthew Henry’s Commentary · Henry and continuators",
+        "catalog_author": "Matthew Henry and continuators",
+        "status": "needs source-boundary review",
+        "note": "Book-opening commentary found; introduction/chapter boundary still requires editorial verification.",
+        "source_opening": "Revelation\nAN EXPOSITION, WITH PRACTICAL OBSERVATIONS, OF THE REVELATION OF ST. JOHN THE DIVINE\nIt ought to be no prejudice to the credit and authority of this book that it has been rejected by men of corrupt minds, such as Cerdon and Marcion, and doubted of by men of a better character; for this has been the lot of other parts of holy writ, and of the divine Author of the scripture himself. The image and superscription of this book are truly sacred and divine, and the matter of it agreeable with other prophetical books, particularly Ezekiel and Daniel; the church of God has generally received it, and found good counsel and great comfort in it. From the beginning, the church of God has been ",
+        "source_sha256": "51b9d2018ec2192b7c6a9a079c7fa7a24ba4c3033577ece49eb8d183676ab6bb"
+      },
+      "art_sha256": "adbd9969b939ac965eb6ea3a49b6b9bb35dfe4476a0a87197454ba678d45bba2",
+      "art_bytes": 2253
+    }
+  ]
+}

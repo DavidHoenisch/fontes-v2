@@ -55,7 +55,7 @@ impl StudyCounts {
     }
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct StudyImport {
     pub source_id: String,
     pub source_records: usize,
@@ -65,7 +65,7 @@ pub struct StudyImport {
     pub non_scripture_links: usize,
     pub unmapped_citations: Vec<CitationIssue>,
 }
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CitationIssue {
     pub source_id: String,
     pub record: String,
@@ -733,8 +733,13 @@ fn citation_ranges(c: &Citation, registry: &Registry) -> Result<Vec<(i64, i64)>>
             .split_whitespace()
             .map(|part| {
                 let (start, end) = part.split_once('-').unwrap_or((part, part));
-                let a = range_for(registry, start, false)?;
-                let b = range_for(registry, end, true)?;
+                // TEI OSIS may qualify canonical references with the Bible work ID.
+                let a = range_for(
+                    registry,
+                    start.strip_prefix("Bible:").unwrap_or(start),
+                    false,
+                )?;
+                let b = range_for(registry, end.strip_prefix("Bible:").unwrap_or(end), true)?;
                 ensure!(a <= b, "reversed OSIS reference");
                 Ok((a, b))
             })
@@ -787,6 +792,63 @@ fn extract_module(path: &Path, dir: &Path) -> Result<()> {
     }
     Ok(())
 }
+/// Import the upstream public-domain TEI transcription without assigning inferred Strong's codes.
+pub fn import_abbott(
+    tx: &Transaction<'_>,
+    snapshot: &str,
+    path: &Path,
+    registry: &Registry,
+    normalized: &Path,
+) -> Result<StudyImport> {
+    let xml = fs::read_to_string(path)?;
+    ensure!(
+        !xml.contains("<!DOCTYPE") && !xml.contains("<!ENTITY"),
+        "unsupported TEI declarations"
+    );
+    let doc = roxmltree::Document::parse(&xml)?;
+    let mut output = File::create(normalized)?;
+    for (i, entry) in doc
+        .descendants()
+        .filter(|n| n.has_tag_name("entry"))
+        .enumerate()
+    {
+        let headword = entry
+            .descendants()
+            .find(|n| n.has_tag_name("orth"))
+            .or_else(|| entry.descendants().find(|n| n.has_tag_name("foreign")))
+            .map(text)
+            .unwrap_or_default();
+        let key = entry
+            .attribute("n")
+            .map(str::to_owned)
+            .unwrap_or_else(|| format!("{}|entry-{:05}", headword, i + 1));
+        let citations: Vec<_> = entry
+            .descendants()
+            .filter_map(|n| n.attribute("osisRef"))
+            .map(|value| Citation {
+                source: value.into(),
+                kind: "osisRef".into(),
+                ranges: vec![],
+            })
+            .collect();
+        writeln!(
+            output,
+            "{}",
+            serde_json::json!({"key":key,"raw":&xml[entry.range()],"citations":citations})
+        )?;
+    }
+    output.sync_all()?;
+    import_sword_records(
+        tx,
+        "abbott-smith",
+        snapshot,
+        registry,
+        normalized,
+        "dictionary",
+        "G. Abbott-Smith",
+    )
+}
+
 pub fn import_sword(
     tx: &Transaction<'_>,
     source: &str,
@@ -800,6 +862,7 @@ pub fn import_sword(
     let (module, kind, author) = match source {
         "matthew-henry" => ("MHC", "commentary", "Matthew Henry and continuators"),
         "nave" => ("Nave", "topic", "Orville J. Nave"),
+        "easton" => ("Easton", "dictionary", "M. G. Easton"),
         "tsk" => (
             "TSK",
             "cross_reference",
@@ -831,6 +894,8 @@ fn import_sword_records(
     let module = match source {
         "matthew-henry" => "MHC",
         "nave" => "Nave",
+        "easton" => "Easton",
+        "abbott-smith" => "Abbott-Smith",
         _ => "TSK",
     };
     let mut report = StudyImport {
@@ -925,7 +990,14 @@ fn import_sword_records(
                 source,
                 key,
                 kind,
-                &format!("{module}: {key}"),
+                &format!(
+                    "{module}: {}",
+                    if source == "abbott-smith" {
+                        key.split('|').next().unwrap_or(key)
+                    } else {
+                        key
+                    }
+                ),
                 author,
                 &plain,
                 display,
@@ -943,11 +1015,28 @@ fn import_sword_records(
                     },
                 )?;
             }
+            if source == "abbott-smith" {
+                for supplied in entry.key.split('|').skip(1) {
+                    if let Some(number) = supplied.strip_prefix('G')
+                        && number.chars().all(|c| c.is_ascii_digit())
+                        && let Ok(code) = strong_code('G', number)
+                    {
+                        let link_id = format!("link:{id}:definition:{code}");
+                        tx.execute("INSERT OR IGNORE INTO resource_links(id,resource_id,strongs,link_type) VALUES(?1,?2,?3,'definition')", params![link_id,id,code])?;
+                    }
+                }
+                let headword = entry.key.split('|').next().unwrap_or("");
+                let display = serde_json::json!({"type":"dictionary_entry","headword":headword,"source_key":entry.key,"raw_sha256":digest(entry.raw.as_bytes()),"unmapped_citations":unresolved,"supplied_strongs_labels":entry.key.split('|').skip(1).collect::<Vec<_>>()});
+                tx.execute(
+                    "UPDATE resources SET display_json=?1 WHERE id=?2",
+                    params![display.to_string(), id],
+                )?;
+            }
             report.resources += 1;
             Some(id)
         };
         if let Some(id) = &id
-            && source != "nave"
+            && matches!(source, "matthew-henry" | "tsk")
             && let Some((a, b)) = own_range(registry, &entry.key)?
         {
             link(tx, id, a, b, "applies_to")?;
@@ -1060,23 +1149,64 @@ struct CitationPolicy {
     expected_imports: BTreeMap<String, ExpectedImport>,
     known_unmapped_citations: Vec<CitationIssue>,
 }
+pub fn check_tsk_citation_policy(
+    path: &Path,
+    lock: &fontes_data_contracts::SourceLock,
+    reports: &[StudyImport],
+) -> Result<()> {
+    ensure!(
+        reports.len() == 1 && reports[0].source_id == "tsk",
+        "Reading requires exactly TSK study data"
+    );
+    check_citation_policy_inner(path, lock, reports, true)
+}
 pub fn check_citation_policy(
     path: &Path,
     lock: &fontes_data_contracts::SourceLock,
     reports: &[StudyImport],
+) -> Result<()> {
+    let (additional, baseline): (Vec<_>, Vec<_>) = reports
+        .iter()
+        .cloned()
+        .partition(|r| matches!(r.source_id.as_str(), "abbott-smith" | "easton"));
+    check_citation_policy_inner(path, lock, &baseline, false)?;
+    if !additional.is_empty() {
+        check_citation_policy_inner(
+            &path.with_file_name("study-dictionaries-v1.json"),
+            lock,
+            &additional,
+            false,
+        )?;
+    }
+    Ok(())
+}
+fn check_citation_policy_inner(
+    path: &Path,
+    lock: &fontes_data_contracts::SourceLock,
+    reports: &[StudyImport],
+    subset: bool,
 ) -> Result<()> {
     let mut policy: CitationPolicy = serde_json::from_slice(&fs::read(path)?)?;
     ensure!(
         policy.mapping_version == 1 && !policy.review.is_empty(),
         "invalid study citation policy"
     );
-    for id in ["matthew-henry", "nave", "tsk"] {
+    if subset {
+        policy.expected_imports.retain(|id, _| id == "tsk");
+        policy
+            .known_unmapped_citations
+            .retain(|c| c.source_id == "tsk");
+    }
+    for id in policy.source_sha256s.keys() {
+        if subset && id != "tsk" {
+            continue;
+        }
         ensure!(
-            policy.source_sha256s.get(id)
+            policy.source_sha256s.get(id.as_str())
                 == lock
                     .sources
                     .iter()
-                    .find(|s| s.source_id == id)
+                    .find(|s| s.source_id == *id)
                     .map(|s| &s.sha256),
             "study source changed without citation review: {id}"
         );
@@ -1196,6 +1326,64 @@ mod tests {
             [(43003016, 43003018), (45008001, 45008039)]
         );
     }
+    #[test]
+    fn abbott_tei_preserves_entries_and_only_explicit_standard_codes() {
+        let mut db = Connection::open_in_memory().unwrap();
+        db.execute_batch(fontes_data_contracts::CONTENT_SCHEMA_SQL)
+            .unwrap();
+        db.execute_batch("INSERT INTO books VALUES(43,'John','John','NT',43); INSERT INTO canonical_refs VALUES(43003016,43,3,16); INSERT INTO strongs_codes VALUES('G0026','grc'); INSERT INTO source_snapshots VALUES('as','abbott-smith','hash','https://example.org',NULL,'review','abbott-smith-tei-v1');").unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("source.xml");
+        fs::write(&path, r#"<TEI xmlns="http://www.crosswire.org/2013/TEIOSIS/namespace"><entry n="ἀγάπη|G26"><form><orth>ἀγάπη</orth></form><sense>Love &amp; charity. <ref osisRef="John.3.16">John 3:16</ref><ref osisRef="Wis.1.1">Wisdom</ref></sense></entry><entry n="variant|G26a"><form><orth>variant</orth></form><sense>Retain the extended code without inventing alignment.</sense></entry><entry><form><foreign>unnumbered</foreign></form><sense>Retained entry.</sense></entry></TEI>"#).unwrap();
+        let tx = db.transaction().unwrap();
+        let report = import_abbott(
+            &tx,
+            "as",
+            &path,
+            &Registry::load().unwrap(),
+            &dir.path().join("normalized.jsonl"),
+        )
+        .unwrap();
+        assert_eq!(report.resources, 3);
+        assert_eq!(report.unmapped_citations.len(), 1);
+        assert_eq!(
+            tx.query_row(
+                "SELECT count(*) FROM resource_links WHERE link_type='definition'",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
+        let (body, display): (String, String) = tx
+            .query_row(
+                "SELECT content,display_json FROM resources WHERE source_record_key='ἀγάπη|G26'",
+                [],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .unwrap();
+        assert!(body.contains("Love & charity."));
+        assert!(display.contains("ἀγάπη"));
+        assert_eq!(
+            tx.query_row(
+                "SELECT count(*) FROM resource_links WHERE link_type='citation'",
+                [],
+                |r| r.get::<_, i64>(0)
+            )
+            .unwrap(),
+            1
+        );
+        let qualified = Citation {
+            source: "Bible:John.3.16".into(),
+            kind: "osisRef".into(),
+            ranges: vec![],
+        };
+        assert_eq!(
+            citation_ranges(&qualified, &Registry::load().unwrap()).unwrap(),
+            [(43003016, 43003016)]
+        );
+    }
+
     #[test]
     fn commentary_aliases_keep_all_verses_and_preverse_prose() {
         let raw = r#"<div type="x-milestone" subType="x-preverse" sID="pv1"/><title>Preface</title><div sID="p1" type="x-p"/>God &amp; love. Roma &amp;#224;. <reference osisRef="John.3.18">John 3:18</reference><div eID="p1" type="x-p"/><div eID="pv1"/>"#;

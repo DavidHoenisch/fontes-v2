@@ -13,6 +13,7 @@ Initial implemented contract, separate from snapshot update-protocol v1 and draf
 | `study.context` | `ref_id`; up to 100 typed article matches, 2,000 source analysis/Strong's rows and 100 distinct cross-reference ranges |
 | `study.resource` | article `id`; full plain text, source/rights-review and up to 500 typed links |
 | `study.word` | `code`, e.g. G25/G0025 or H7225; definitions and first 100 distinct canonical occurrence locations, total count |
+| `study.occurrences` | `code`, optional `book_id`, `offset` (default 0, maximum 100000), `limit` (default 8, 1–50); complete distinct verse counts by book plus filtered, paged active-edition previews |
 | `annotation.save` | optional existing `id`, `start_ref`, `end_ref`, `kind` (`note`/`highlight`), optional `color`, `content`; UUID on create, inclusive range |
 | `annotation.delete` | existing annotation `id`; durable local deletion |
 | `reference.favorite` | `ref_id`, `enabled: boolean`; idempotently add/remove favorite |
@@ -24,11 +25,11 @@ Context additionally includes `cross_references` (default empty in older seriali
 
 Word results additionally include `headwords` (default empty when reading older responses), with `resource_id`, exact source-supplied `text` and optional `transliteration`. These come only from a definition-linked resource's structured `dictionary_entry` display metadata. Missing, blank, malformed or differently typed metadata yields no headword and does not hide definitions. A dictionary headword is not an inferred verse lemma or English alignment. Existing command inputs, IDs, SQL and protocol version are unchanged.
 
-Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Colors are `amber`, `sage`, `blue`, `rose`. Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
+Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Legacy `annotation.save` colors are `amber`, `sage`, `blue`, `rose`. The additive `highlight.save` command supports richer styles and exact edition-bound selection; see [rich highlights v1](highlights-v1.md). Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
 
 ## First-run bootstrap
 
-The separate `library.setup` lifecycle operation is implemented by `fontes-engine::bootstrap`, with GUI confirmation and `fontes-cli setup --data-dir DIRECTORY --profile reading|study`. It runs before an initialized Engine exists, downloads only a confirmed signed profile, stores versioned app-owned receipts/generations and opens the library. It does not add a command to the existing 13-command registry or expose pre-initialization JSON/MCP access. Exact state/trust/compatibility/activation requirements are in [first-run setup](../../docs/app/first-run-setup.md). A future remote bootstrap transport needs its own authorization/lifecycle contract.
+The separate `library.setup` lifecycle operation is implemented by `fontes-engine::bootstrap`, with GUI confirmation and `fontes-cli setup --data-dir DIRECTORY --profile reading|study`. It runs before an initialized Engine exists, downloads only a confirmed signed profile, stores versioned app-owned receipts/generations and opens the library. It does not add a command to the 17-command registry or expose pre-initialization JSON/MCP access. Exact state/trust/compatibility/activation requirements are in [first-run setup](../../docs/app/first-run-setup.md). A future remote bootstrap transport needs its own authorization/lifecycle contract.
 
 ## JSON control / CLI
 
@@ -38,7 +39,7 @@ One request object per line:
 {"command":"reading.navigate","params":{"reference":"Rom 1:3"}}
 ```
 
-The JSON transport replies with `{"ok":true,"result":{...}}` or `{"ok":false,"error":{"code":"...","message":"..."}}`. Successful result objects contain `protocol_version: 1`, a `state` workspace and a tagged `data` value (`workspace`, `search`, `context`, `resource`, `word`, `saved_annotation`). JSON field ordering is not significant. Search includes `offset`/`has_more`; context includes its reference; resource links retain their typed basis. Stable error categories are `invalid_command`, `invalid_json`, `invalid_input`, `not_found`, `incompatible_data`, `storage`.
+The JSON transport replies with `{"ok":true,"result":{...}}` or `{"ok":false,"error":{"code":"...","message":"..."}}`. Successful result objects contain `protocol_version: 1`, a `state` workspace and a tagged `data` value (`workspace`, `search`, `context`, `resource`, `word`, `occurrences`, `saved_annotation`). JSON field ordering is not significant. Search includes `offset`/`has_more`; context includes its reference; resource links retain their typed basis. Stable error categories are `invalid_command`, `invalid_json`, `invalid_input`, `not_found`, `incompatible_data`, `storage`.
 
 Frames are bounded to 1 MiB including an optional newline. Malformed/invalid ordinary commands produce an error and permit the next line. A frame exceeding the limit closes the stream with a stderr diagnostic; the server does not allocate or drain an unbounded frame. No TCP/HTTP endpoint, shell execution, arbitrary SQL, content write, package installer, or AI generation command exists.
 
@@ -67,3 +68,15 @@ Optional stored metadata uses the new [verse Strong’s tags v1 schema](verse-st
 `preferences.set` retains its command ID and adds optional `preferences.theme`: `sea_glass`, `ink_saffron`, `charcoal_raspberry`, `cobalt_citron`, `terracotta_linen`, `aubergine_apricot`, or `midnight_mint`. Omission defaults to Sea glass; unknown values are rejected. The generated catalog is authoritative. The same field is included in workspace preferences and saved in the existing app-session JSON. No published content/user SQL changes. Legacy sessions without this field load with Sea glass; older binaries may reject sessions saved with the new field because session decoding is strict. Notes/highlights are independent of this presentation preference.
 
 New app sessions default to 24px Scripture at 1.63 line spacing (D038). Existing explicitly serialized typography values are preserved; this does not rewrite saved preferences or change the accepted 16–36 / 1.2–2.2 ranges.
+
+The additive `note.save` and read-only `note.passage` commands implement [note documents v1](notes-v1.md), including exact source validation, optional text selection and backward-compatible annotation fallback. Workspace `notes` defaults empty.
+
+
+### Parent library catalogue (2026-10-17)
+
+`library.catalog` is additive to protocol v1: optional `source_id` and default-zero `offset` (0–100000). Without a source it lists installed study sources grouped by source ID and resource type, with article counts/author; translations remain in workspace metadata. With a source it additionally returns at most 50 deterministic title/ID-ordered resource summaries and `has_more`. `Data::Library` carries sources, resources, offset and has_more. It never changes reading session or user data. No published SQL changes. The generated command catalogue now has 18 entries. Existing commands/IDs are unchanged.
+
+
+### In-place passage preview (2026-10-17)
+
+`reading.preview` accepts canonical inclusive `start_ref` and `end_ref`; both must be valid and ordered. `Data::Preview` contains `verses` (`ref_id`, display `label`, exact active-edition `text`) and `has_more`. It returns at most 100 distinct source verse segments in canonical order; merged source rows render once. Missing edition text yields an empty list. It does not call navigation or add recent history. The command catalogue now contains 19 commands. No SQL migration or repurposed command IDs.

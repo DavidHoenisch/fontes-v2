@@ -114,8 +114,14 @@ struct Mappings {
     review: String,
 }
 
+fn default_resource_profile() -> String {
+    fontes_data_contracts::DEFAULT_RESOURCE_PROFILE.into()
+}
+
 #[derive(Deserialize)]
 struct ProfileConfig {
+    #[serde(default = "default_resource_profile")]
+    default_profile: String,
     profile_config_version: u32,
     profiles: Vec<Profile>,
 }
@@ -344,6 +350,12 @@ fn supported_database_sources(profile: &str, actual: &BTreeSet<String>) -> Resul
     if actual == &current {
         return Ok(true);
     }
+    if profile == "reading" {
+        return Ok(actual
+            == &["kjv-base".into(), "web-classic".into()]
+                .into_iter()
+                .collect());
+    }
     if profile != "study" {
         return Ok(false);
     }
@@ -364,6 +376,10 @@ fn supported_database_sources(profile: &str, actual: &BTreeSet<String>) -> Resul
         return Ok(true);
     }
     legacy.insert("oshb-hebrew".into());
+    if actual == &legacy {
+        return Ok(true);
+    }
+    legacy.insert("kjv-strongs".into());
     Ok(actual == &legacy)
 }
 
@@ -469,7 +485,22 @@ pub fn validate_database(path: &Path) -> Result<DatabaseReport> {
         study::validate_study(&db, &study)?;
     } else {
         ensure!(
-            profile == "reading" && study == study::StudyCounts::default(),
+            profile == "reading"
+                && study.strongs_codes == 0
+                && study.original_tokens == 0
+                && study.token_analyses == 0
+                && study.token_strongs == 0
+                && study.greek_segments == 0
+                && (if source_ids.contains("tsk") {
+                    study.resources_by_source.len() == 1
+                        && study.resources_by_source.get("tsk").is_some_and(|n| *n > 0)
+                        && study
+                            .passage_links_by_type
+                            .get("cross_reference")
+                            .is_some_and(|n| *n > 0)
+                } else {
+                    study == study::StudyCounts::default()
+                }),
             "unsupported profile or unexpected study rows"
         );
     }
@@ -506,7 +537,7 @@ pub fn source_asset(source: &LockedSource) -> String {
         "source-{}-{}.{}",
         source.source_id,
         source.sha256,
-        if source.adapter.starts_with("strongs-") {
+        if source.adapter.starts_with("strongs-") || source.adapter == "abbott-smith-tei-v1" {
             "xml"
         } else {
             "zip"
@@ -541,7 +572,8 @@ pub fn build(
     let profile_bytes = fs::read(root.join("data/profiles.json"))?;
     let config: ProfileConfig = serde_json::from_slice(&profile_bytes)?;
     ensure!(
-        config.profile_config_version == 1,
+        config.profile_config_version == 1
+            && config.default_profile == fontes_data_contracts::DEFAULT_RESOURCE_PROFILE,
         "unsupported profiles file"
     );
     let config = config
@@ -550,8 +582,19 @@ pub fn build(
         .find(|p| p.id == profile)
         .context("profile not defined")?;
     ensure!(
-        config.required_sources == profile_sources(profile)?
-            && config.capabilities == profile_capabilities(profile)?,
+        (config.required_sources == profile_sources(profile)?
+            && config.capabilities == profile_capabilities(profile)?)
+            || (profile == "study"
+                && config.required_sources
+                    == profile_sources(profile)?
+                        .iter()
+                        .copied()
+                        .filter(|s| !matches!(*s, "abbott-smith" | "easton"))
+                        .collect::<Vec<_>>()
+                && config.capabilities == profile_capabilities(profile)?)
+            || (profile == "reading"
+                && config.required_sources == ["kjv-base", "web-classic"]
+                && config.capabilities == [fontes_data_contracts::Capability::Reading]),
         "profile membership changed without adapter support"
     );
     let mappings_bytes = fs::read(root.join("data/mappings/reading-v1.json"))?;
@@ -568,7 +611,8 @@ pub fn build(
     let registry = Registry::load()?;
     let mut acquired = Vec::new();
     let mut study_acquired = Vec::new();
-    if profile == "study" {
+    let includes_tsk = config.required_sources.iter().any(|s| s == "tsk");
+    if profile == "study" || includes_tsk {
         study::check_exporter()?;
     }
     for id in &config.required_sources {
@@ -585,7 +629,8 @@ pub fn build(
                 "robinson-tr" => "robinson-utr-v1",
                 "oshb-hebrew" => "oshb-osis-v1",
                 "kjv-strongs" => "kjv-usfm-strongs-v1",
-                "nave" => "sword-dictionary-v1",
+                "nave" | "easton" => "sword-dictionary-v1",
+                "abbott-smith" => "abbott-smith-tei-v1",
                 "matthew-henry" | "tsk" => "sword-commentary-v1",
                 _ => bail!("unknown study source"),
             };
@@ -608,7 +653,7 @@ pub fn build(
     }
     let lock_sha = digest(&lock_bytes);
     let content_id = digest(&serde_json::to_vec(&serde_json::json!({
-        "word_tags_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/kjv-strongs-v1.json"))?))} else {None}, "hebrew_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/hebrew-oshb-v1.json"))?))} else {None}, "study_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/study-v1.json"))?))} else {None}, "profile": profile, "sword_exporter": (profile=="study").then_some(study::SWORD_VERSION), "lock": lock_sha, "mappings": digest(&mappings_bytes),
+        "dictionary_mapping": if config.required_sources.iter().any(|s| s == "abbott-smith" || s == "easton") {Some(digest(&fs::read(root.join("data/mappings/study-dictionaries-v1.json"))?))} else {None}, "word_tags_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/kjv-strongs-v1.json"))?))} else {None}, "hebrew_mapping": if profile=="study" {Some(digest(&fs::read(root.join("data/mappings/hebrew-oshb-v1.json"))?))} else {None}, "study_mapping": if profile=="study" || includes_tsk {Some(digest(&fs::read(root.join("data/mappings/study-v1.json"))?))} else {None}, "profile": profile, "sword_exporter": (profile=="study" || includes_tsk).then_some(study::SWORD_VERSION), "lock": lock_sha, "mappings": digest(&mappings_bytes),
         "profile_config": digest(&profile_bytes), "registry": digest(CANONICAL_REGISTRY_JSON.as_bytes()),
         "schema": digest(CONTENT_SCHEMA_SQL.as_bytes()), "cargo_lock": digest(&fs::read(root.join("Cargo.lock"))?),
         "toolchain": digest(&fs::read(root.join("rust-toolchain.toml"))?),
@@ -750,6 +795,7 @@ pub fn build(
             "strongs-greek" | "strongs-hebrew" => {
                 study::import_strongs(&tx, &source.source_id, &snapshot, &path)?
             }
+            "abbott-smith" => study::import_abbott(&tx, &snapshot, &path, &registry, &normalized)?,
             "robinson-tr" => study::import_greek(&tx, &snapshot, &path, &registry, &normalized)?,
             "kjv-strongs" => {
                 let mapping: word_tags::Mapping = serde_json::from_slice(&fs::read(
@@ -790,7 +836,17 @@ pub fn build(
         });
         study_imports.push(report);
     }
+    if profile == "reading" && includes_tsk {
+        study::check_tsk_citation_policy(
+            &root.join("data/mappings/study-v1.json"),
+            &lock,
+            &study_imports,
+        )?;
+        study::write_audit(&output.join("study-imports.json"), &study_imports)?;
+        notice.push_str("Treasury of Scripture Knowledge (TSK): public domain. Cross-references retain locked CrossWire source provenance and reviewed canonical citation mappings. SWORD 1.9.0 is a build-time extraction dependency only.\n");
+    }
     if profile == "study" {
+        study::write_audit(&output.join("study-imports.json"), &study_imports)?;
         study::check_citation_policy(
             &root.join("data/mappings/study-v1.json"),
             &lock,
@@ -874,6 +930,10 @@ mod database_compatibility_tests {
             .iter()
             .map(|s| s.to_string())
             .collect();
+        assert!(supported_database_sources("study", &sources).unwrap());
+        sources.remove("abbott-smith");
+        assert!(!supported_database_sources("study", &sources).unwrap());
+        sources.remove("easton");
         assert!(supported_database_sources("study", &sources).unwrap());
         sources.remove("kjv-strongs");
         assert!(supported_database_sources("study", &sources).unwrap());

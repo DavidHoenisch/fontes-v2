@@ -1,7 +1,7 @@
 {
   "commands": [
     {
-      "description": "Read the current passage, session and library metadata.",
+      "description": "List installed parent study sources or page 50 articles in one source, without changing reading context.",
       "inputSchema": {
         "$defs": {
           "AnnotationKind": {
@@ -10,6 +10,180 @@
               "highlight"
             ],
             "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
           },
           "Preferences": {
             "additionalProperties": false,
@@ -53,12 +227,649 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "offset": {
+            "default": 0,
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "name": "library.catalog"
+    },
+    {
+      "description": "Read the current passage, session and library metadata.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
         "type": "object"
       },
       "name": "workspace.get"
+    },
+    {
+      "description": "Read up to 100 edition-aware verse segments for a canonical range without changing reading position or history.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "end_ref": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "start_ref": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start_ref",
+          "end_ref"
+        ],
+        "type": "object"
+      },
+      "name": "reading.preview"
     },
     {
       "description": "Navigate to an unambiguous canonical book, chapter and optional verse.",
@@ -71,6 +882,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -113,6 +1098,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -139,6 +1171,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -181,6 +1387,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -208,6 +1461,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -250,6 +1677,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -277,6 +1751,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -319,6 +1967,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -345,6 +2040,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -387,6 +2256,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -425,6 +2341,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -467,6 +2557,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -494,6 +2631,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -536,6 +2847,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -562,6 +2920,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -604,6 +3136,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -620,7 +3199,7 @@
       "name": "study.word"
     },
     {
-      "description": "Create or update a local note/highlight on a canonical inclusive range.",
+      "description": "Count all distinct installed source-token verses by book, and page matching verse previews in the active edition.",
       "inputSchema": {
         "$defs": {
           "AnnotationKind": {
@@ -629,6 +3208,180 @@
               "highlight"
             ],
             "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
           },
           "Preferences": {
             "additionalProperties": false,
@@ -672,6 +3425,363 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "book_id": {
+            "format": "uint16",
+            "maximum": 65535,
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "code": {
+            "type": "string"
+          },
+          "limit": {
+            "default": 8,
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "format": "uint32",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "type": "object"
+      },
+      "name": "study.occurrences"
+    },
+    {
+      "description": "Create or update a local note/highlight on a canonical inclusive range.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -719,7 +3829,7 @@
       "name": "annotation.save"
     },
     {
-      "description": "Delete a local annotation by its stable ID.",
+      "description": "Preview the exact active-edition verse for a note without changing the reading session.",
       "inputSchema": {
         "$defs": {
           "AnnotationKind": {
@@ -728,6 +3838,180 @@
               "highlight"
             ],
             "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
           },
           "Preferences": {
             "additionalProperties": false,
@@ -771,6 +4055,963 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "ref_id": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "ref_id"
+        ],
+        "type": "object"
+      },
+      "name": "note.passage"
+    },
+    {
+      "description": "Save a versioned note document with verified source clippings and an optional exact text selection.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "document": {
+            "$ref": "#/$defs/NoteDocument"
+          },
+          "end_ref": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_ref": {
+            "format": "int64",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "start_ref",
+          "end_ref",
+          "document"
+        ],
+        "type": "object"
+      },
+      "name": "note.save"
+    },
+    {
+      "description": "Create or update a styled whole-range or exact edition-bound text highlight.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "end_ref": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "selection": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/TextSelection"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "start_ref": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "style": {
+            "$ref": "#/$defs/HighlightStyle"
+          }
+        },
+        "required": [
+          "start_ref",
+          "end_ref",
+          "style"
+        ],
+        "type": "object"
+      },
+      "name": "highlight.save"
+    },
+    {
+      "description": "Delete a local annotation by its stable ID.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -797,6 +5038,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -839,6 +5254,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,
@@ -870,6 +5332,180 @@
             ],
             "type": "string"
           },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -912,6 +5548,53 @@
               "midnight_mint"
             ],
             "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
           }
         },
         "additionalProperties": false,

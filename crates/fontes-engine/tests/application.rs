@@ -420,7 +420,7 @@ fn transports_share_dispatch_and_reject_invalid_arguments() {
         catalog,
         serde_json::from_str::<Value>(include_str!("../../../specs/app/commands-v1.json")).unwrap()
     );
-    assert_eq!(catalog["commands"].as_array().unwrap().len(), 13);
+    assert_eq!(catalog["commands"].as_array().unwrap().len(), 19);
     for value in [
         json!({"command":"reading.select","params":{"ref_id":"wrong"}}),
         json!({"command":"workspace.get","params":{"unexpected":true}}),
@@ -478,7 +478,7 @@ fn transports_share_dispatch_and_reject_invalid_arguments() {
         .collect::<Vec<_>>();
     assert_eq!(replies.len(), 3);
     assert_eq!(replies[0]["result"]["protocolVersion"], "2025-06-18");
-    assert_eq!(replies[1]["result"]["tools"].as_array().unwrap().len(), 13);
+    assert_eq!(replies[1]["result"]["tools"].as_array().unwrap().len(), 19);
     assert_eq!(
         replies[2]["result"]["structuredContent"]["state"]["session"]["selected_ref"],
         43003016
@@ -777,4 +777,610 @@ fn reading_themes_persist_and_legacy_preferences_default_without_touching_notes(
         f.engine().workspace().unwrap().session.preferences.theme,
         ReadingTheme::SeaGlass
     );
+}
+
+#[test]
+fn exact_highlights_validate_unicode_persist_edit_and_delete_without_losing_notes() {
+    let f = Fixture::new();
+    Connection::open(f.dir.path().join("content.sqlite"))
+        .unwrap()
+        .execute(
+            "UPDATE verse_texts SET text='For ἀγάπη 🙂 café' WHERE id='kjv16'",
+            [],
+        )
+        .unwrap();
+    let mut e = f.engine();
+    let workspace = e.dispatch(Command::Workspace {}).unwrap().state;
+    let verse = workspace
+        .passage
+        .iter()
+        .find(|v| v.refs.contains(&43003016))
+        .unwrap();
+    let selection = TextSelection {
+        translation_id: workspace.session.translation.clone(),
+        spans: vec![TextSpan {
+            verse_id: verse.id.clone(),
+            start: 4,
+            end: 7,
+            quote: verse.text.chars().skip(4).take(3).collect(),
+        }],
+    };
+    let style = HighlightStyle {
+        kind: MarkKind::DoubleUnderline,
+        color: MarkColor::Purple,
+        symbol: None,
+    };
+    let result = e
+        .dispatch(Command::SaveHighlight {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            style: style.clone(),
+            selection: Some(selection.clone()),
+        })
+        .unwrap();
+    let Data::SavedAnnotation { id } = result.data else {
+        panic!()
+    };
+    assert_eq!(
+        result.state.highlights[0].selection,
+        Some(selection.clone())
+    );
+    for variant in 0..3 {
+        let mut wrong = selection.clone();
+        match variant {
+            0 => wrong.spans[0].quote = "wrong".into(),
+            1 => wrong.translation_id = "missing-edition".into(),
+            _ => wrong.spans[0].verse_id = "different-verse".into(),
+        }
+        assert!(
+            e.dispatch(Command::SaveHighlight {
+                id: Some(id.clone()),
+                start_ref: 43003016,
+                end_ref: 43003016,
+                style: style.clone(),
+                selection: Some(wrong)
+            })
+            .is_err()
+        );
+    }
+    let mut invalid = selection.clone();
+    invalid.spans[0].end = usize::MAX;
+    assert!(
+        e.dispatch(Command::SaveHighlight {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            style: style.clone(),
+            selection: Some(invalid)
+        })
+        .is_err()
+    );
+    e.dispatch(Command::SaveAnnotation {
+        id: None,
+        start_ref: 43003016,
+        end_ref: 43003016,
+        kind: AnnotationKind::Note,
+        color: None,
+        content: Some("Keep my note".into()),
+    })
+    .unwrap();
+    drop(e);
+    let mut e = f.engine();
+    let loaded = e.dispatch(Command::Workspace {}).unwrap().state;
+    assert_eq!(loaded.highlights[0].style, style);
+    assert_eq!(loaded.highlights[0].selection, Some(selection.clone()));
+    let changed = HighlightStyle {
+        kind: MarkKind::Box,
+        color: MarkColor::Green,
+        symbol: None,
+    };
+    assert_eq!(
+        e.dispatch(Command::SaveHighlight {
+            id: Some(id.clone()),
+            start_ref: 43003016,
+            end_ref: 43003016,
+            style: changed.clone(),
+            selection: Some(selection)
+        })
+        .unwrap()
+        .state
+        .highlights[0]
+            .style,
+        changed
+    );
+    let deleted = e.dispatch(Command::DeleteAnnotation { id }).unwrap().state;
+    assert!(deleted.highlights.is_empty());
+    assert!(
+        deleted
+            .annotations
+            .iter()
+            .any(|a| a.content.as_deref() == Some("Keep my note"))
+    );
+}
+
+#[test]
+fn cross_verse_highlights_are_contiguous_and_user_v1_stays_compatible() {
+    let f = Fixture::new();
+    Connection::open(f.dir.path().join("content.sqlite")).unwrap().execute_batch("INSERT INTO source_segments VALUES('kjv17','source','kjv-witness','John 3:17','kjv17'); INSERT INTO segment_refs VALUES('kjv17',43003017,'exact'); INSERT INTO verse_texts VALUES('kjv17','kjv','kjv17','ἀγάπη and grace',NULL);").unwrap();
+    let mut e = f.engine();
+    let legacy = e
+        .dispatch(Command::SaveAnnotation {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            kind: AnnotationKind::Highlight,
+            color: Some("amber".into()),
+            content: None,
+        })
+        .unwrap();
+    let Data::SavedAnnotation { id: legacy_id } = legacy.data else {
+        panic!()
+    };
+    let style = HighlightStyle {
+        kind: MarkKind::WavyUnderline,
+        color: MarkColor::Orange,
+        symbol: None,
+    };
+    let selection = TextSelection {
+        translation_id: "kjv".into(),
+        spans: vec![
+            TextSpan {
+                verse_id: "kjv16".into(),
+                start: 4,
+                end: 27,
+                quote: "God so loved the world.".into(),
+            },
+            TextSpan {
+                verse_id: "kjv17".into(),
+                start: 0,
+                end: 5,
+                quote: "ἀγάπη".into(),
+            },
+        ],
+    };
+    let saved = e
+        .dispatch(Command::SaveHighlight {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003017,
+            style: style.clone(),
+            selection: Some(selection.clone()),
+        })
+        .unwrap();
+    assert_eq!(saved.state.annotations.len(), 2);
+    assert_eq!(saved.state.highlights[0].selection, Some(selection.clone()));
+    let mut broken = selection;
+    broken.spans[1].start = 1;
+    broken.spans[1].quote = "γάπη".into();
+    assert!(
+        e.dispatch(Command::SaveHighlight {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003017,
+            style,
+            selection: Some(broken)
+        })
+        .is_err()
+    );
+    let Data::SavedAnnotation { id } = saved.data else {
+        panic!()
+    };
+    let state = e.dispatch(Command::DeleteAnnotation { id }).unwrap().state;
+    assert_eq!(state.annotations[0].id, legacy_id);
+    assert!(state.highlights.is_empty());
+    let user = Connection::open(f.dir.path().join("user.sqlite")).unwrap();
+    assert_eq!(
+        user.query_row("PRAGMA user_version", [], |r| r.get::<_, u32>(0))
+            .unwrap(),
+        1
+    );
+}
+
+#[test]
+fn occurrence_distribution_is_complete_distinct_paged_and_edition_aware() {
+    let f = Fixture::new();
+    Connection::open(f.dir.path().join("content.sqlite")).unwrap().execute_batch("INSERT INTO original_tokens VALUES('merged-token','web-witness','merged','ἀγάπη',1,NULL); INSERT INTO token_analyses VALUES('merged-token',0,NULL,NULL,NULL); INSERT INTO token_strongs VALUES('merged-token',0,'G0025'); INSERT INTO source_segments VALUES('rom-token-source','source','kjv-witness','Rom 1:3','rom-token-source'); INSERT INTO segment_refs VALUES('rom-token-source',45001003,'exact'); INSERT INTO original_tokens VALUES('rom-token','kjv-witness','rom-token-source','ἀγάπη',1,NULL); INSERT INTO token_analyses VALUES('rom-token',0,NULL,NULL,NULL); INSERT INTO token_strongs VALUES('rom-token',0,'G0025');").unwrap();
+    let mut e = f.engine();
+    let Data::Occurrences { occurrences: first } = e
+        .dispatch(Command::Occurrences {
+            code: "g25".into(),
+            book_id: None,
+            offset: 0,
+            limit: 2,
+        })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(first.code, "G0025");
+    assert_eq!(first.total, 4);
+    assert_eq!(first.books.iter().map(|b| b.verses).sum::<u32>(), 4);
+    assert_eq!(
+        first.books.iter().find(|b| b.book_id == 43).unwrap().verses,
+        3
+    );
+    assert_eq!(
+        first.verses.iter().map(|v| v.ref_id).collect::<Vec<_>>(),
+        vec![43003016, 43003018]
+    );
+    assert!(first.has_more);
+    assert!(!first.verses[0].preview.as_ref().unwrap().contains("WEB"));
+    let Data::Occurrences {
+        occurrences: second,
+    } = e
+        .dispatch(Command::Occurrences {
+            code: "G25".into(),
+            book_id: None,
+            offset: 2,
+            limit: 2,
+        })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert!(!second.has_more);
+    assert_eq!(second.verses[0].ref_id, 43003019);
+    assert_eq!(second.verses[1].ref_id, 45001003);
+    assert!(second.verses[1].preview.is_none());
+    let Data::Occurrences {
+        occurrences: filtered,
+    } = e
+        .dispatch(Command::Occurrences {
+            code: "G25".into(),
+            book_id: Some(45),
+            offset: 0,
+            limit: 6,
+        })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(filtered.total, 4);
+    assert_eq!(filtered.filtered_total, 1);
+    assert_eq!(filtered.books.len(), 2);
+    assert_eq!(filtered.verses[0].ref_id, 45001003);
+    e.dispatch(Command::Translation { id: "web".into() })
+        .unwrap();
+    let Data::Occurrences { occurrences: web } = e
+        .dispatch(Command::Occurrences {
+            code: "G25".into(),
+            book_id: Some(43),
+            offset: 0,
+            limit: 6,
+        })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert!(web.verses[0].preview.as_ref().unwrap().contains("WEB"));
+    assert_eq!(web.total, 4);
+    for (book, limit) in [(Some(999), 6), (None, 0), (None, 51)] {
+        assert!(
+            e.dispatch(Command::Occurrences {
+                code: "G25".into(),
+                book_id: book,
+                offset: 0,
+                limit
+            })
+            .is_err()
+        );
+    }
+}
+
+#[test]
+fn scrapbook_notes_preserve_sources_selection_legacy_and_atomicity() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    let selection = TextSelection {
+        translation_id: "kjv".into(),
+        spans: vec![TextSpan {
+            verse_id: "kjv16".into(),
+            start: 4,
+            end: 7,
+            quote: "God".into(),
+        }],
+    };
+    let document = NoteDocument {
+        title: "Trust and love".into(),
+        pinned: true,
+        selection: Some(selection.clone()),
+        blocks: vec![
+            NoteBlock::Thought {
+                text: "A personal observation.".into(),
+            },
+            NoteBlock::Resource {
+                resource_id: "mh".into(),
+                quote: "A commentary about love.".into(),
+                title: "untrusted title".into(),
+                author: Some("spoof".into()),
+                source: String::new(),
+                content_id: String::new(),
+            },
+            NoteBlock::Passage {
+                ref_id: 43003016,
+                translation_id: "kjv".into(),
+                quote: "For God so loved the world.".into(),
+            },
+        ],
+    };
+    let response = e
+        .dispatch(Command::SaveNote {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            document: document.clone(),
+        })
+        .unwrap();
+    let id = match response.data {
+        Data::SavedAnnotation { id } => id,
+        _ => panic!(),
+    };
+    let note = &response.state.notes[0];
+    assert!(note.document.pinned);
+    assert_eq!(note.document.selection, Some(selection));
+    if let NoteBlock::Resource {
+        title,
+        author,
+        content_id,
+        ..
+    } = &note.document.blocks[1]
+    {
+        assert_eq!(title, "Matthew Henry");
+        assert_eq!(author.as_deref(), Some("Matthew Henry"));
+        assert_eq!(content_id, "fixture-content");
+    } else {
+        panic!()
+    }
+    assert!(
+        response.state.annotations[0]
+            .content
+            .as_ref()
+            .unwrap()
+            .contains("A personal observation.")
+    );
+    let stored = note.document.clone();
+    drop(e);
+    let mut e = f.engine();
+    let state = e.dispatch(Command::Workspace {}).unwrap().state;
+    assert_eq!(state.notes[0].document, stored);
+    let mut bad = document.clone();
+    bad.blocks.push(NoteBlock::Resource {
+        resource_id: "mh".into(),
+        quote: "invented quote".into(),
+        title: String::new(),
+        author: None,
+        source: String::new(),
+        content_id: String::new(),
+    });
+    assert!(
+        e.dispatch(Command::SaveNote {
+            id: Some(id.clone()),
+            start_ref: 43003016,
+            end_ref: 43003016,
+            document: bad
+        })
+        .is_err()
+    );
+    assert_eq!(
+        e.dispatch(Command::Workspace {}).unwrap().state.notes[0].document,
+        stored
+    );
+    let mut bad = document.clone();
+    bad.selection.as_mut().unwrap().spans[0].quote = "wrong".into();
+    assert!(
+        e.dispatch(Command::SaveNote {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            document: bad
+        })
+        .is_err()
+    );
+    let before = e.dispatch(Command::Workspace {}).unwrap().state.session;
+    let preview = e
+        .dispatch(Command::NotePassage { ref_id: 43003016 })
+        .unwrap();
+    assert_eq!(before, preview.state.session);
+    assert!(matches!(preview.data, Data::NotePassage { .. }));
+    e.dispatch(Command::SaveAnnotation {
+        id: Some(id.clone()),
+        start_ref: 43003016,
+        end_ref: 43003016,
+        kind: AnnotationKind::Note,
+        color: None,
+        content: Some("Legacy edit".into()),
+    })
+    .unwrap();
+    assert!(
+        e.dispatch(Command::Workspace {})
+            .unwrap()
+            .state
+            .notes
+            .is_empty()
+    );
+    let response = e
+        .dispatch(Command::SaveNote {
+            id: Some(id.clone()),
+            start_ref: 43003016,
+            end_ref: 43003016,
+            document,
+        })
+        .unwrap();
+    assert_eq!(response.state.notes.len(), 1);
+    let response = e.dispatch(Command::DeleteAnnotation { id }).unwrap();
+    assert!(response.state.notes.is_empty());
+    assert!(response.state.annotations.is_empty());
+}
+
+#[test]
+fn library_catalog_groups_parent_sources_and_pages_without_navigation() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    let before = e.workspace().unwrap().session;
+    let r = e
+        .dispatch(Command::LibraryCatalog {
+            source_id: None,
+            offset: 0,
+        })
+        .unwrap();
+    let Data::Library {
+        sources, resources, ..
+    } = r.data
+    else {
+        panic!("catalog")
+    };
+    assert_eq!(sources.iter().map(|s| s.count).sum::<u32>(), 4);
+    assert!(resources.is_empty());
+    let r = e
+        .dispatch(Command::LibraryCatalog {
+            source_id: Some("fixture".into()),
+            offset: 0,
+        })
+        .unwrap();
+    let Data::Library {
+        resources,
+        has_more,
+        ..
+    } = r.data
+    else {
+        panic!("entries")
+    };
+    assert_eq!(resources.len(), 4);
+    assert!(!has_more);
+    assert_eq!(e.workspace().unwrap().session, before);
+    assert!(
+        e.dispatch(Command::LibraryCatalog {
+            source_id: None,
+            offset: 100001
+        })
+        .is_err()
+    );
+}
+
+#[test]
+fn library_catalog_pages_large_sources_without_duplicates() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    for n in 0..60 {
+        db.execute(
+            "INSERT INTO resources VALUES(?1,'source',?1,'commentary',?1,NULL,'Excerpt',NULL)",
+            [format!("extra-{n:03}")],
+        )
+        .unwrap();
+    }
+    let mut e = f.engine();
+    let mut ids = std::collections::BTreeSet::new();
+    for (offset, expected, more) in [(0, 50, true), (50, 14, false)] {
+        let r = e
+            .dispatch(Command::LibraryCatalog {
+                source_id: Some("fixture".into()),
+                offset,
+            })
+            .unwrap();
+        let Data::Library {
+            resources,
+            has_more,
+            ..
+        } = r.data
+        else {
+            panic!("entries")
+        };
+        assert_eq!(resources.len(), expected);
+        assert_eq!(has_more, more);
+        for resource in resources {
+            assert!(ids.insert(resource.id));
+        }
+    }
+    assert_eq!(ids.len(), 64);
+}
+
+#[test]
+fn passage_preview_does_not_navigate_or_write_history_and_deduplicates_merged_text() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    e.dispatch(Command::Translation { id: "web".into() })
+        .unwrap();
+    let before = e.workspace().unwrap();
+    let result = e
+        .dispatch(Command::Preview {
+            start_ref: 43003016,
+            end_ref: 43003019,
+        })
+        .unwrap();
+    let Data::Preview { verses, has_more } = result.data else {
+        panic!("preview")
+    };
+    assert_eq!(verses.len(), 2);
+    assert!(!has_more);
+    assert_eq!(verses[1].text, "Merged source text.");
+    assert_eq!(result.state.session, before.session);
+    assert_eq!(
+        serde_json::to_value(result.state.saved).unwrap(),
+        serde_json::to_value(before.saved).unwrap()
+    );
+    assert!(
+        e.dispatch(Command::Preview {
+            start_ref: 43003019,
+            end_ref: 43003016
+        })
+        .is_err()
+    );
+}
+
+#[test]
+fn additional_dictionaries_keep_multiple_definitions_and_cited_articles() {
+    let f = Fixture::new();
+    let db = Connection::open(f.dir.path().join("content.sqlite")).unwrap();
+    db.execute_batch("INSERT INTO source_snapshots VALUES('as-source','abbott-smith','hash','https://example.org',NULL,'review','abbott-smith-tei-v1'),('easton-source','easton','hash','https://example.org',NULL,'review','sword-dictionary-v1');
+        INSERT INTO resources VALUES('as-entry','as-source','ἀγαπάω|G25','dictionary','Abbott-Smith: ἀγαπάω','G. Abbott-Smith','To love with source attribution.','{\"type\":\"dictionary_entry\",\"headword\":\"ἀγαπάω\"}'),('easton-entry','easton-source','LOVE','dictionary','Easton: Love','M. G. Easton','A general Bible dictionary article.',NULL);
+        INSERT INTO resource_links VALUES('as-definition','as-entry',NULL,'G0025',NULL,'definition'),('as-citation','as-entry','john16',NULL,NULL,'citation'),('easton-citation','easton-entry','john16',NULL,NULL,'citation');").unwrap();
+    drop(db);
+    let mut engine = f.engine();
+    let Data::Word {
+        definitions,
+        headwords,
+        ..
+    } = engine
+        .dispatch(Command::Word { code: "G25".into() })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(definitions.len(), 2);
+    assert!(definitions.iter().any(|d| d.id == "strong"));
+    assert!(definitions.iter().any(|d| d.id == "as-entry"));
+    assert!(
+        headwords
+            .iter()
+            .any(|h| h.text == "ἀγαπάω" && h.resource_id == "as-entry")
+    );
+    let Data::Context { resources, .. } = engine
+        .dispatch(Command::Context { ref_id: 43003016 })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert!(
+        resources
+            .iter()
+            .any(|r| r.id == "easton-entry" && r.kind == "dictionary")
+    );
+    let Data::Resource { resource } = engine
+        .dispatch(Command::Resource {
+            id: "as-entry".into(),
+        })
+        .unwrap()
+        .data
+    else {
+        panic!()
+    };
+    assert_eq!(resource.source, "abbott-smith");
+    assert!(resource.links.iter().any(|l| l.start_ref == Some(43003016)));
 }

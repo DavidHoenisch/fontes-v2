@@ -102,6 +102,9 @@ jobs:
       - name: Install APK packager
         run: cargo install cargo-apk --version "$CARGO_APK_VERSION" --locked
       - name: Build and package NativeActivity application
+        env:
+          # Keep development signing/debugging while optimizing the UI/render loop.
+          CARGO_PROFILE_DEV_OPT_LEVEL: "2"
         run: |
           cargo fetch --locked
           sha256sum Cargo.lock > /tmp/fontes-cargo-lock.sha256
@@ -219,3 +222,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/publish-app.py --artifacts checked-apps
+
+  tauri-frontend:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust
+        run: rustup toolchain install 1.93.0 --profile minimal
+      - name: Build shared React frontend
+        run: |
+          npm ci --prefix apps/fontes-web
+          npm test --prefix apps/fontes-web
+          npm run build --prefix apps/fontes-web
+      - name: Check native Tauri adapter
+        run: cargo check --locked -p fontes-tauri

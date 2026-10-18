@@ -58,7 +58,14 @@ impl FontesApp {
             self.preview_requested.insert(code.into());
         }
     }
-    fn lookup_word(&mut self, code: &str) {
+    pub(super) fn lookup_word(&mut self, code: &str) {
+        self.word_card_key.clear();
+        self.word_card_back = false;
+        self.occurrences_open = false;
+        self.occurrence_data = None;
+        self.occurrence_book = None;
+        self.occurrence_requested = None;
+        self.occurrence_return = None;
         self.word_focus = None;
         self.study_tab = StudyTab::Words;
         self.word = None;
@@ -101,24 +108,55 @@ impl FontesApp {
             job.append(&verse.text[start..end], 0.0, selected_format);
             job.append(&verse.text[end..], 0.0, format);
         }
-        // An immutable TextBuffer supplies native drag/double-click selection and copy.
-        let mut text = verse.text.as_str();
-        let mut layouter = |ui: &egui::Ui, _: &dyn egui::TextBuffer, width: f32| {
-            let mut job = job.clone();
-            job.wrap.max_width = width;
-            ui.fonts_mut(|fonts| fonts.layout_job(job))
+        highlights::styled_job(
+            &mut job,
+            self.state.as_ref().unwrap(),
+            verse,
+            self.highlight_draft.as_ref(),
+        );
+        // Mobile text must not own drag/keyboard focus: a focused TextEdit steals
+        // the next swipe for cursor selection and issues cursor scroll-to requests.
+        // Desktop retains native text selection; touch uses tap/long-press lookup.
+        let (response, galley, galley_pos, cursor_range) = if mobile {
+            job.wrap.max_width = (ui.available_width() - 40.0).max(80.0);
+            let galley = ui.fonts_mut(|fonts| fonts.layout_job(job));
+            let response = ui.add(
+                egui::Label::new(galley.clone())
+                    .selectable(false)
+                    .sense(egui::Sense::click()),
+            );
+            let pos = response.rect.min;
+            (response, galley, pos, None)
+        } else {
+            let mut text = verse.text.as_str();
+            let mut layouter = |ui: &egui::Ui, _: &dyn egui::TextBuffer, width: f32| {
+                let mut job = job.clone();
+                job.wrap.max_width = width;
+                ui.fonts_mut(|fonts| fonts.layout_job(job))
+            };
+            let output = egui::TextEdit::multiline(&mut text)
+                .id_salt(("verse-text", &verse.id, self.selection_generation))
+                .frame(egui::Frame::NONE)
+                .margin(0)
+                .desired_rows(1)
+                .desired_width((ui.available_width() - 40.0).max(80.0))
+                .layouter(&mut layouter)
+                .show(ui);
+            (
+                output.response.response,
+                output.galley,
+                output.galley_pos,
+                output.cursor_range,
+            )
         };
-        let output = egui::TextEdit::multiline(&mut text)
-            .id_salt(("verse-text", &verse.id, self.selection_generation))
-            .frame(egui::Frame::NONE)
-            .margin(0)
-            .desired_rows(1)
-            .min_size(egui::vec2(0.0, if mobile { 44.0 } else { 0.0 }))
-            .desired_width(ui.available_width())
-            .layouter(&mut layouter)
-            .show(ui);
-        let response = &output.response.response;
-        if response.clicked()
+        highlights::decorations(ui, self.state.as_ref().unwrap(), verse, &galley, galley_pos);
+        self.draw_highlight_handles(ui, verse, &galley, galley_pos, response.rect);
+        self.draw_note_markers(ui, verse, &galley, galley_pos, response.rect);
+        if self.highlight_draft.as_ref().is_some_and(|d| d.selecting) {
+            return;
+        }
+        if !mobile
+            && response.clicked()
             && self
                 .state
                 .as_ref()
@@ -129,7 +167,7 @@ impl FontesApp {
             });
         }
         if response.has_focus()
-            && let Some(range) = output.cursor_range
+            && let Some(range) = cursor_range
         {
             let range = range.as_sorted_char_range();
             let range = range.start.0..range.end.0;
@@ -143,27 +181,75 @@ impl FontesApp {
                 self.selected_text = None;
             }
         }
+        // Track the gesture independently of egui's touch-only secondary click.
+        // Android pointer delivery and sparse repaint timing must not turn a hold
+        // into the primary word-study click when the finger is released.
+        let mut held = false;
+        if mobile {
+            let (pressed, down, released, pos, time) = ui.input(|i| {
+                (
+                    i.pointer.primary_pressed(),
+                    i.pointer.primary_down(),
+                    i.pointer.primary_released(),
+                    i.pointer.interact_pos(),
+                    i.time,
+                )
+            });
+            if pressed
+                && response.is_pointer_button_down_on()
+                && let Some(pos) = pos
+            {
+                self.scripture_press = Some((response.id, pos, time));
+            }
+            if let Some((id, origin, start)) = self.scripture_press
+                && id == response.id
+            {
+                if pos.is_none_or(|p| p.distance(origin) > 8.0) {
+                    self.scripture_press = None;
+                } else if down || released {
+                    if time - start >= 0.5 && !self.suppress_word_tap {
+                        held = true;
+                    } else if down {
+                        ui.ctx()
+                            .request_repaint_after(std::time::Duration::from_millis(50));
+                    }
+                }
+            }
+        }
+        let secondary = response.secondary_clicked() || held;
+        if mobile && secondary {
+            self.suppress_word_tap = true;
+        }
         if mobile
+            && !self.suppress_word_tap
             && response.clicked()
             && let Some(pos) = response.interact_pointer_pos()
         {
-            let cursor = output
-                .galley
-                .cursor_from_pos(pos - output.galley_pos)
-                .index
-                .0;
+            let cursor = galley.cursor_from_pos(pos - galley_pos).index.0;
             let range = verse
                 .strongs_links
                 .iter()
                 .map(|l| l.start..l.end)
                 .chain(verse.word_links.iter().map(|l| l.start..l.end))
-                .find(|range| range.contains(&cursor));
+                .find(|range| range.contains(&cursor))
+                .or_else(|| word_at(&verse.text, cursor));
             if let Some(range) = range {
+                if let Some((id, _, _)) = highlights::marks(self.state.as_ref().unwrap(), verse)
+                    .into_iter()
+                    .find(|(_, r, _)| r.start < range.end && r.end > range.start)
+                {
+                    self.begin_highlight(verse, Some(id));
+                    return;
+                }
+                let codes = lookup_codes(verse, &range);
                 self.selected_text = Some(selection(verse, range));
-                self.verse_actions = Some(verse.clone());
+                self.open_study(verse.refs[0], StudyTab::Words);
+                if codes.len() == 1 {
+                    self.lookup_word(codes.first().expect("one verified code"));
+                }
             }
         }
-        if response.secondary_clicked() {
+        if secondary {
             // Right-click without a selection targets the word beneath the pointer.
             if self
                 .selected_text
@@ -171,14 +257,23 @@ impl FontesApp {
                 .is_none_or(|t| t.verse_id != verse.id)
                 && let Some(pos) = response.interact_pointer_pos()
             {
-                let cursor = output.galley.cursor_from_pos(pos - output.galley_pos);
+                let cursor = galley.cursor_from_pos(pos - galley_pos);
                 self.selected_text =
                     word_at(&verse.text, cursor.index.0).map(|range| selection(verse, range));
             }
         }
         if mobile {
-            if response.secondary_clicked() {
-                self.verse_actions = Some(verse.clone());
+            if secondary {
+                // Holding is a text-selection gesture, not a dictionary/menu action.
+                if let Some(pos) = response.interact_pointer_pos() {
+                    let cursor = galley.cursor_from_pos(pos - galley_pos);
+                    self.selected_text =
+                        word_at(&verse.text, cursor.index.0).map(|range| selection(verse, range));
+                }
+                self.begin_highlight(verse, None);
+                if let Some(draft) = &mut self.highlight_draft {
+                    draft.selecting = true;
+                }
             }
         } else {
             response.context_menu(|ui| {
@@ -187,9 +282,6 @@ impl FontesApp {
                     self.verse_action_contents(ui, verse, false);
                 });
             });
-        }
-        if mobile && response.double_clicked() {
-            self.open_study(verse.refs[0], StudyTab::Words);
         }
     }
     pub(super) fn mobile_verse_actions(&mut self, ctx: &egui::Context) {
@@ -325,18 +417,33 @@ impl FontesApp {
             ui.close();
         }
         if action_row(ui, "notes", "Add note", false, mobile).clicked() {
-            self.new_note(verse.refs[0]);
+            let selection = self
+                .selected_text
+                .as_ref()
+                .filter(|t| t.verse_id == verse.id)
+                .map(|t| TextSelection {
+                    translation_id: self.state.as_ref().unwrap().session.translation.clone(),
+                    spans: vec![TextSpan {
+                        verse_id: verse.id.clone(),
+                        start: t.range.start,
+                        end: t.range.end,
+                        quote: t.text.clone(),
+                    }],
+                });
+            self.note_from_selection(verse.refs[0], *verse.refs.last().unwrap(), selection);
             ui.close();
         }
-        if action_row(ui, "bookmark", "Highlight verse · amber", false, mobile).clicked() {
-            self.dispatch(Command::SaveAnnotation {
-                id: None,
-                start_ref: verse.refs[0],
-                end_ref: *verse.refs.last().unwrap(),
-                kind: AnnotationKind::Highlight,
-                color: Some("amber".into()),
-                content: None,
-            });
+        if action_row(ui, "bookmark", "Highlight…", false, mobile).clicked() {
+            let range = self
+                .selected_text
+                .as_ref()
+                .map(|s| s.range.clone())
+                .unwrap_or(0..verse.text.chars().count());
+            let existing = highlights::marks(self.state.as_ref().unwrap(), verse)
+                .into_iter()
+                .find(|(_, r, _)| r.start < range.end && r.end > range.start)
+                .map(|(id, _, _)| id);
+            self.begin_highlight(verse, existing);
             ui.close();
         }
         if action_row(ui, "copy", "Copy verse", false, mobile).clicked() {
@@ -353,7 +460,14 @@ impl FontesApp {
         let s = self.state.clone().unwrap();
         // Each article opens at its beginning; returning restores the results scroll.
         let article_id = self.resource.as_ref().map(|r| r.id.clone());
-        egui::ScrollArea::vertical().scroll_bar_visibility(if ui.available_width()<760.0{egui::scroll_area::ScrollBarVisibility::AlwaysHidden}else{egui::scroll_area::ScrollBarVisibility::VisibleWhenNeeded}).id_salt(("study-scroll", self.study_tab as u8, article_id)).show(ui, |ui| {
+        let word_key = self.word.as_ref().and_then(|word| {
+            if let Data::Word { code, .. } = word {
+                Some(code.clone())
+            } else {
+                None
+            }
+        });
+        egui::ScrollArea::vertical().scroll_bar_visibility(if ui.available_width()<760.0{egui::scroll_area::ScrollBarVisibility::AlwaysHidden}else{egui::scroll_area::ScrollBarVisibility::VisibleWhenNeeded}).id_salt(("study-scroll", self.study_tab as u8, article_id, word_key, self.occurrences_open)).show(ui, |ui| {
             egui::Frame::new().inner_margin(18).show(ui, |ui| {
                 let header_top=ui.cursor().min;
                 let header_wash=ui.painter().add(egui::Shape::Noop);
@@ -396,6 +510,7 @@ impl FontesApp {
                     ui.label(RichText::new(friendly_title(&r.title)).size(20.0).strong());
                     if let Some(author) = &r.author { caption(ui, author); }
                     ui.add_space(12.0);
+                    if ui.add_sized([180.0,44.0],egui::Button::new("Add excerpt to note")).clicked(){self.collect_resource(r.clone());}
                     article_body(ui, &r.content);
                     let links: BTreeSet<_> = r.links.iter().filter_map(|l| l.start_ref).collect();
                     if !links.is_empty() {
@@ -431,6 +546,7 @@ impl FontesApp {
                                     }else{caption(ui,"No verse text supplied by this edition.");}
                                     if target.start_ref!=target.end_ref{ui.add_space(8.0);caption(ui,"Preview of the first verse");}
                                     ui.add_space(12.0);
+                                    if ui.add_sized([160.0,44.0],egui::Button::new("Add passage to note")).clicked(){self.notes_state.collecting=self.note.is_none();self.notes_state.insert=self.note.is_some();self.dispatch(Command::NotePassage{ref_id:target.start_ref});}
                                     if ui.add_sized([144.0,44.0],egui::Button::new("Source article")).clicked(){self.dispatch(Command::Resource{id:target.resource_id.clone()});}
                                 });
                                 ui.add_space(16.0);
@@ -464,10 +580,64 @@ impl FontesApp {
             code,
             headwords,
             definitions,
-            occurrences,
+            occurrences: _,
             total,
         }) = self.word.clone()
         {
+            if ui
+                .add_sized(
+                    [ui.available_width(), 44.0],
+                    egui::Button::new("← Words in this verse").frame(false),
+                )
+                .clicked()
+            {
+                self.word = None;
+                self.word_focus = None;
+                return;
+            }
+            ui.add_space(8.0);
+            ui.columns(2, |cols| {
+                if cols[0]
+                    .add_sized(
+                        [cols[0].available_width(), 44.0],
+                        egui::Button::new("Meaning").selected(!self.occurrences_open),
+                    )
+                    .clicked()
+                {
+                    self.occurrences_open = false;
+                }
+                if cols[1]
+                    .add_sized(
+                        [cols[1].available_width(), 44.0],
+                        egui::Button::new(format!("Occurrences · {total}"))
+                            .selected(self.occurrences_open),
+                    )
+                    .clicked()
+                {
+                    self.occurrences_open = true;
+                    if self.occurrence_data.is_none() && self.occurrence_requested.is_none() {
+                        self.request_occurrences(&code, None, 0);
+                    }
+                }
+            });
+            ui.add_space(12.0);
+            if self.occurrences_open {
+                self.occurrence_panel(ui, &code, headwords.first().map(|h| h.text.as_str()));
+                return;
+            }
+            if self.word_card_key != code {
+                self.word_card_key = code.clone();
+                self.word_card_back = false;
+            }
+            let motion = !self.reduce_card_motion;
+            let progress = ui.ctx().animate_bool_with_time(
+                ui.id().with(("word-flip", &code)),
+                self.word_card_back,
+                if motion { 0.32 } else { 0.18 },
+            );
+            let reverse = progress >= 0.5;
+            let paint_start = ui.ctx().graphics_mut(|g| g.entry(ui.layer_id()).next_idx());
+            let mut full_entry = None;
             let linked = self.selected_text.as_ref().and_then(|selected| {
                 self.state
                     .as_ref()?
@@ -486,6 +656,11 @@ impl FontesApp {
             let p = theme::palette(ui.ctx());
             let mut slots = None;
             let has_form = focus.is_some() || linked.is_some();
+            let flip = ui.interact(
+                egui::Rect::from_min_size(ui.cursor().min, egui::vec2(ui.available_width(), 366.0)),
+                ui.id().with(("flip-word-card", &code)),
+                egui::Sense::click(),
+            );
             let hero = egui::Frame::new()
                 .corner_radius(22)
                 .inner_margin(23)
@@ -497,119 +672,199 @@ impl FontesApp {
                 })
                 .show(ui, |ui| {
                     ui.set_min_width(ui.available_width());
+                    ui.set_min_height(320.0);
                     slots = Some((
                         ui.painter().add(egui::Shape::Noop),
                         ui.painter().add(egui::Shape::Noop),
                     ));
                     ui.visuals_mut().override_text_color = Some(p.on_feature);
-                    ui.columns(2, |cols| {
-                        let language = if code.starts_with('H') {
-                            "HEBREW"
-                        } else {
-                            "GREEK"
-                        };
-                        let kind = if focus.is_some() {
-                            "VERSE WORD"
-                        } else if linked.is_some() {
-                            "LINKED SOURCE WORD"
-                        } else {
-                            "DICTIONARY HEADWORD"
-                        };
-                        theme::eyebrow(&mut cols[0], format!("{language} {kind}"), p.on_feature);
-                        let reference = self
-                            .state
-                            .as_ref()
-                            .unwrap()
-                            .reference_label()
-                            .to_uppercase();
-                        cols[1].with_layout(egui::Layout::right_to_left(egui::Align::TOP), |ui| {
-                            ui.set_max_width(72.0);
-                            theme::eyebrow(ui, reference, p.on_feature);
-                        });
-                    });
-                    ui.add_space(12.0);
-                    if let Some(focus) = focus {
-                        original_word_heading(ui, &focus.surface);
-                    } else if let Some(link) = linked {
-                        original_word_heading(ui, &link.surface);
-                    } else if let Some(headword) = headwords.first() {
-                        original_word_heading(ui, &headword.text);
-                    } else {
-                        theme::editorial(ui, format!("Strong’s {code}"), 30.0, p.on_feature);
-                    }
-                    if let Some(headword) = headwords.first() {
-                        if has_form {
-                            feature_caption(ui, format!("Dictionary headword · {}", headword.text));
-                        }
-                        if let Some(transliteration) = &headword.transliteration {
-                            ui.label(scripture(transliteration, 16.0, true).color(p.on_feature));
-                        }
-                    }
-                    for headword in headwords.iter().skip(1) {
-                        feature_caption(ui, format!("Dictionary headword · {}", headword.text));
-                    }
-                    if let Some(focus) = focus {
-                        feature_caption(ui, witness_title(&focus.witness));
-                    }
-                    if !has_form && !headwords.is_empty() {
-                        // The label remains explicit for assistive technology and source distinction.
-                        let response = ui.allocate_response(egui::Vec2::ZERO, egui::Sense::hover());
-                        response.widget_info(|| {
-                            egui::WidgetInfo::labeled(
-                                egui::WidgetType::Label,
-                                true,
-                                "Dictionary headword",
-                            )
-                        });
-                    }
-                    ui.add_space(15.0);
-                    let (line, _) = ui.allocate_exact_size(
-                        egui::vec2(ui.available_width(), 1.0),
-                        egui::Sense::hover(),
-                    );
-                    ui.painter().hline(
-                        line.x_range(),
-                        line.center().y,
-                        egui::Stroke::new(1.0, p.on_feature.gamma_multiply(0.18)),
-                    );
-                    ui.add_space(8.0);
-                    ui.allocate_ui_with_layout(
-                        egui::vec2(ui.available_width(), 28.0),
-                        egui::Layout::left_to_right(egui::Align::Center),
-                        |ui| {
+                    if reverse {
+                        theme::eyebrow(ui, format!("STRONG’S {code} · MEANING"), p.on_feature);
+                        ui.add_space(16.0);
+                        if let Some(d) = definitions.first() {
                             let text = self
-                                .selected_text
-                                .as_ref()
-                                .map(|t| format!("Reading selection: “{}”", t.text))
-                                .unwrap_or_else(|| {
-                                    if has_form {
-                                        "Supplied source form".into()
-                                    } else {
-                                        "Dictionary entry".into()
-                                    }
-                                });
-                            ui.add(
-                                egui::Label::new(
-                                    RichText::new(text).size(10.0).color(p.on_feature),
-                                )
-                                .wrap(),
+                                .word_entries
+                                .get(&d.id)
+                                .map(|e| e.content.as_str())
+                                .unwrap_or(&d.excerpt);
+                            let mut excerpt = egui::text::LayoutJob::simple(
+                                text.to_owned(),
+                                egui::FontId::proportional(15.0),
+                                p.on_feature,
+                                ui.available_width(),
                             );
-                            ui.with_layout(
-                                egui::Layout::right_to_left(egui::Align::Center),
+                            excerpt.sections[0].format.line_height = Some(23.0);
+                            excerpt.wrap.max_rows = 6;
+                            excerpt.wrap.break_anywhere = false;
+                            ui.add(egui::Label::new(excerpt).selectable(false));
+                            ui.add_space(12.0);
+                            if ui
+                                .add_sized(
+                                    [ui.available_width(), 44.0],
+                                    egui::Button::new(
+                                        RichText::new("Read full entry →").color(p.feature),
+                                    )
+                                    .fill(p.on_feature),
+                                )
+                                .clicked()
+                            {
+                                full_entry = Some(d.id.clone());
+                            }
+                            if definitions.len() > 1 {
+                                feature_caption(
+                                    ui,
+                                    format!(
+                                        "{} dictionary sources available below",
+                                        definitions.len()
+                                    ),
+                                );
+                            }
+                        } else {
+                            ui.label(
+                                RichText::new("No dictionary entry installed for this number.")
+                                    .color(p.on_feature),
+                            );
+                        }
+                        ui.add_space(8.0);
+                        if ui
+                            .add_sized(
+                                [ui.available_width(), 44.0],
+                                egui::Button::new(
+                                    RichText::new("Back to word").color(p.on_feature),
+                                )
+                                .frame(false),
+                            )
+                            .clicked()
+                        {
+                            self.word_card_back = false;
+                        }
+                    } else {
+                        ui.columns(2, |cols| {
+                            let language = if code.starts_with('H') {
+                                "HEBREW"
+                            } else {
+                                "GREEK"
+                            };
+                            let kind = if focus.is_some() {
+                                "VERSE WORD"
+                            } else if linked.is_some() {
+                                "LINKED SOURCE WORD"
+                            } else {
+                                "DICTIONARY HEADWORD"
+                            };
+                            theme::eyebrow(
+                                &mut cols[0],
+                                format!("{language} {kind}"),
+                                p.on_feature,
+                            );
+                            let reference = self
+                                .state
+                                .as_ref()
+                                .unwrap()
+                                .reference_label()
+                                .to_uppercase();
+                            cols[1].with_layout(
+                                egui::Layout::right_to_left(egui::Align::TOP),
                                 |ui| {
-                                    egui::Frame::new()
-                                        .fill(p.on_feature.gamma_multiply(0.12))
-                                        .corner_radius(6)
-                                        .inner_margin(egui::Margin::symmetric(8, 5))
-                                        .show(ui, |ui| {
-                                            ui.label(
-                                                RichText::new(&code).size(11.0).color(p.on_feature),
-                                            );
-                                        });
+                                    ui.set_max_width(72.0);
+                                    theme::eyebrow(ui, reference, p.on_feature);
                                 },
                             );
-                        },
-                    );
+                        });
+                        ui.add_space(12.0);
+                        if let Some(focus) = focus {
+                            original_word_heading(ui, &focus.surface);
+                        } else if let Some(link) = linked {
+                            original_word_heading(ui, &link.surface);
+                        } else if let Some(headword) = headwords.first() {
+                            original_word_heading(ui, &headword.text);
+                        } else {
+                            theme::editorial(ui, format!("Strong’s {code}"), 30.0, p.on_feature);
+                        }
+                        if let Some(headword) = headwords.first() {
+                            if has_form {
+                                feature_caption(
+                                    ui,
+                                    format!("Dictionary headword · {}", headword.text),
+                                );
+                            }
+                            if let Some(transliteration) = &headword.transliteration {
+                                ui.label(
+                                    scripture(transliteration, 16.0, true).color(p.on_feature),
+                                );
+                            }
+                        }
+                        for headword in headwords.iter().skip(1) {
+                            feature_caption(ui, format!("Dictionary headword · {}", headword.text));
+                        }
+                        if let Some(focus) = focus {
+                            feature_caption(ui, witness_title(&focus.witness));
+                        }
+                        if !has_form && !headwords.is_empty() {
+                            // The label remains explicit for assistive technology and source distinction.
+                            let response =
+                                ui.allocate_response(egui::Vec2::ZERO, egui::Sense::hover());
+                            response.widget_info(|| {
+                                egui::WidgetInfo::labeled(
+                                    egui::WidgetType::Label,
+                                    true,
+                                    "Dictionary headword",
+                                )
+                            });
+                        }
+                        ui.add_space(15.0);
+                        let (line, _) = ui.allocate_exact_size(
+                            egui::vec2(ui.available_width(), 1.0),
+                            egui::Sense::hover(),
+                        );
+                        ui.painter().hline(
+                            line.x_range(),
+                            line.center().y,
+                            egui::Stroke::new(1.0, p.on_feature.gamma_multiply(0.18)),
+                        );
+                        ui.add_space(8.0);
+                        ui.allocate_ui_with_layout(
+                            egui::vec2(ui.available_width(), 28.0),
+                            egui::Layout::left_to_right(egui::Align::Center),
+                            |ui| {
+                                let text = self
+                                    .selected_text
+                                    .as_ref()
+                                    .map(|t| format!("Reading selection: “{}”", t.text))
+                                    .unwrap_or_else(|| {
+                                        if has_form {
+                                            "Supplied source form".into()
+                                        } else {
+                                            "Dictionary entry".into()
+                                        }
+                                    });
+                                ui.add(
+                                    egui::Label::new(
+                                        RichText::new(text).size(10.0).color(p.on_feature),
+                                    )
+                                    .wrap(),
+                                );
+                                ui.with_layout(
+                                    egui::Layout::right_to_left(egui::Align::Center),
+                                    |ui| {
+                                        egui::Frame::new()
+                                            .fill(p.on_feature.gamma_multiply(0.12))
+                                            .corner_radius(6)
+                                            .inner_margin(egui::Margin::symmetric(8, 5))
+                                            .show(ui, |ui| {
+                                                ui.label(
+                                                    RichText::new(&code)
+                                                        .size(11.0)
+                                                        .color(p.on_feature),
+                                                );
+                                            });
+                                    },
+                                );
+                            },
+                        );
+                        ui.add_space(12.0);
+                        feature_caption(ui, "Tap for meaning ↻");
+                    }
                 });
             let (slot, rings) = slots.expect("word card background");
             theme::radial_wash(
@@ -622,70 +877,73 @@ impl FontesApp {
                 0.60,
             );
             theme::word_rings(ui, rings, hero.response.rect);
-            ui.add_space(18.0);
-            if definitions.is_empty() {
-                ui.label("No dictionary entry installed for this number.");
-            }
-            for d in definitions {
-                theme::card(ui.ctx()).show(ui, |ui| {
-                    ui.set_min_width(ui.available_width());
-                    theme::eyebrow(
-                        ui,
-                        if code.starts_with('H') {
-                            "STRONG’S HEBREW DICTIONARY"
-                        } else {
-                            "STRONG’S GREEK DICTIONARY"
-                        },
-                        muted(ui.ctx()),
-                    );
-                    ui.add_space(8.0);
-                    theme::editorial(ui, &d.title, 22.0, theme::palette(ui.ctx()).ink);
-                    ui.add_space(8.0);
-                    let mut excerpt = egui::text::LayoutJob::simple(
-                        d.excerpt.clone(),
-                        egui::FontId::proportional(13.0),
-                        muted(ui.ctx()),
-                        ui.available_width(),
-                    );
-                    excerpt.sections[0].format.line_height = Some(21.5);
-                    ui.add(egui::Label::new(excerpt).wrap().selectable(true));
-                    ui.add_space(8.0);
-                    if ui
-                        .add(
-                            egui::Button::new(
-                                RichText::new("Read full dictionary entry").color(accent(ui.ctx())),
-                            )
-                            .frame(false),
-                        )
-                        .clicked()
-                    {
-                        self.dispatch(Command::Resource { id: d.id });
+            // Tessellate just this card, then compress its vertices around the
+            // vertical axis. Layout and text wrapping remain fixed during the flip.
+            let paint_end = ui.ctx().graphics_mut(|g| g.entry(ui.layer_id()).next_idx());
+            if progress > 0.0 && progress < 1.0 {
+                let shapes = ui.ctx().graphics_mut(|g| {
+                    let list = g.entry(ui.layer_id());
+                    let shapes = list
+                        .all_entries()
+                        .skip(paint_start.0)
+                        .take(paint_end.0 - paint_start.0)
+                        .cloned()
+                        .collect::<Vec<_>>();
+                    for i in paint_start.0..paint_end.0 {
+                        list.reset_shape(egui::layers::ShapeIdx(i));
                     }
-                    if let Some(author) = d.author {
-                        caption(ui, author);
-                    }
+                    shapes
                 });
+                let scale = (progress * std::f32::consts::PI).cos().abs().max(0.025);
+                let center = hero.response.rect.center().x;
+                for primitive in ui.ctx().tessellate(shapes, ui.ctx().pixels_per_point()) {
+                    if let egui::epaint::Primitive::Mesh(mut mesh) = primitive.primitive {
+                        for vertex in &mut mesh.vertices {
+                            if motion {
+                                vertex.pos.x = center + (vertex.pos.x - center) * scale;
+                            } else {
+                                vertex.color =
+                                    vertex.color.gamma_multiply((progress * 2.0 - 1.0).abs());
+                            }
+                        }
+                        ui.painter()
+                            .with_clip_rect(primitive.clip_rect)
+                            .add(egui::Shape::mesh(mesh));
+                    }
+                }
+            }
+            flip.widget_info(|| {
+                egui::WidgetInfo::labeled(
+                    egui::WidgetType::Button,
+                    true,
+                    if reverse {
+                        "Flip word card"
+                    } else {
+                        "Tap for meaning"
+                    },
+                )
+            });
+            if full_entry.is_none() && flip.clicked() {
+                self.word_card_back = !self.word_card_back;
+                ui.ctx().request_repaint();
+            }
+            if let Some(id) = full_entry {
+                self.dispatch(Command::Resource { id });
+            }
+            if reverse && definitions.len() > 1 {
                 ui.add_space(12.0);
-            }
-            ui.add_space(16.0);
-            if ui
-                .add(egui::Button::new("← Words in this verse").frame(false))
-                .clicked()
-            {
-                self.word = None;
-                self.word_focus = None;
-            }
-            ui.add_space(8.0);
-            ui.collapsing(format!("Occurrences · {total} verses"), |ui| {
-                caption(ui, "Installed source tokens · first 100 distinct verses");
-                ui.horizontal_wrapped(|ui| {
-                    for r in occurrences {
-                        if ui.button(r.label).clicked() {
-                            self.select(r.ref_id);
+                ui.collapsing("Other dictionary sources", |ui| {
+                    for d in definitions.iter().skip(1) {
+                        if ui
+                            .add_sized([ui.available_width(), 44.0], egui::Button::new(&d.title))
+                            .clicked()
+                        {
+                            self.dispatch(Command::Resource { id: d.id.clone() });
                         }
                     }
                 });
-            });
+            }
+            ui.add_space(16.0);
         } else {
             if let Some(selected) = &self.selected_text {
                 caption(ui, format!("Reading selection: “{}”", selected.text));
@@ -774,7 +1032,26 @@ impl FontesApp {
                             .filter_map(|a| a.strongs.as_deref())
                             .collect();
                         ui.horizontal_wrapped(|ui| {
-                            ui.label(scripture(&t.surface, 28.0, true));
+                            if codes.len() == 1 {
+                                if ui
+                                    .add_sized(
+                                        [ui.available_width().min(180.0), 48.0],
+                                        egui::Button::new(scripture(&t.surface, 28.0, true))
+                                            .frame(false),
+                                    )
+                                    .clicked()
+                                {
+                                    let code = *codes.first().unwrap();
+                                    self.lookup_word(code);
+                                    self.word_focus = Some(WordFocus {
+                                        code: code.into(),
+                                        surface: t.surface.clone(),
+                                        witness: t.witness.clone(),
+                                    });
+                                }
+                            } else {
+                                ui.label(scripture(&t.surface, 28.0, true));
+                            }
                             for code in codes {
                                 if ui.button(code).clicked() {
                                     self.lookup_word(code);
@@ -812,31 +1089,6 @@ impl FontesApp {
             }
         }
         ui.add_space(16.0);
-        let hebrew_source = matches!(&self.context, Some(Data::Context { tokens, .. }) if tokens.iter().any(|t|t.witness == "witness:oshb-wlc"))
-            || matches!(&self.word,Some(Data::Word { code,total,.. }) if code.starts_with('H') && *total>0);
-        if hebrew_source {
-            ui.collapsing("Hebrew source and license", |ui| {
-                ui.label("Original work of the Open Scriptures Hebrew Bible available at https://github.com/openscriptures/morphhb");
-                ui.hyperlink_to("Open Scriptures Hebrew Bible", "https://github.com/openscriptures/morphhb");
-                ui.hyperlink_to("CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/");
-                caption(ui,"Word forms and analyses are retained from OSHB. Verse numbering is adapted to the reading edition; variants in source notes are not shown. No endorsement implied.");
-            });
-        }
-        if self
-            .state
-            .as_ref()
-            .is_some_and(|s| s.passage.iter().any(|v| !v.strongs_links.is_empty()))
-        {
-            ui.collapsing("KJV annotation source and license", |ui| {
-                ui.label("Strong’s tags: Bible Foundation (OT), KJV2003/CrossWire and Maurice Robinson (NT). Formatting: Michael Paul Johnson/eBible.org. Copyright © 2003–2023 CrossWire Bible Society. Distributed under GNU GPL version 3.");
-                ui.hyperlink_to("Source and credits", "https://wiki.crosswire.org/CrossWire_KJV");
-                ui.hyperlink_to("Editable USFM source", "https://ebible.org/Scriptures/eng-kjv_usfm.zip?x=1");
-                caption(ui, "Tags are checked against this KJV text; mismatched verses are withheld. A dictionary tag does not identify a Hebrew or Greek verse token.");
-                ui.collapsing("GNU General Public License", |ui| {
-                    ui.label(include_str!("../../../data/rights/GPL-3.0.txt"));
-                });
-            });
-        }
         ui.collapsing("Look up a Strong’s number", |ui| {
             let response = ui.add(
                 egui::TextEdit::singleline(&mut self.word_code)
@@ -1175,7 +1427,7 @@ fn original_word_heading(ui: &mut egui::Ui, text: &str) {
         theme::palette(ui.ctx()).on_feature,
         ui.available_width(),
     );
-    job.sections[0].format.line_height = Some(84.0);
+    job.sections[0].format.line_height = Some(64.0);
     job.wrap.max_rows = 3;
     ui.add(egui::Label::new(job).wrap().selectable(false));
 }

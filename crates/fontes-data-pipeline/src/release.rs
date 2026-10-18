@@ -273,6 +273,38 @@ fn resource_texts(path: &Path) -> Result<BTreeMap<String, String>> {
     Ok(db.prepare("SELECT id,title || char(10) || content || char(10) || coalesce(display_json,'') FROM resources")?.query_map([],|r|Ok((r.get(0)?,r.get(1)?)))?.collect::<rusqlite::Result<_>>()?)
 }
 
+/// Only the deliberate Reading -> complete-default consolidation may retire a profile.
+fn check_profile_transition(
+    previous: &[ProfileArtifact],
+    next: &[ProfileArtifact],
+) -> Result<Vec<String>> {
+    let complete_default = next.len() == 1
+        && next[0].profile == fontes_data_contracts::DEFAULT_RESOURCE_PROFILE
+        && next[0]
+            .source_ids
+            .iter()
+            .map(String::as_str)
+            .collect::<std::collections::BTreeSet<_>>()
+            == fontes_data_contracts::profile_sources("study")
+                .unwrap()
+                .iter()
+                .copied()
+                .collect()
+        && fontes_data_contracts::supported_profile(&next[0]);
+    let mut retired = Vec::new();
+    for old in previous {
+        if next.iter().any(|p| p.profile == old.profile) {
+            continue;
+        }
+        ensure!(
+            complete_default && old.profile == "reading",
+            "published profile would disappear without a complete default replacement"
+        );
+        retired.push(old.profile.clone());
+    }
+    Ok(retired)
+}
+
 pub fn publish(
     dir: &Path,
     trust_path: &Path,
@@ -395,8 +427,7 @@ pub fn publish(
         .max_by_key(|(seq, _)| *seq)
         .map(|(_, r)| r["tagName"].as_str().unwrap().to_owned());
     let old = tempfile::tempdir()?;
-    let mut changes =
-        serde_json::json!({"previous_release":previous,"profiles":{},"source_changes":[]});
+    let mut changes = serde_json::json!({"previous_release":previous,"profiles":{},"source_changes":[],"retired_profiles":[],"default_profile":fontes_data_contracts::DEFAULT_RESOURCE_PROFILE});
     if let Some(tag) = &previous {
         download_assets(
             repository,
@@ -414,13 +445,9 @@ pub fn publish(
             prior.release_tag == *tag,
             "previous release identity mismatch"
         );
-        ensure!(
-            prior
-                .profiles
-                .iter()
-                .all(|p| profiles.iter().any(|n| n.profile == p.profile)),
-            "published profile would disappear"
-        );
+        changes["retired_profiles"] =
+            serde_json::to_value(check_profile_transition(&prior.profiles, &profiles)?)?;
+        changes["default_profile"] = fontes_data_contracts::DEFAULT_RESOURCE_PROFILE.into();
         if profiles.len() == prior.profiles.len()
             && profiles.iter().all(|p| {
                 prior
@@ -526,10 +553,10 @@ pub fn publish(
         assets.push(profile.asset.clone());
     }
     if additional.is_some() {
-        assets.extend([
-            "validation-report-study.json".into(),
-            "study-imports.json".into(),
-        ]);
+        assets.push("validation-report-study.json".into());
+    }
+    if manifest.profiles.iter().any(|p| p.profile == "study") {
+        assets.push("study-imports.json".into());
     }
     if manifest
         .sources
@@ -547,7 +574,7 @@ pub fn publish(
         ));
     }
     let notes = format!(
-        "Fontes data {}\n\n{}\nCompiler commit: {}\nManifest: Ed25519 signed with {}\n\nReading contains KJV and WEB Classic with 31,102 canonical verses each. Study adds Strong's Greek/Hebrew dictionaries, Robinson TR Greek morphology in both source reading streams, OSHB Hebrew words/morphology (CC BY 4.0), edition-bound KJV dictionary tags (GPL), Matthew Henry, Nave's, and TSK. See NOTICE.txt, source locks, validation reports, study-imports.json (study releases), and changes.json. Verify with the public key distributed with the application.\n",
+        "Fontes data {}\n\n{}\nCompiler commit: {}\nManifest: Ed25519 signed with {}\n\nThe complete free-resource package contains KJV and WEB Classic; Strong's Greek/Hebrew dictionaries; Abbott-Smith's Greek Lexicon (1922); Easton's Bible Dictionary (1897); Robinson TR Greek morphology; OSHB Hebrew words/morphology (CC BY 4.0); edition-bound KJV dictionary tags (GPL); Matthew Henry; Nave's; and TSK. The internal study identifier is retained for compatibility. New releases no longer provide a separate Reading download; historical releases remain unchanged. See NOTICE.txt, source locks, validation reports, study-imports.json, and changes.json. Verify with the public key distributed with the application.\n",
         manifest.release_tag,
         manifest
             .profiles
@@ -610,4 +637,67 @@ pub fn publish(
         manifest.release_tag
     );
     Ok(())
+}
+
+#[cfg(test)]
+mod default_bundle_tests {
+    use super::*;
+    fn profiles() -> (ProfileArtifact, ProfileArtifact) {
+        let manifest: ReleaseManifest =
+            serde_json::from_str(include_str!("../../../data/examples/release-manifest.json"))
+                .unwrap();
+        let reading = manifest.profiles[0].clone();
+        let mut complete = reading.clone();
+        complete.profile = "study".into();
+        complete.asset = "fontes-study.sqlite.zst".into();
+        complete.source_ids = fontes_data_contracts::profile_sources("study")
+            .unwrap()
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        complete.capabilities = fontes_data_contracts::profile_capabilities("study")
+            .unwrap()
+            .to_vec();
+        (reading, complete)
+    }
+    #[test]
+    fn sole_complete_default_can_retire_reading_but_not_other_resources() {
+        let (reading, complete) = profiles();
+        let mut historical = complete.clone();
+        historical
+            .source_ids
+            .retain(|s| !matches!(s.as_str(), "abbott-smith" | "easton"));
+        assert_eq!(
+            check_profile_transition(
+                &[reading.clone(), historical.clone()],
+                std::slice::from_ref(&complete)
+            )
+            .unwrap(),
+            ["reading"]
+        );
+        assert!(
+            check_profile_transition(&[historical.clone()], std::slice::from_ref(&reading))
+                .is_err()
+        );
+        assert!(
+            check_profile_transition(
+                &[reading.clone(), historical.clone()],
+                &[historical.clone()]
+            )
+            .is_err()
+        );
+        let mut partial = complete.clone();
+        partial.source_ids.retain(|s| s != "easton");
+        assert!(
+            check_profile_transition(&[reading.clone(), historical.clone()], &[partial]).is_err()
+        );
+        assert!(
+            check_profile_transition(&[reading.clone(), historical.clone()], &[reading, complete])
+                .unwrap()
+                .is_empty()
+        );
+        let mut unknown = historical;
+        unknown.profile = "optional-resource".into();
+        assert!(check_profile_transition(&[unknown], std::slice::from_ref(&profiles().1)).is_err());
+    }
 }

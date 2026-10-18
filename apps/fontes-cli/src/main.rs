@@ -17,7 +17,7 @@ enum Mode {
     Setup {
         #[arg(long)]
         data_dir: PathBuf,
-        #[arg(long, default_value = "reading", value_parser = ["reading", "study"])]
+        #[arg(long, default_value = "study", value_parser = ["reading", "study"])]
         profile: String,
     },
     /// List stable command IDs and generated input schemas; no database needed.

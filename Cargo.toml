@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/fontes-data-contracts", "crates/fontes-data-pipeline", "crates/fontes-resource", "crates/fontes-engine", "crates/ui-egui", "apps/fontes", "apps/fontes-cli", "apps/fontes-android"]
+members = ["crates/fontes-data-contracts", "crates/fontes-data-pipeline", "crates/fontes-resource", "crates/fontes-engine", "crates/ui-egui", "apps/fontes", "apps/fontes-cli", "apps/fontes-android", "apps/fontes-web/src-tauri"]
 resolver = "3"
 
 [workspace.package]

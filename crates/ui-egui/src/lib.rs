@@ -3,6 +3,10 @@
 mod tests;
 
 mod backdrop;
+mod book_openings;
+mod highlights;
+mod notes;
+mod occurrences;
 mod picker;
 mod preferences;
 mod setup;
@@ -42,8 +46,7 @@ struct NoteDraft {
     start: i64,
     end: i64,
     text: String,
-    color: Option<String>,
-    kind: AnnotationKind,
+    document: NoteDocument,
 }
 pub struct FontesApp {
     host: Host,
@@ -58,6 +61,7 @@ pub struct FontesApp {
     error: Option<String>,
     reference: String,
     picker: bool,
+    book_opening: Option<u16>,
     reading_settings: bool,
     reading_advanced: bool,
     backdrop: backdrop::Backdrop,
@@ -73,6 +77,8 @@ pub struct FontesApp {
     search_more: bool,
     context: Option<Data>,
     resource: Option<ResourceDetail>,
+    word_entries: std::collections::BTreeMap<String, ResourceDetail>,
+    word_entry_requests: std::collections::BTreeSet<String>,
     study_tab: StudyTab,
     include_mentions: bool,
     witness: String,
@@ -81,11 +87,26 @@ pub struct FontesApp {
     selection_generation: u64,
     word_code: String,
     word: Option<Data>,
+    occurrences_open: bool,
+    occurrence_scroll_results: bool,
+    occurrence_data: Option<WordOccurrences>,
+    occurrence_book: Option<u16>,
+    occurrence_requested: Option<(String, Option<u16>, u32)>,
+    occurrence_return: Option<occurrences::OccurrenceReturn>,
     word_focus: Option<WordFocus>,
+    word_card_back: bool,
+    reduce_card_motion: bool,
+    word_card_key: String,
     reply_previews: std::collections::VecDeque<bool>,
     word_previews: std::collections::BTreeMap<String, Vec<DictionaryHeadword>>,
     preview_requested: std::collections::BTreeSet<String>,
     note: Option<NoteDraft>,
+    notes_state: notes::NotesState,
+    highlight_draft: Option<highlights::HighlightDraft>,
+    highlight_layouts: Vec<highlights::TextLayout>,
+    highlight_drag: Option<(bool, egui::Pos2)>,
+    suppress_word_tap: bool,
+    scripture_press: Option<(egui::Id, egui::Pos2, f64)>,
     scroll_to: Option<i64>,
     save_pending: bool,
 }
@@ -123,6 +144,9 @@ impl FontesApp {
             .map(|p| p.display().to_string())
             .unwrap_or_else(|| data_dir.join("library.sqlite").display().to_string());
 
+        let reduce_card_motion =
+            std::fs::read_to_string(data_dir.join("reduce-card-motion-v1.txt"))
+                .is_ok_and(|s| s.trim() == "true");
         let mut app = Self {
             host,
             setup: setup::Setup::default(),
@@ -136,6 +160,7 @@ impl FontesApp {
             error: None,
             reference: String::new(),
             picker: false,
+            book_opening: None,
             reading_settings: false,
             reading_advanced: false,
             backdrop: Default::default(),
@@ -151,6 +176,8 @@ impl FontesApp {
             search_more: false,
             context: None,
             resource: None,
+            word_entries: Default::default(),
+            word_entry_requests: Default::default(),
             study_tab: StudyTab::Commentary,
             include_mentions: false,
             witness: String::new(),
@@ -159,11 +186,26 @@ impl FontesApp {
             selection_generation: 0,
             word_code: String::new(),
             word: None,
+            occurrences_open: false,
+            occurrence_scroll_results: false,
+            occurrence_data: None,
+            occurrence_book: None,
+            occurrence_requested: None,
+            occurrence_return: None,
             word_focus: None,
+            word_card_back: false,
+            reduce_card_motion,
+            word_card_key: String::new(),
             reply_previews: Default::default(),
             word_previews: Default::default(),
             preview_requested: Default::default(),
             note: None,
+            notes_state: Default::default(),
+            highlight_draft: None,
+            highlight_layouts: Vec::new(),
+            highlight_drag: None,
+            suppress_word_tap: false,
+            scripture_press: None,
             scroll_to: None,
             save_pending: false,
         };
@@ -241,6 +283,11 @@ impl FontesApp {
                             s.session.selected_ref != response.state.session.selected_ref
                         });
                     if content_changed {
+                        self.occurrence_data = None;
+                        self.occurrence_requested = None;
+                        self.occurrence_return = None;
+                        self.word_entries.clear();
+                        self.word_entry_requests.clear();
                         self.word_previews.clear();
                         self.preview_requested.clear();
                         self.word = None;
@@ -254,6 +301,9 @@ impl FontesApp {
                     });
 
                     if content_changed || translation_changed {
+                        self.occurrence_data = None;
+                        self.occurrence_requested = None;
+                        self.highlight_draft = None;
                         self.word = None;
                         self.word_focus = None;
                         self.selection_generation = self.selection_generation.wrapping_add(1);
@@ -326,11 +376,55 @@ impl FontesApp {
                                 self.word_previews.insert(code.clone(), headwords.clone());
                             }
                             if !preview_reply {
+                                if let Data::Word { definitions, .. } = &d {
+                                    for entry in definitions {
+                                        if !self.word_entries.contains_key(&entry.id)
+                                            && self.word_entry_requests.insert(entry.id.clone())
+                                        {
+                                            self.dispatch(Command::Resource {
+                                                id: entry.id.clone(),
+                                            });
+                                        }
+                                    }
+                                }
                                 self.word = Some(d);
                                 self.resource = None;
                             }
                         }
-                        Data::Resource { resource } => self.resource = Some(resource),
+                        Data::NotePassage { block } => {
+                            self.notes_state.passage_clip = Some(block);
+                        }
+                        Data::Resource { resource } => {
+                            if self.notes_state.clip_request.as_ref() == Some(&resource.id) {
+                                self.notes_state.excerpt = if self.notes_state.insert_kind == 1 {
+                                    resource.content.clone()
+                                } else {
+                                    String::new()
+                                };
+                                self.notes_state.clip = Some(resource.clone());
+                                self.notes_state.clip_request = None;
+                            }
+                            if self.word_entry_requests.remove(&resource.id) {
+                                if self.word_entries.len() >= 64 {
+                                    self.word_entries.clear();
+                                }
+                                self.word_entries.insert(resource.id.clone(), resource);
+                            } else {
+                                self.resource = Some(resource);
+                            }
+                        }
+                        Data::Occurrences { occurrences } => {
+                            if self.occurrence_requested.as_ref().is_some_and(
+                                |(code, book, offset)| {
+                                    code == &occurrences.code
+                                        && book == &occurrences.book_id
+                                        && offset == &occurrences.offset
+                                },
+                            ) {
+                                self.occurrence_data = Some(occurrences);
+                                self.occurrence_requested = None;
+                            }
+                        }
                         Data::Search {
                             hits,
                             offset,
@@ -361,6 +455,7 @@ impl FontesApp {
         }
     }
     fn choose(&mut self, d: Destination) {
+        self.book_opening = None;
         if (d == Destination::Study || self.destination == Destination::Study)
             && let Some(s) = &self.state
         {
@@ -377,6 +472,7 @@ impl FontesApp {
         }
     }
     fn select(&mut self, id: i64) {
+        self.book_opening = None;
         self.dispatch(Command::Select { ref_id: id });
 
         if self.destination != Destination::Study {
@@ -387,6 +483,7 @@ impl FontesApp {
     }
     pub fn draw(&mut self, ui: &mut egui::Ui) {
         self.receive();
+        self.highlight_layouts.clear();
 
         let key = self
             .state
@@ -498,6 +595,8 @@ impl FontesApp {
                     self.note_editor(ui);
                 } else if self.picker {
                     self.reference_picker(ui, mobile);
+                } else if self.book_opening.is_some() {
+                    self.book_opening_ui(ui, mobile);
                 } else {
                     match self.destination {
                         Destination::Read => self.reader(ui, mobile),
@@ -509,6 +608,9 @@ impl FontesApp {
                     }
                 }
             });
+        self.update_highlight_drag();
+        self.highlight_ui(ui.ctx());
+        self.notes_modal(ui.ctx());
         if mobile
             && self.backdrop.prepare(
                 ui.ctx(),
@@ -522,6 +624,10 @@ impl FontesApp {
             self.verse_actions = None;
             self.reading_settings = false;
             self.backdrop.prepare(ui.ctx(), false, key);
+        }
+        if ui.input(|i| i.pointer.any_released()) {
+            self.suppress_word_tap = false;
+            self.scripture_press = None;
         }
     }
     fn sidebar(&mut self, ui: &mut egui::Ui) {
@@ -792,6 +898,7 @@ impl FontesApp {
                     }
                 });
         }
+        self.occurrence_return_link(ui);
         egui::ScrollArea::vertical().scroll_bar_visibility(if mobile{egui::scroll_area::ScrollBarVisibility::AlwaysHidden}else{egui::scroll_area::ScrollBarVisibility::VisibleWhenNeeded}).id_salt("passage-scroll").show(ui,|ui|{
             let width=ui.available_width().min(ui.clip_rect().width()).min(if mobile{600.0}else{720.0});
 
@@ -805,22 +912,21 @@ impl FontesApp {
 
                 let chapter_start=ui.cursor().min;
                 let chapter_wash=ui.painter().add(egui::Shape::Noop);
-                theme::eyebrow(ui,reading_section(book.id),muted(ui.ctx()));
-
-                ui.add_space(12.0);
-                let heading_width=ui.available_width();
-                let mut heading_font=egui::FontId::new(if mobile{42.0}else{38.0},egui::FontFamily::Name("scripture".into()));
-                // Keep whole book-name words readable when a narrow viewport cannot fit one at full size.
-                let heading_ink=theme::palette(ui.ctx()).ink;
-                let longest_word=ui.fonts_mut(|fonts|book.name.split_whitespace().map(|word|fonts.layout_no_wrap(word.to_owned(),heading_font.clone(),heading_ink).size().x).fold(0.0_f32,f32::max));
-                if longest_word>heading_width{heading_font.size*=heading_width/longest_word;}
-                let heading=egui::text::LayoutJob::simple(format!("{} {}",book.name,s.session.selected_ref%1_000_000/1000),heading_font,theme::palette(ui.ctx()).ink,heading_width);
-                let mut heading=heading; heading.sections[0].format.extra_letter_spacing = -1.8;heading.sections[0].format.line_height=Some(heading.sections[0].format.font_id.size*1.16);
-                let heading=ui.fonts_mut(|fonts|fonts.layout_job(heading));
-                ui.label(heading);
-
-                ui.add_space(8.0);
-ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),14.5),egui::Layout::left_to_right(egui::Align::Center),|ui|{ui.label(RichText::new(s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.name.clone()).unwrap_or_default()).size(11.0).color(muted(ui.ctx())));caption(ui,"·");let (dot,_)=ui.allocate_exact_size(egui::vec2(5.0,12.0),egui::Sense::hover());ui.painter().circle_filled(dot.center(),2.5,accent(ui.ctx()));ui.label(RichText::new("Available offline").size(11.0).color(muted(ui.ctx())));});
+                ui.vertical_centered(|ui| {
+                    theme::eyebrow(ui,reading_section(book.id),muted(ui.ctx()));
+                    ui.add_space(12.0);
+                    let width=ui.available_width();
+                    let mut font=egui::FontId::new(if mobile {62.0} else {58.0},egui::FontFamily::Name("chapter_heading".into()));
+                    let ink=theme::palette(ui.ctx()).ink;
+                    let measured=ui.fonts_mut(|fonts|fonts.layout_no_wrap(book.name.clone(),font.clone(),ink).size().x);
+                    if measured>width {font.size*=width/measured;}
+                    if ui.add(egui::Button::new(RichText::new(&book.name).font(font).color(ink)).frame(false)).on_hover_text("View artwork and book introduction").clicked() {self.book_opening=Some(book.id);}
+                    if ui.small_button("Artwork & introduction").clicked() {self.book_opening=Some(book.id);}
+                    ui.add_space(8.0);
+                    ui.label(RichText::new(format!("CHAPTER {}",s.session.selected_ref%1_000_000/1000)).size(11.0).color(accent(ui.ctx())));
+                    ui.add_space(16.0);
+                    ui.label(RichText::new(s.translations.iter().find(|t|t.id==s.session.translation).map(|t|t.name.clone()).unwrap_or_default()).size(11.0).color(muted(ui.ctx())));
+                });
 
                 ui.add_space(24.0);
                 let p=theme::palette(ui.ctx());
@@ -832,13 +938,14 @@ ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),14.5),egui::Layout::l
                 for verse in &s.passage{
                     let selected=verse.refs.contains(&s.session.selected_ref);
 
-                    let highlight=s.annotations.iter().find(|a|a.color.is_some() && verse.refs.iter().any(|id|*id>=a.start_ref && *id<=a.end_ref));
+                    let highlight:Option<&Annotation>=None;
 
-                    let fill=highlight.and_then(|a|a.color.as_deref()).map(|c|highlight_color(ui.ctx(),c)).unwrap_or_else(||if selected{theme::palette(ui.ctx()).selection}else{egui::Color32::TRANSPARENT});
+                    let fill=highlight.and_then(|a|a.color.as_deref()).map(|c|highlight_color(ui.ctx(),c)).unwrap_or(egui::Color32::TRANSPARENT);
 
-                    let mut row_wash=None;
-                    let row=egui::Frame::new().fill(if selected && highlight.is_none(){egui::Color32::TRANSPARENT}else{fill}).corner_radius(17).stroke(if selected{egui::Stroke::new(1.0,theme::palette(ui.ctx()).mark.gamma_multiply(0.10))}else{egui::Stroke::NONE}).shadow(if selected{egui::epaint::Shadow{offset:[0,5],blur:16,spread:0,color:theme::palette(ui.ctx()).feature.gamma_multiply(0.10)}}else{Default::default()}).inner_margin(egui::Margin::symmetric(if selected{13}else{7},if selected{17}else{13})).show(ui,|ui|{
-                        row_wash=Some(ui.painter().add(egui::Shape::Noop));
+                    // Selection is indicated by the verse number, not a card. Keep
+                    // identical insets so selecting a verse never rewraps its text.
+                    let row=egui::Frame::new().fill(fill).corner_radius(17)
+                        .inner_margin(egui::Margin::symmetric(7,13)).show(ui,|ui|{
                         ui.spacing_mut().item_spacing.x=10.0;
                         ui.horizontal_top(|ui|{
                             if s.session.preferences.verse_numbers{ui.add_sized([12.0,32.0],egui::Label::new(RichText::new(verse.refs.iter().map(|r|(r%1000).to_string()).collect::<Vec<_>>().join("–")).size(12.0).color(if selected{theme::palette(ui.ctx()).mark}else{muted(ui.ctx())})));
@@ -850,16 +957,13 @@ ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),14.5),egui::Layout::l
                             job.append(text,0.0,egui::TextFormat{font_id:egui::FontId::new(s.session.preferences.text_size,if s.session.preferences.scripture_serif{egui::FontFamily::Name("scripture".into())}else{egui::FontFamily::Proportional}),color:theme::palette(ui.ctx()).ink,extra_letter_spacing:-0.25,line_height:Some(s.session.preferences.text_size*s.session.preferences.line_spacing),..Default::default()});
 
                             ui.vertical(|ui|{self.verse_text(ui, verse, job, mobile);
-                            if mobile && selected && verse.strongs_links.len()+verse.word_links.len()>0 {ui.add_space(8.0);ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),12.5),egui::Layout::left_to_right(egui::Align::Center),|ui|{ui.add(icon(ui.ctx(),"spark",11.0,false));ui.label(RichText::new("Tap a word to explore the original").size(10.0).color(muted(ui.ctx())));});}
+                            if mobile && selected && verse.strongs_links.len()+verse.word_links.len()>0 {ui.add_space(8.0);ui.allocate_ui_with_layout(egui::vec2(ui.available_width(),12.5),egui::Layout::left_to_right(egui::Align::Center),|ui|{ui.add(icon(ui.ctx(),"spark",11.0,false));ui.label(RichText::new("Tap: word study · Hold: select text").size(10.0).color(muted(ui.ctx())));});}
                             });
 
                         });
 
-                        for note in s.annotations.iter().filter(|a|a.kind==AnnotationKind::Note && verse.refs.iter().any(|id|*id>=a.start_ref && *id<=a.end_ref)){caption(ui,format!("Note · {}",note.content.as_deref().unwrap_or("")));
-}
                     });
 
-                    if selected && highlight.is_none(){theme::wash(ui,row_wash.expect("row background"),row.response.rect.shrink(0.7),17.0,fill,fill.lerp_to_gamma(theme::palette(ui.ctx()).page,0.35));}
                     if self.scroll_to.is_some_and(|id|verse.refs.contains(&id)){row.response.scroll_to_me(Some(egui::Align::Center));
 self.scroll_to=None;
 }
@@ -1062,158 +1166,6 @@ ui.horizontal(|ui|{
                 });
         });
     }
-    fn new_note(&mut self, reference: i64) {
-        self.note = Some(NoteDraft {
-            id: None,
-            start: reference,
-            end: reference,
-            text: String::new(),
-            color: None,
-            kind: AnnotationKind::Note,
-        });
-    }
-    fn note_editor(&mut self, ui: &mut egui::Ui) {
-        let s = self.state.clone().unwrap();
-
-        egui::Panel::bottom("note-actions")
-            .exact_size(80.0)
-            .frame(
-                egui::Frame::new()
-                    .fill(theme::desk(ui.ctx()))
-                    .inner_margin(egui::Margin::symmetric(24, 16)),
-            )
-            .show(ui, |ui| {
-                ui.add_enabled_ui(!self.save_pending, |ui| {
-                    ui.columns(2, |cols| {
-                        let width = cols[0].available_width();
-
-                        if cols[0]
-                            .add_sized([width, 48.0], egui::Button::new("Cancel"))
-                            .clicked()
-                        {
-                            self.note = None;
-                        }
-                        if primary(&mut cols[1], "Save")
-                            && let Some(draft) = &self.note
-                        {
-                            let command = Command::SaveAnnotation {
-                                id: draft.id.clone(),
-                                start_ref: draft.start,
-                                end_ref: draft.end,
-                                kind: draft.kind.clone(),
-                                color: draft.color.clone(),
-                                content: Some(draft.text.clone()),
-                            };
-
-                            self.save_pending = true;
-
-                            self.dispatch(command);
-                        }
-                    });
-                });
-            });
-
-        if self.note.is_none() {
-            return;
-        }
-        egui::ScrollArea::vertical().show(ui, |ui| {
-            egui::Frame::new().inner_margin(24).show(ui, |ui| {
-                let draft = self.note.as_mut().unwrap();
-
-                ui.heading(if draft.kind == AnnotationKind::Note {
-                    "Your note"
-                } else {
-                    "Your highlight"
-                });
-
-                caption(
-                    ui,
-                    format!(
-                        "ATTACHED TO {} · PRIVATE ON THIS DEVICE",
-                        label(&s.books, draft.start)
-                    ),
-                );
-
-                ui.add_space(16.0);
-
-                ui.horizontal_wrapped(|ui| {
-                    caption(ui, "COLOR");
-
-                    if ui.selectable_label(draft.color.is_none(), "None").clicked() {
-                        draft.color = None;
-                    }
-                    for c in ["amber", "sage", "blue", "rose"] {
-                        if ui
-                            .add_sized(
-                                [48.0, 44.0],
-                                egui::Button::new(c)
-                                    .fill(highlight_color(ui.ctx(), c))
-                                    .selected(draft.color.as_deref() == Some(c)),
-                            )
-                            .clicked()
-                        {
-                            draft.color = Some(c.into());
-                        }
-                    }
-                });
-
-                ui.add_space(16.0);
-
-                if draft.kind == AnnotationKind::Note {
-                    ui.add(
-                        egui::TextEdit::multiline(&mut draft.text)
-                            .desired_width(f32::INFINITY)
-                            .desired_rows(12)
-                            .hint_text("What stands out in this passage?"),
-                    );
-                }
-                ui.add_space(16.0);
-
-                caption(ui, "Follows the passage across translations.");
-            });
-        });
-    }
-    fn notes_ui(&mut self, ui: &mut egui::Ui) {
-        let s = self.state.clone().unwrap();
-
-        egui::ScrollArea::vertical().show(ui,|ui|{egui::Frame::new().inner_margin(24).show(ui,|ui|{
-            ui.label(scripture("Notes & highlights",30.0,true));
-caption(ui,"PRIVATE ON THIS DEVICE");
-ui.add_space(16.0);
-
-            if primary(ui,"Add a note to selected verse"){self.new_note(s.session.selected_ref);
-}
-            if ui.add_sized([ui.available_width(),48.0],egui::Button::new("Highlight selected verse")).clicked(){self.note=Some(NoteDraft{id:None,start:s.session.selected_ref,end:s.session.selected_ref,text:String::new(),color:Some("amber".into()),kind:AnnotationKind::Highlight});
-}
-            let favorite=s.saved.iter().any(|r|r.kind=="favorite" && r.ref_id==s.session.selected_ref);
-
-            if ui.add_sized([ui.available_width(),48.0],egui::Button::new(if favorite{"Remove passage bookmark"}else{"Bookmark selected passage"})).clicked(){self.dispatch(Command::Favorite{ref_id:s.session.selected_ref,enabled:!favorite});
-}
-            if s.annotations.is_empty(){ui.add_space(24.0);
-ui.label("Your observations belong alongside the passage. Select a verse and add your first note.");
-}
-            for note in &s.annotations{ui.add_space(24.0);
-theme::card(ui.ctx()).show(ui,|ui|{
-ui.set_min_width(ui.available_width());
-ui.colored_label(accent(ui.ctx()),label(&s.books,note.start_ref));
-ui.label(note.content.as_deref().unwrap_or("Highlight"));
-if let Some(c)=&note.color{caption(ui,format!("Color · {c}"));
-}
-                ui.horizontal_wrapped(|ui|{if ui.button("Read passage").clicked(){self.select(note.start_ref);
-}
-if ui.button("Edit").clicked(){self.note=Some(NoteDraft{id:Some(note.id.clone()),start:note.start_ref,end:note.end_ref,text:note.content.clone().unwrap_or_default(),color:note.color.clone(),kind:note.kind.clone()});
-}});
-
-                // Deletion deliberately uses a confirmation to protect user-authored text.
-                ui.menu_button("Delete…",|ui|{if ui.button("Permanently delete this annotation").clicked(){self.dispatch(Command::DeleteAnnotation{id:note.id.clone()});
-ui.close();
-}});
-});
-
-            }
-        });
-});
-    }
     fn preferences(&mut self, ui: &mut egui::Ui) {
         let s = self.state.clone().unwrap();
 
@@ -1228,6 +1180,7 @@ ui.close();
                 ui.add_space(24.0);
 
                 Self::reading_controls(ui, &mut p, &s);
+                self.card_motion_control(ui);
 
                 if primary(ui, "Back to reading") {
                     self.destination = Destination::Read;
@@ -1244,6 +1197,8 @@ ui.close();
                         bootstrap::Profile::Reading
                     };
                 }
+                ui.add_space(16.0);
+                preferences::source_credits(ui);
                 ui.add_space(16.0);
                 ui.collapsing("Advanced: open a local library", |ui| {
                     ui.add(

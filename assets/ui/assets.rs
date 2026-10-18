@@ -138,6 +138,12 @@ pub static ICONS: &[(&str, &str, &[u8])] = &[
 /// Font family, weight, role, TrueType bytes.
 pub static FONTS: &[(&str, u16, &str, &[u8])] = &[
     (
+        "Cormorant Garamond Italic",
+        400,
+        "chapter_heading",
+        include_bytes!("fonts/CormorantGaramond-Italic.ttf"),
+    ),
+    (
         "IBM Plex Sans",
         400,
         "ui_body",

@@ -18,11 +18,11 @@ enum Commands {
     Build {
         #[arg(long, default_value = ".")]
         root: PathBuf,
-        #[arg(long, default_value = "reading")]
+        #[arg(long, default_value = "study")]
         profile: String,
         #[arg(long, default_value = ".data-cache")]
         cache: PathBuf,
-        #[arg(long, default_value = "dist/reading")]
+        #[arg(long, default_value = "dist/free-resources")]
         output: PathBuf,
         #[arg(long)]
         builder_commit: String,
@@ -55,7 +55,7 @@ enum Commands {
     },
     /// Sign and publish checked build outputs as a versioned GitHub Release.
     Publish {
-        /// Add the study build to the reading release bundle.
+        /// Legacy maintenance only: add a study build to a historical reading release bundle.
         #[arg(long)]
         additional_dir: Option<PathBuf>,
         #[arg(long)]

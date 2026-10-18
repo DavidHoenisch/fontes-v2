@@ -158,6 +158,10 @@ pub struct Workspace {
     pub translations: Vec<Translation>,
     pub passage: Vec<Verse>,
     pub annotations: Vec<Annotation>,
+    #[serde(default)]
+    pub highlights: Vec<crate::RichHighlight>,
+    #[serde(default)]
+    pub notes: Vec<crate::RichNote>,
     pub saved: Vec<SavedReference>,
     pub has_study: bool,
 }
@@ -245,6 +249,19 @@ pub struct CrossReference {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Data {
+    Preview {
+        verses: Vec<PreviewVerse>,
+        has_more: bool,
+    },
+    Library {
+        sources: Vec<LibrarySource>,
+        resources: Vec<ResourceSummary>,
+        offset: u32,
+        has_more: bool,
+    },
+    NotePassage {
+        block: crate::NoteBlock,
+    },
     Workspace,
     Search {
         hits: Vec<SearchHit>,
@@ -269,6 +286,9 @@ pub enum Data {
         occurrences: Vec<SavedReference>,
         total: u32,
     },
+    Occurrences {
+        occurrences: crate::WordOccurrences,
+    },
     SavedAnnotation {
         id: String,
     },
@@ -278,4 +298,19 @@ pub struct Response {
     pub protocol_version: u32,
     pub state: Workspace,
     pub data: Data,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct LibrarySource {
+    pub id: String,
+    pub kind: String,
+    pub count: u32,
+    pub author: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PreviewVerse {
+    pub ref_id: i64,
+    pub label: String,
+    pub text: String,
 }

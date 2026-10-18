@@ -60,6 +60,10 @@ pub fn install(ctx: &egui::Context) {
         ],
     );
     fonts.families.insert(
+        FontFamily::Name("chapter_heading".into()),
+        vec!["chapter_heading".into(), "scripture".into()],
+    );
+    fonts.families.insert(
         FontFamily::Name("original".into()),
         vec!["greek_fallback".into(), "hebrew_fallback".into()],
     );

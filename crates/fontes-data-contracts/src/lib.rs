@@ -59,10 +59,13 @@ pub enum Capability {
     BookOverviews,
 }
 
+/// Full free-resource bundle selected by new installations. Legacy profile IDs remain valid.
+pub const DEFAULT_RESOURCE_PROFILE: &str = "study";
+
 /// Published v1 snapshot profiles; shared by the compiler and first-run client.
 pub fn profile_sources(profile: &str) -> Option<&'static [&'static str]> {
     match profile {
-        "reading" => Some(&["kjv-base", "web-classic"]),
+        "reading" => Some(&["kjv-base", "web-classic", "tsk"]),
         "study" => Some(&[
             "kjv-base",
             "web-classic",
@@ -74,13 +77,15 @@ pub fn profile_sources(profile: &str) -> Option<&'static [&'static str]> {
             "nave",
             "tsk",
             "kjv-strongs",
+            "abbott-smith",
+            "easton",
         ]),
         _ => None,
     }
 }
 pub fn profile_capabilities(profile: &str) -> Option<&'static [Capability]> {
     match profile {
-        "reading" => Some(&[Capability::Reading]),
+        "reading" => Some(&[Capability::Reading, Capability::CrossReferences]),
         "study" => Some(&[
             Capability::Reading,
             Capability::StrongsLexicon,
@@ -206,13 +211,24 @@ pub fn supported_profile(artifact: &ProfileArtifact) -> bool {
     if actual == sources.iter().copied().collect() && caps == capabilities.iter().collect() {
         return true;
     }
-    let hebrew_sources: BTreeSet<_> = sources
+    if artifact.profile == "reading"
+        && actual == ["kjv-base", "web-classic"].into_iter().collect()
+        && caps == [&Capability::Reading].into_iter().collect()
+    {
+        return true;
+    }
+    let previous_sources: BTreeSet<_> = sources
+        .iter()
+        .copied()
+        .filter(|s| !matches!(*s, "abbott-smith" | "easton"))
+        .collect();
+    let hebrew_sources: BTreeSet<_> = previous_sources
         .iter()
         .copied()
         .filter(|s| *s != "kjv-strongs")
         .collect();
     if artifact.profile == "study"
-        && actual == hebrew_sources
+        && (actual == previous_sources || actual == hebrew_sources)
         && caps == capabilities.iter().collect()
     {
         return true;

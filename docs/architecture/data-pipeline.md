@@ -6,7 +6,7 @@ Use a Rust compiler running in GitHub Actions to turn locked source files into v
 
 This preserves the reference-centric model in Specification v0.1 while making source refreshes, reproducible builds, app compatibility, and interrupted updates explicit. The initial transport is a complete snapshot for a selected content profile. Source imports are modular inside the build; clients do not need to merge resource databases or apply SQL patches.
 
-The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, ten locked inputs, and shared contracts. The workflow compiles both reading and study twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, OSHB Hebrew words and KJV dictionary tags, Matthew Henry, Nave’s, and TSK. Scheduled source discovery and client installation remain implementation work.
+The reading compiler, source acquisition, Ed25519 signer, GitHub publisher, package verifier, and release workflow are now implemented alongside the canonical registry, SQLite schemas, twelve locked inputs, and shared contracts. The workflow compiles the single complete default bundle twice and verifies reproducibility before publication. Study imports Strong’s Greek/Hebrew, both Robinson TR reading streams, OSHB Hebrew words and KJV dictionary tags, Matthew Henry, Nave’s, TSK, Abbott-Smith’s Greek lexicon and Easton’s Bible dictionary. Scheduled source discovery and client installation remain implementation work.
 
 ## Independently installable resources
 
@@ -37,7 +37,7 @@ Upstream discovery and release compilation are different operations. Discovery m
 | Component | Responsibility | Status |
 | --- | --- | --- |
 | `data/canonical/registry-v1.json` | Permanent book IDs and complete initial verse anchor catalog | Added and checked |
-| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Nine inspected inputs added |
+| `data/sources.lock.json` | Exact source bytes, sizes, adapters, and rights review references | Twelve inspected inputs added |
 | `data/profiles.json` | Required source membership and advertised capabilities | Reading and study profiles defined |
 | `data/schema/` | Immutable content and separate mutable user schemas | Added and exercised in SQLite |
 | `crates/fontes-data-contracts` | Shared identities, manifest types, structural checks, embedded schemas | Added with tests |
@@ -45,7 +45,7 @@ Upstream discovery and release compilation are different operations. Discovery m
 | Future `crates/fontes-data-update` | Manifest verification, compatibility, download, staging, activation, recovery | To implement; shared by desktop and mobile |
 | Future `data/curated/` | Reviewed genealogies, overviews, and reference mapping exceptions | To author |
 | `.github/workflows/data-contracts.yml` | Run the existing contract tests, formatting, and Clippy | Added |
-| `.github/workflows/data-release.yml` | Build reading and study twice and publish checked signed releases | Implemented |
+| `.github/workflows/data-release.yml` | Build the complete default bundle twice and publish one checked signed snapshot | Implemented |
 
 Rust remains the application and pipeline language. A pinned SWORD utility toolchain can run in the build container as an ingestion dependency; published app data has no SWORD runtime requirement. Cache raw files outside Git under their SHA-256. Keep bulk datasets and generated SQLite files out of repository history.
 
@@ -90,7 +90,7 @@ At first install, seed that local registry from the bundled trusted registry. La
 
 ### Source registry and lockfile
 
-The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current ten locked inputs correspond to inspected downloads, including the full Robinson TR archive. The earlier checked John sample is historical acquisition evidence, not the production source.
+The research manifest is a candidate catalog, not a production allowlist. The production lock records source ID, acquisition URL, exact SHA-256 and byte length, adapter version, upstream revision if applicable, rights class, and rights review ID/evidence URL. The current twelve locked inputs correspond to inspected downloads, including the full Robinson TR archive. The earlier checked John sample is historical acquisition evidence, not the production source.
 
 A separate source discovery configuration will describe the upstream branch/release or moving file, rights evidence URL, refresh cadence, expected coverage, and whether the source is enabled. For Git-hosted texts discover a commit and pin it. For moving download URLs compare actual hashes, using HTTP validators to reduce transfers. ETag, Last-Modified, and upstream version labels are hints; SHA-256 identifies the bytes.
 
@@ -137,7 +137,7 @@ FTS5 is built into the SQLite profiles. Search hits retain verse/resource identi
 
 ## Profiles and versioning
 
-The initial `reading` profile contains KJV and WEB; `study` adds both dictionaries, Greek TR parsing, Matthew Henry, Nave, and TSK. These use the same schema and canonical registry. Mobile can select reading to reduce storage, while either platform can select study. Study now includes pinned OSHB Hebrew words and supplied morphology. Genealogy and book overview capabilities are advertised only when their actual reviewed data is included. No placeholder data enables a capability.
+The current `reading` profile contains KJV, WEB and TSK cross-references; `study` adds both dictionaries, Greek TR parsing, Matthew Henry and Nave (and also retains TSK). Previously signed KJV/WEB-only Reading profiles remain supported without a cross-reference capability. These use the same schema and canonical registry. Reading builds remain a maintenance tool for historical data; new releases and first-run UI use the single complete default bundle. Study now includes pinned OSHB Hebrew words and supplied morphology. Genealogy and book overview capabilities are advertised only when their actual reviewed data is included. No placeholder data enables a capability.
 
 Both reading and study profiles are implemented. Current v1 releases distribute complete snapshots. The package-native design will make each resource independently installable and represent these profiles as selection bundles; whole-profile replacement must not erase user-installed add-ons. Optional larger dictionaries can then become independent packages.
 
@@ -272,3 +272,12 @@ No published SQL schema or user-data migration is needed. Updated bootstrap/pack
 The approved ten-source Study profile adds `kjv-usfm-strongs-v1`. Tags attach only when the entire normalized source verse matches the installed KJV text. Comparison removes paragraph marks and collapses whitespace; stored text is unchanged and offsets address the exact Unicode scalar sequence. Of 31,102 source verses, 31,101 match, producing 349,297 tagged spans. The reviewed 1 John 2:23 bracket mismatch withholds that verse’s tags. No other text mismatch is accepted. WEB receives no KJV tags.
 
 `verse_texts.display_json.source_strongs` uses the explicit [verse Strong’s v1 contract](../../specs/app/verse-strongs-v1.schema.json). Dictionary associations have edition/text hashes and provenance, but no fabricated original-token identity. The engine fails closed on invalid metadata. Exact tagged USFM source, GPL text and attribution/modification notice accompany Study releases; the publisher carries these files into combined releases. The initial eight-source Greek-only counts above describe the prior baseline; the new build additionally has 305,507 OSHB words across 23,144 canonical verses.
+
+The Abbott-Smith TEI and Easton SWORD adapters are documented in [their source review](../research/abbott-smith-easton.md). The separate dictionary citation policy contributes to build identity and preserves the historical study-citation baseline.
+
+
+## Single default release bundle (2026-10-17)
+
+The release workflow builds only internal profile `study` into `dist/free-resources` and repeats it offline into `dist/repro-free-resources`. It compares SQLite, zstd, validation reports and study-import audits. The publisher receives one checked directory and emits one installable database asset, `fontes-study.sqlite.zst`, plus signatures, notices, reports and exact source archives. The default includes all twelve locked sources, including Abbott-Smith and Easton. Source archives are provenance/rebuild inputs, not separate user-facing resource packages.
+
+The publisher explicitly allows retiring the prior `reading` profile only when its replacement is the complete current default source/capability set. It records this in `changes.json`; removal of other profiles or a partial replacement remains an error. Historical signed releases/receipts remain untouched. Old clients requesting a Reading artifact from the newest release will need an app update/default-bundle selection or a historical release; no fabricated Reading alias is advertised. Existing installed snapshots are not rewritten. `--additional-dir` is retained for historical maintenance, but is not used by the normal workflow.

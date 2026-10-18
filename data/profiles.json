@@ -5,10 +5,12 @@
       "id": "reading",
       "required_sources": [
         "kjv-base",
-        "web-classic"
+        "web-classic",
+        "tsk"
       ],
       "capabilities": [
-        "reading"
+        "reading",
+        "cross_references"
       ]
     },
     {
@@ -23,7 +25,9 @@
         "matthew-henry",
         "nave",
         "tsk",
-        "kjv-strongs"
+        "kjv-strongs",
+        "abbott-smith",
+        "easton"
       ],
       "capabilities": [
         "reading",
@@ -44,6 +48,11 @@
     {
       "id": "genealogies-curated",
       "reason": "Curated relationships and per-edge scripture evidence are required."
+    },
+    {
+      "id": "vines-expository-nt",
+      "reason": "Requested 2026-10-17. Exact edition, redistributable source and rights review unresolved: StudyLight labels its files public domain, but the publisher copyright notice describes restored NT copyright. No default-bundle ingestion until an approved redistributable edition/source is established."
     }
-  ]
+  ],
+  "default_profile": "study"
 }

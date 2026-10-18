@@ -1,0 +1,7 @@
+# Study scrapbook concept
+
+Interactive prototype only; no installed-app changes. A note consists of interleaved personal thought blocks and attributed Scripture, commentary-excerpt and linguistic-definition clippings. Source links open retained-context dialogs. Add to note opens a type picker and a small filterable sample library. Editing supports inline writing/title changes, insertion between pieces, accessible move-up/down buttons and removal with Undo. Three app palettes supported. All changes are in memory and reset on reload.
+
+KJV passage excerpts are public-domain source text. Genesis commentary excerpt is taken from the bundled verified Henry introduction. The second commentary example and linguistic definition are illustrative samples and labeled as such in source details; not a claim of verified dictionary/resource content. Sample personal thoughts are authored for this mockup.
+
+Production follow-up: define a versioned note-document model and backward-compatible plain-note rendering; preserve edition/exact selection, resource ID/version, excerpt bounds and attribution with each clipping. Retain a readable snapshot if a resource is unavailable, and distinguish retained excerpts from live source text. Existing annotation text contracts are unchanged. Rich-block persistence, actual library search, cross-note collection, attachments, sync and export are not implemented here. This explores sourced study material, not unrestricted HTML/media embeds.

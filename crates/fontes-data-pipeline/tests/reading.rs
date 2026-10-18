@@ -126,6 +126,13 @@ fn fixture(root: &Path) {
     ] {
         fs::copy(repo.join(name), root.join(name)).unwrap();
     }
+    // Retain the previously published reading-only profile fixture for compatibility tests.
+    let profiles = root.join("data/profiles.json");
+    let mut config: serde_json::Value =
+        serde_json::from_slice(&fs::read(&profiles).unwrap()).unwrap();
+    config["profiles"][0]["required_sources"] = serde_json::json!(["kjv-base", "web-classic"]);
+    config["profiles"][0]["capabilities"] = serde_json::json!(["reading"]);
+    write_json(&profiles, &config).unwrap();
     let mut lock: SourceLock =
         serde_json::from_str(include_str!("../../../data/sources.lock.json")).unwrap();
     lock.sources
@@ -308,6 +315,16 @@ fn signed_manifest_supports_both_profiles_and_checks_each_profiles_claims() {
         )
     };
     assert_eq!(check(&manifest).unwrap().profiles.len(), 2);
+    let mut sole_default = manifest.clone();
+    sole_default.profiles.retain(|p| p.profile == "study");
+    assert_eq!(check(&sole_default).unwrap().profiles.len(), 1);
+    sole_default.profiles[0]
+        .source_ids
+        .retain(|s| s != "easton");
+    assert!(
+        check(&sole_default).is_err(),
+        "the single default must include every required new resource"
+    );
     manifest.profiles[1].capabilities.pop();
     assert!(check(&manifest).is_err());
     manifest.profiles[1].capabilities = fontes_data_pipeline::profile_capabilities("study")

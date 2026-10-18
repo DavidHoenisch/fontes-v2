@@ -262,6 +262,13 @@ fn study_profiles_accept_exact_legacy_and_hebrew_sets_but_reject_mixed_claims() 
         .unwrap()
         .to_vec();
     assert!(fontes_data_contracts::supported_profile(&artifact));
+    artifact.source_ids.retain(|s| s != "abbott-smith");
+    assert!(
+        !fontes_data_contracts::supported_profile(&artifact),
+        "partial new dictionary bundle is not a historical profile"
+    );
+    artifact.source_ids.retain(|s| s != "easton");
+    assert!(fontes_data_contracts::supported_profile(&artifact));
     artifact.source_ids.retain(|s| s != "kjv-strongs");
     assert!(fontes_data_contracts::supported_profile(&artifact));
     artifact.source_ids.retain(|s| s != "oshb-hebrew");
@@ -278,4 +285,57 @@ fn study_profiles_accept_exact_legacy_and_hebrew_sets_but_reject_mixed_claims() 
     );
     artifact.source_ids.push("unreviewed-extra-source".into());
     assert!(!fontes_data_contracts::supported_profile(&artifact));
+}
+
+#[test]
+fn reading_tsk_capability_requires_tsk_and_preserves_old_signed_reading_profiles() {
+    use fontes_data_contracts::{Capability, supported_profile};
+    let mut artifact = manifest().profiles.remove(0);
+    artifact.profile = "reading".into();
+    artifact.source_ids = vec!["kjv-base".into(), "web-classic".into()];
+    artifact.capabilities = vec![Capability::Reading];
+    assert!(supported_profile(&artifact));
+    artifact.capabilities.push(Capability::CrossReferences);
+    assert!(!supported_profile(&artifact));
+    artifact.source_ids.push("tsk".into());
+    assert!(supported_profile(&artifact));
+    artifact
+        .capabilities
+        .retain(|c| *c != Capability::CrossReferences);
+    assert!(!supported_profile(&artifact));
+}
+
+#[test]
+fn default_resource_bundle_is_the_complete_study_source_set() {
+    let config: Value = serde_json::from_str(include_str!("../../../data/profiles.json")).unwrap();
+    assert_eq!(
+        config["default_profile"],
+        fontes_data_contracts::DEFAULT_RESOURCE_PROFILE
+    );
+    let full = config["profiles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|p| p["id"] == fontes_data_contracts::DEFAULT_RESOURCE_PROFILE)
+        .unwrap();
+    for source in [
+        "kjv-base",
+        "web-classic",
+        "tsk",
+        "matthew-henry",
+        "strongs-hebrew",
+        "strongs-greek",
+        "nave",
+        "oshb-hebrew",
+        "robinson-tr",
+        "kjv-strongs",
+    ] {
+        assert!(
+            full["required_sources"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|s| s == source)
+        );
+    }
 }

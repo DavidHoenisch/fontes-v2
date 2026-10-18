@@ -209,6 +209,355 @@
       "source": "https://fonts.gstatic.com/s/notoserifhebrew/v30/k3k0o9MMPvpLmixYH7euCwmkS9DohjX1-kRyiqyBqIxnoLbp93i9IKrXKF_qVAwSAG8.ttf",
       "license": "OFL-1.1",
       "licenseFile": "licenses/NOTO-SERIF-HEBREW-OFL.txt"
+    },
+    {
+      "family": "Cormorant Garamond",
+      "weight": "Italic (variable)",
+      "role": "chapter_heading",
+      "path": "fonts/CormorantGaramond-Italic.ttf",
+      "source": "https://github.com/google/fonts/tree/main/ofl/cormorantgaramond",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/CORMORANT-GARAMOND-OFL.txt"
+    },
+    {
+      "path": "book-covers/1Chr.svg",
+      "bytes": 2640,
+      "sha256": "dec6382c82e214f2c5fac2fa78350a19827eff823e648376c1d360f104b10d74"
+    },
+    {
+      "path": "book-covers/1Cor.svg",
+      "bytes": 2447,
+      "sha256": "a0c6d706ce0eacf76c890d2c3642825e5bd0beb302a6e82eeb27add855582527"
+    },
+    {
+      "path": "book-covers/1John.svg",
+      "bytes": 1295,
+      "sha256": "ec0365f164c602bff6baef774cb2cea7339c57b06d074fde0b8531234930cdd4"
+    },
+    {
+      "path": "book-covers/1Kgs.svg",
+      "bytes": 2207,
+      "sha256": "de6a4f562d32fc891c1a8b54907fac8e2635ae07c5091dd92e438b1d12088873"
+    },
+    {
+      "path": "book-covers/1Pet.svg",
+      "bytes": 1535,
+      "sha256": "030041c04a17d7bcca3b9d654d03dbf771c896bdf3cdd5076a5476280be2095f"
+    },
+    {
+      "path": "book-covers/1Sam.svg",
+      "bytes": 2215,
+      "sha256": "ee5bc50797047175f276c2cb95cd5eadcc1a37cbf85de2b82bdebcea9031f526"
+    },
+    {
+      "path": "book-covers/1Thess.svg",
+      "bytes": 1601,
+      "sha256": "95b0c2f7e3db04eb9c276a63a861e4ad23f7d0bd7f51027fc701be24d4e9046d"
+    },
+    {
+      "path": "book-covers/1Tim.svg",
+      "bytes": 3058,
+      "sha256": "9f6c7fc3a26a4f6658ff6a2270232a2d722c6f2c302d677cc02f20883a72cc59"
+    },
+    {
+      "path": "book-covers/2Chr.svg",
+      "bytes": 1422,
+      "sha256": "76300020652ee07bced8d0a4f27ed9784e029159c3f8040445eb9d20b8156881"
+    },
+    {
+      "path": "book-covers/2Cor.svg",
+      "bytes": 2139,
+      "sha256": "9f8b10119b626896608701a03c7d62ae07571ffc99bb0bdea2ac371eb577d313"
+    },
+    {
+      "path": "book-covers/2John.svg",
+      "bytes": 2328,
+      "sha256": "a22908fe02810c118caff8c4d8bcebd5e10426c571c299afdbd46e3afdbb1c5d"
+    },
+    {
+      "path": "book-covers/2Kgs.svg",
+      "bytes": 1828,
+      "sha256": "3cff9b53175499d691db5bceb581de924bd3ed36e298a0aae97bed738b7272bb"
+    },
+    {
+      "path": "book-covers/2Pet.svg",
+      "bytes": 1433,
+      "sha256": "7d25a58f9f97307afd574eacd1d86a0dfd85b96927712e3436f4710b54d406fd"
+    },
+    {
+      "path": "book-covers/2Sam.svg",
+      "bytes": 2070,
+      "sha256": "4c7b872894405ee0f5a109e40bc934741a537d5c40966a9f66851f4d38067d60"
+    },
+    {
+      "path": "book-covers/2Thess.svg",
+      "bytes": 2380,
+      "sha256": "8c215d2b41bd149c064faeadb008d229fe33d670b67574d2662417b17e1a4f95"
+    },
+    {
+      "path": "book-covers/2Tim.svg",
+      "bytes": 2184,
+      "sha256": "8d2e554077245e1ef5dd0adb7402b1a06f3eed643adbaa1d9ae220c7617e2a7f"
+    },
+    {
+      "path": "book-covers/3John.svg",
+      "bytes": 1741,
+      "sha256": "499baf3c0178f1b85e3e55bb5a696bac471b35644323ae0f2929e55267f4429e"
+    },
+    {
+      "path": "book-covers/Acts.svg",
+      "bytes": 1085,
+      "sha256": "ccf08b256d5cbc8a523a44707ba3c440e6c42e1b1a4a4fa1579ce7c133cdc142"
+    },
+    {
+      "path": "book-covers/Amos.svg",
+      "bytes": 1965,
+      "sha256": "25cf3a9955e2ce6d2ec37e4d78bbb840db6a8c8186113fea128f401b68177f90"
+    },
+    {
+      "path": "book-covers/Col.svg",
+      "bytes": 2722,
+      "sha256": "3ec18020359ce5b3a656a983d39a4fe6cd4cd03401435cec1fa3cbbbb2950f3b"
+    },
+    {
+      "path": "book-covers/Dan.svg",
+      "bytes": 2438,
+      "sha256": "28abc5cd62122b4e294c7fe2c31afaa84cb82d54c9d991e2304776002e000947"
+    },
+    {
+      "path": "book-covers/Deut.svg",
+      "bytes": 1587,
+      "sha256": "6b09b1a19146d8eba0eedebc282f18340cd831ccf9bc189bcf4fb65a418512a4"
+    },
+    {
+      "path": "book-covers/Eccl.svg",
+      "bytes": 1322,
+      "sha256": "a2d104aa280f385e40d6ab62602f9b7a38d9be38c5315db3ed640023436fcf7c"
+    },
+    {
+      "path": "book-covers/Eph.svg",
+      "bytes": 2041,
+      "sha256": "5fad16f3bd70ffaaeb1733689919de91aea2b211f65e5c3a906103c5a7ece648"
+    },
+    {
+      "path": "book-covers/Esth.svg",
+      "bytes": 2467,
+      "sha256": "8fb04a4970efcc71d8d687a61d21cc95d382e12cd79ef19b83d137b91c78b5f6"
+    },
+    {
+      "path": "book-covers/Exod.svg",
+      "bytes": 755,
+      "sha256": "3e99dc392ccfd90c2ade24d121893f5ed224e2ea86c96b20da907989f3acf09e"
+    },
+    {
+      "path": "book-covers/Ezek.svg",
+      "bytes": 2562,
+      "sha256": "18996da8d84738dd3477d32154f4578f7ed012a9b022c249740c5b818e84a7ba"
+    },
+    {
+      "path": "book-covers/Ezra.svg",
+      "bytes": 3003,
+      "sha256": "a6941b5c5633cd855bffba852afd163fe917d9027d523b9efca168b2e95ef712"
+    },
+    {
+      "path": "book-covers/Gal.svg",
+      "bytes": 2188,
+      "sha256": "4098820f8b9374674b5757f4bd48275e50b26c13b6dd12be24e7dd039440ddf3"
+    },
+    {
+      "path": "book-covers/Gen.svg",
+      "bytes": 2078,
+      "sha256": "566887d59e8946541c8427d255fb35ac4902833a657226b7995223d6212a0303"
+    },
+    {
+      "path": "book-covers/Hab.svg",
+      "bytes": 1748,
+      "sha256": "76c55bd73d9f10f7886e709d1f0b8505ec13c5c23f4cb40883cd9a84509593a0"
+    },
+    {
+      "path": "book-covers/Hag.svg",
+      "bytes": 2051,
+      "sha256": "81bea15283ed2a5d41c5674572471c11b7bb7c8939a1ceee24fa7b897174a49e"
+    },
+    {
+      "path": "book-covers/Heb.svg",
+      "bytes": 2683,
+      "sha256": "0b48511dcf682cb144ace4b612cf3b5eb5795deffe25b129b42c70eef53faed3"
+    },
+    {
+      "path": "book-covers/Hos.svg",
+      "bytes": 1994,
+      "sha256": "e1b76d702d6e063069b7dbcf00f99736a52b03253706cc39f1571a89bd2eaa96"
+    },
+    {
+      "path": "book-covers/Isa.svg",
+      "bytes": 1967,
+      "sha256": "813665bbee583be49731875dd6b2306c7178a639895149a05f89edcbfc28858a"
+    },
+    {
+      "path": "book-covers/Jas.svg",
+      "bytes": 1796,
+      "sha256": "a40c2f58e72654e9874d8771d2fd02307296d88a02534fbb815a3d4668f36d79"
+    },
+    {
+      "path": "book-covers/Jer.svg",
+      "bytes": 1919,
+      "sha256": "2547e9f128b73748bda6d53814024c5bb91c6b53f004556740e0b07e58b496e6"
+    },
+    {
+      "path": "book-covers/Job.svg",
+      "bytes": 1987,
+      "sha256": "00a35e3090a301edae839e84b95fcb71fe281a9735b02fa36e90872b30e2c66d"
+    },
+    {
+      "path": "book-covers/Joel.svg",
+      "bytes": 2498,
+      "sha256": "f225ac11bc2c247fe1b950c6d4215f05f640618c4d0b119a12c2882ac0e8561f"
+    },
+    {
+      "path": "book-covers/John.svg",
+      "bytes": 898,
+      "sha256": "228a55a5b5214a1df0627be52fc08f602f7d02583bf414092af1880f819ce659"
+    },
+    {
+      "path": "book-covers/Jonah.svg",
+      "bytes": 1856,
+      "sha256": "185b4e61242ac28302eda647cdd51d16a6500b3e6a2a493f2485b256d1858ccf"
+    },
+    {
+      "path": "book-covers/Josh.svg",
+      "bytes": 2200,
+      "sha256": "3001d125cf633a1363a33d44cbf8d3a0b9cbb7a43e23e0ca8245d805b43bb4be"
+    },
+    {
+      "path": "book-covers/Jude.svg",
+      "bytes": 1859,
+      "sha256": "4bfb1703cd84b38492efa7c7f8ceb3121ed8d6a0d9c0cc1d0aafdbf8c3a86718"
+    },
+    {
+      "path": "book-covers/Judg.svg",
+      "bytes": 1139,
+      "sha256": "0dc1c4807444b5e87e1dc58751773d007a0fedfd11b3481299a5dc4a595b6541"
+    },
+    {
+      "path": "book-covers/Lam.svg",
+      "bytes": 1316,
+      "sha256": "3eaad1f38cc0994e02c10f4fa81bdb7a7e3293390e8d9990a1f78e1b4b3c8489"
+    },
+    {
+      "path": "book-covers/Lev.svg",
+      "bytes": 2082,
+      "sha256": "e75453754e9bb307bd8b5b34c52e1594cc829e7e449a6a00ae11af2d64e2b708"
+    },
+    {
+      "path": "book-covers/Luke.svg",
+      "bytes": 2210,
+      "sha256": "8a9030cb14ec3bb6db82973d97d65337dc38c02ad05205e7083d154b26e6ab94"
+    },
+    {
+      "path": "book-covers/Mal.svg",
+      "bytes": 2219,
+      "sha256": "4568baf95549dd230ddf95455109c98d8f1446768b9670fcfef0a7bf6098a3fd"
+    },
+    {
+      "path": "book-covers/Mark.svg",
+      "bytes": 1807,
+      "sha256": "1deaf19da14b084f143166bcdb6d699f198520323b743d37298ff26d0289a56f"
+    },
+    {
+      "path": "book-covers/Matt.svg",
+      "bytes": 1391,
+      "sha256": "bf5d22ca53a08280ad8cc12e7af2f7371804233ebd877022df2fa8d684b9be09"
+    },
+    {
+      "path": "book-covers/Mic.svg",
+      "bytes": 2553,
+      "sha256": "e3348ad799b1a8abaaa1cf902a4f83c4816b4c6b758fdcd001725acf8b9f2376"
+    },
+    {
+      "path": "book-covers/Nah.svg",
+      "bytes": 2589,
+      "sha256": "b26f253d3b5227a0754a19b7a870e274e8b1fa588a562b639ea44cca7b9f6417"
+    },
+    {
+      "path": "book-covers/Neh.svg",
+      "bytes": 3574,
+      "sha256": "0f247ac95897ca763d877b752d413298e76815c993b43bde576ea33e95f2fc88"
+    },
+    {
+      "path": "book-covers/Num.svg",
+      "bytes": 1919,
+      "sha256": "2f8023d6364cce6bf3042b540922544366b8c02cf867bfddacd57c3fc6c778d4"
+    },
+    {
+      "path": "book-covers/Obad.svg",
+      "bytes": 1524,
+      "sha256": "99c5ee1f86b2344ed15fb0a8cbd978c902fdaac200324bfcbf8cf011c7ba4fc3"
+    },
+    {
+      "path": "book-covers/Phil.svg",
+      "bytes": 1193,
+      "sha256": "0481121fec1675fada727185f463902365a00e4ab41533f4ae9b720410f33a14"
+    },
+    {
+      "path": "book-covers/Phlm.svg",
+      "bytes": 2552,
+      "sha256": "52c97111f1d34e27e8f17c114ad94893b6028f301802675c31fa3b00adffbe5c"
+    },
+    {
+      "path": "book-covers/Prov.svg",
+      "bytes": 2252,
+      "sha256": "c3110182d44c362dfbea18a80fdeaf374707691ea1d13c1aacb94ac77434f731"
+    },
+    {
+      "path": "book-covers/Ps.svg",
+      "bytes": 1804,
+      "sha256": "55f7dd18e3f2a1619e90af810d9f5edc0e5623e61bc4987be203d1d06d36a342"
+    },
+    {
+      "path": "book-covers/README.md",
+      "bytes": 1445,
+      "sha256": "df77533451d614b5c3a798b325ce88c17071722037ab7951b9c554587a5c8327"
+    },
+    {
+      "path": "book-covers/Rev.svg",
+      "bytes": 2253,
+      "sha256": "adbd9969b939ac965eb6ea3a49b6b9bb35dfe4476a0a87197454ba678d45bba2"
+    },
+    {
+      "path": "book-covers/Rom.svg",
+      "bytes": 2259,
+      "sha256": "f1ef2711264de3bd748e751d037d9a564465b0714288e34b911bab3615fedc9d"
+    },
+    {
+      "path": "book-covers/Ruth.svg",
+      "bytes": 1337,
+      "sha256": "c767a5074ca05ac6c9c2628af54accc4083354b427ad34c624fb83a4e90da4e9"
+    },
+    {
+      "path": "book-covers/Song.svg",
+      "bytes": 2638,
+      "sha256": "306afe6847a5745d5b31fb5bf46f5b3810fe2ee4444cbc2234fc5fb6ec38c07a"
+    },
+    {
+      "path": "book-covers/Titus.svg",
+      "bytes": 1993,
+      "sha256": "3e9621a47b73d7f051cb284850aacafa3b17ce0637eb40ce74d3212a1ee2732d"
+    },
+    {
+      "path": "book-covers/Zech.svg",
+      "bytes": 3864,
+      "sha256": "f9b705f5cd60ef6b735e1e360c1e42e685c82d8563dc1aabb1476d3fdaf942e6"
+    },
+    {
+      "path": "book-covers/Zeph.svg",
+      "bytes": 2354,
+      "sha256": "0deaedd37f10119825ce2f7a0ad6ea7fd5be0421bc77ec071641b043b1c15fe0"
+    },
+    {
+      "path": "book-covers/introductions.json",
+      "bytes": 253533,
+      "sha256": "0f80820c469d5cbb9ffb513748c9692b0537d2d0ebaa31666493f0ba01e3c84b"
     }
   ],
   "tokenFile": "tokens.json",
@@ -228,8 +577,8 @@
     },
     {
       "path": "assets.rs",
-      "bytes": 5316,
-      "sha256": "3d98026a5633c04fffae3e21c63ce9261be8b1193b729132a24472d286ff6ea5"
+      "bytes": 5468,
+      "sha256": "c0a2296426911992c87157ebd53d0cfbe8cee42db541dfe3ecf9ead4b1b1681e"
     },
     {
       "path": "fonts/IBMPlexSans-Medium.ttf",
@@ -580,6 +929,16 @@
       "path": "tokens.json",
       "bytes": 4905,
       "sha256": "135cce5c2069db498bf2be1844f126b05daa71700a5930c5705c85245b80ca4e"
+    },
+    {
+      "path": "fonts/CormorantGaramond-Italic.ttf",
+      "bytes": 715644,
+      "sha256": "0f48ea6abb2084537854f7174c470991a463b13036309e3b50a81511611c530d"
+    },
+    {
+      "path": "licenses/CORMORANT-GARAMOND-OFL.txt",
+      "bytes": 4387,
+      "sha256": "60700d351cac4650c51f3f9db318d2a420f8b45052dba2715eb5fec41f0f6956"
     }
   ],
   "themeFile": "themes.json"

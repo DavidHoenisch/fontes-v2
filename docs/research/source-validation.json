@@ -288,7 +288,7 @@
         "Verse",
         "Language",
         "WLC / Nestle Base TR RP WH NE NA SBL",
-        "WLC / Nestle Base {TR} \u29fcRP\u29fd (WH) \u2329NE\u232a [NA] \u2039SBL\u203a [[ECM]]",
+        "WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]",
         "Translit",
         "Parsing",
         "Parsing",
@@ -399,6 +399,32 @@
           "1JN.2.23"
         ]
       }
+    },
+    {
+      "resource_id": "abbott-smith",
+      "downloaded_bytes": 5698817,
+      "sha256": "99821bee411626b4aa3e674040297b54b267eff86cb4f9b7ef69a8bdb18b6f90",
+      "source_download_url": "https://raw.githubusercontent.com/translatable-exegetical-tools/Abbott-Smith/8c00cb244761aa23659421a8cbbbf7a3b27b7d59/abbott-smith.tei.xml",
+      "inspection_date": "2026-10-17",
+      "rights_evidence_url": "https://github.com/translatable-exegetical-tools/Abbott-Smith#source-and-copyright",
+      "inspection": "Abbott-Smith TEI: 6153 entries, exact upstream n labels retained; extended Strong’s labels not coerced. Easton ZIP configuration: TEI zLD, 1897 third edition, Public Domain -- Copy Freely."
+    },
+    {
+      "resource_id": "easton",
+      "downloaded_bytes": 1437674,
+      "sha256": "f6dd054554764e2e97d5d189a697eb26039054578a9ccf98ce668ab810341c6e",
+      "source_download_url": "https://www.crosswire.org/ftpmirror/pub/sword/packages/rawzip/Easton.zip",
+      "inspection_date": "2026-10-17",
+      "rights_evidence_url": "https://www.crosswire.org/sword/modules/ModInfo.jsp?modName=Easton",
+      "inspection": "Abbott-Smith TEI: 6153 entries, exact upstream n labels retained; extended Strong’s labels not coerced. Easton ZIP configuration: TEI zLD, 1897 third edition, Public Domain -- Copy Freely.",
+      "archive_files": [
+        "modules/lexdict/zld/easton/easton.idx",
+        "modules/lexdict/zld/easton/easton.zdx",
+        "modules/lexdict/zld/easton/easton.dat",
+        "modules/lexdict/zld/easton/dict.dat",
+        "modules/lexdict/zld/easton/easton.zdt",
+        "mods.d/easton.conf"
+      ]
     }
   ]
 }

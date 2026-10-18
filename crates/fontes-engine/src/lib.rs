@@ -1,6 +1,12 @@
 //! Fontes' toolkit-independent application engine. Content is read-only; user writes are transactional.
 pub mod bootstrap;
 mod commands;
+mod highlights;
+mod occurrences;
+pub use highlights::*;
+mod notes;
+pub use notes::*;
+pub use occurrences::*;
 mod model;
 mod queries;
 pub mod transport;
@@ -194,7 +200,7 @@ impl Engine {
             ));
         }
         // App-owned additive extension: preserves the published user-v1 tables and version.
-        user.execute_batch("CREATE TABLE IF NOT EXISTS fontes_app_session_v1 (singleton INTEGER PRIMARY KEY CHECK(singleton=1), json TEXT NOT NULL) STRICT;")?;
+        user.execute_batch("CREATE TABLE IF NOT EXISTS fontes_app_session_v1 (singleton INTEGER PRIMARY KEY CHECK(singleton=1), json TEXT NOT NULL) STRICT; CREATE TABLE IF NOT EXISTS fontes_notes_v1 (annotation_id TEXT PRIMARY KEY REFERENCES annotations(id) ON DELETE CASCADE,document_json TEXT NOT NULL) STRICT; CREATE TABLE IF NOT EXISTS fontes_highlights_v1 (annotation_id TEXT PRIMARY KEY REFERENCES annotations(id) ON DELETE CASCADE,style_json TEXT NOT NULL,selection_json TEXT) STRICT;")?;
         let saved: Option<String> = user
             .query_row(
                 "SELECT json FROM fontes_app_session_v1 WHERE singleton=1",
@@ -238,6 +244,20 @@ impl Engine {
         let mut recent = false;
         let data = match command {
             Command::Workspace {} => Data::Workspace,
+            Command::Preview { start_ref, end_ref } => {
+                self.validate_ref(start_ref)?;
+                self.validate_ref(end_ref)?;
+                if end_ref < start_ref {
+                    return Err(Error::invalid("Invalid preview range."));
+                }
+                let mut verses=self.content.prepare("SELECT min(canonical_ref_id),text FROM verses_by_reference WHERE translation_id=?1 AND canonical_ref_id BETWEEN ?2 AND ?3 GROUP BY id ORDER BY min(canonical_ref_id),id LIMIT 101")?.query_map(params![self.session.translation,start_ref,end_ref],|r|{let reference=r.get(0)?;Ok(PreviewVerse{ref_id:reference,label:label(&self.books,reference),text:r.get(1)?})})?.collect::<std::result::Result<Vec<_>,_>>()?;
+                let has_more = verses.len() > 100;
+                verses.truncate(100);
+                Data::Preview { verses, has_more }
+            }
+            Command::LibraryCatalog { source_id, offset } => {
+                self.library_catalog(source_id.as_deref(), offset)?
+            }
             Command::Navigate { reference } => {
                 next.selected_ref = self.resolve(&reference)?;
                 recent = true;
@@ -293,6 +313,36 @@ impl Engine {
                 resource: self.resource(&id)?,
             },
             Command::Word { code } => self.word(&code)?,
+            Command::Occurrences {
+                code,
+                book_id,
+                offset,
+                limit,
+            } => self.occurrences(&code, book_id, offset, limit)?,
+            Command::SaveHighlight {
+                id,
+                start_ref,
+                end_ref,
+                style,
+                selection,
+            } => self.save_highlight(id, start_ref, end_ref, style, selection)?,
+            Command::NotePassage { ref_id } => {
+                self.validate_ref(ref_id)?;
+                let quote:String=self.content.query_row("SELECT text FROM verses_by_reference WHERE canonical_ref_id=?1 AND translation_id=?2 LIMIT 1",params![ref_id,self.session.translation],|r|r.get(0)).optional()?.ok_or_else(||Error::missing("No supplied text in this edition."))?;
+                Data::NotePassage {
+                    block: NoteBlock::Passage {
+                        ref_id,
+                        translation_id: self.session.translation.clone(),
+                        quote,
+                    },
+                }
+            }
+            Command::SaveNote {
+                id,
+                start_ref,
+                end_ref,
+                document,
+            } => self.save_note(id, start_ref, end_ref, document)?,
             Command::SaveAnnotation {
                 id,
                 start_ref,
@@ -339,6 +389,11 @@ impl Engine {
                 let tx = self.user.transaction()?;
                 let range = ensure_range(&tx, start_ref, end_ref)?;
                 tx.execute("INSERT INTO annotations(id,range_id,type,color,content,created_at,updated_at) VALUES(?1,?2,?3,?4,?5,strftime('%Y-%m-%dT%H:%M:%fZ','now'),strftime('%Y-%m-%dT%H:%M:%fZ','now')) ON CONFLICT(id) DO UPDATE SET range_id=excluded.range_id,type=excluded.type,color=excluded.color,content=excluded.content,updated_at=excluded.updated_at",params![id,range,kind.as_str(),color,content])?;
+                tx.execute(
+                    "DELETE FROM fontes_highlights_v1 WHERE annotation_id=?1",
+                    [&id],
+                )?;
+                tx.execute("DELETE FROM fontes_notes_v1 WHERE annotation_id=?1", [&id])?;
                 tx.commit()?;
                 Data::SavedAnnotation { id }
             }

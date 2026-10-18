@@ -82,6 +82,21 @@ impl FontesApp {
                         }
                     });
                 });
+                if let Some(book) = book
+                    && ui
+                        .add_sized(
+                            [ui.available_width(), 44.0],
+                            egui::Button::new(format!(
+                                "About {} · artwork & introduction",
+                                book.name
+                            )),
+                        )
+                        .clicked()
+                {
+                    self.book_opening = Some(book.id);
+                    self.destination = Destination::Read;
+                    self.picker = false;
+                }
                 ui.add_space(8.0);
                 ui.horizontal(|ui| {
                     let input = ui.add_sized(

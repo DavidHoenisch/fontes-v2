@@ -1,3 +1,8 @@
 /target/
 /.data-cache/
 /dist/
+
+# React frontend
+**/node_modules/
+/apps/fontes-web/dist/
+*.tsbuildinfo
