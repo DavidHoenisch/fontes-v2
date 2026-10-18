@@ -10,48 +10,48 @@
   "font_license": "SIL Open Font License 1.1",
   "assets": {
     "symbol.svg": {
-      "sha256": "cd49e421d10bfcd5f6efc68aac2f16b5ed8ea5a4df4447d53cd646fd0931f553",
-      "bytes": 688
+      "sha256": "a2208e9fb0400a83de08932c35448cb7bce2bf777c9aaeab2102f977c5474fbe",
+      "bytes": 717
     },
     "symbol-ink.svg": {
-      "sha256": "92a64c3ec420a0c3354977ac098840f51e1f3d1921d4a6490af5b359c9c4a1c3",
-      "bytes": 713
+      "sha256": "91363e28df128b92025691939451e346d6e9f8656fa5297950ebc7d2c9482ec7",
+      "bytes": 742
     },
     "symbol-reversed.svg": {
-      "sha256": "d79f15a6da1cae9e4b3288871ad5b6c4af4c002d5a609e92c1b1f01abd83482c",
-      "bytes": 688
+      "sha256": "acd7b0973bc0f4f57dc1f338c4a1163295ed05068d7590182c20e9ab78abe3f9",
+      "bytes": 717
     },
     "app-icon.svg": {
-      "sha256": "5924b2f07bb70fa977f00f50a830d0e895ad9fe85545fa8940fe48e403f394e5",
-      "bytes": 735
+      "sha256": "8faa0466f392757db3a986c4862a57f4f765c9abf4dad7db44455bb281da0907",
+      "bytes": 764
     },
     "app-icon-rounded.svg": {
-      "sha256": "4aa936374d532c0b1fa2fcf2d9a1e1fdb9ef496c0db52f8b62414454215f17e0",
-      "bytes": 743
+      "sha256": "3ba7f088168ce9bfa1d79b47acf339f818ca282c31c8dd7fd7d4b9912cf2a2b0",
+      "bytes": 772
     },
     "android-background.svg": {
       "sha256": "98a4deddfba4bcab6e109e9b73a31180113c86e2280a570b36cf161bff4508da",
       "bytes": 190
     },
     "android-foreground.svg": {
-      "sha256": "06cfb38de00ba700d7cf500f05c44294944556fead5ae28e8bf92d6c0fc8810b",
-      "bytes": 738
+      "sha256": "8e91c01949b57624c576786c5317908adb3a5e9247c31638081535cf1ccfe1ba",
+      "bytes": 767
     },
     "android-monochrome.svg": {
-      "sha256": "d7f60496052c8c6cd35737da8dc52fd2acb1890e5ab11fc0e98113b21eae4817",
-      "bytes": 738
+      "sha256": "c75310ac2208b44bd2c1c24101b3c9d2d85c8807e8f8e6f466129d444b7b66f9",
+      "bytes": 767
     },
     "wordmark.svg": {
       "sha256": "4a7a5356c85010e2b0829da9a07e311838032786248c013af2b42ce2616a308a",
       "bytes": 8549
     },
     "logo-horizontal.svg": {
-      "sha256": "30f01a1bcf146f5d6aa25010e6d71628f3540be32246348f239ac36d26568793",
-      "bytes": 9104
+      "sha256": "a0b0cc3acd1297bb361f1d252d38efa6031b081cc1104bc09d572ba055068b98",
+      "bytes": 9133
     },
     "logo-horizontal-ink.svg": {
-      "sha256": "e9512a91bb8615eb159bca2c13ca3e381d10da043cefca64107fe689b096ad2f",
-      "bytes": 9156
+      "sha256": "4b2c0e178d64e28f21900a0840c744645f64dd7bd9bc7b9ae886ab0826591f7d",
+      "bytes": 9185
     }
   }
 }

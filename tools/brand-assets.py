@@ -10,7 +10,7 @@ OUT = ROOT / 'assets/brand/wellspring'
 OUT.mkdir(parents=True, exist_ok=True)
 TEAL, IVORY, CLAY = '#233F47', '#F7F0E0', '#AC563D'
 # Geometry is deliberately sparse; all colored masters share the same paths.
-ARCH = 'M48 190V112a80 80 0 0 1 160 0v78h-12v-78a68 68 0 0 0-136 0v78Z'
+ARCH = 'M48 196V112a80 80 0 0 1 160 0v84c-3-12-7-20-12-24v-60a68 68 0 0 0-136 0v60c-5 4-9 12-12 24Z'
 CENTER = 'M126 185c-1-29-13-55-13-73 0-16 7-27 15-27s15 11 15 27c0 18-12 44-13 73Z'
 SIDE = 'M120 185c-4-26-14-43-34-50-13-5-19-13-14-22 5-10 18-8 28 1 18 17 23 42 24 71Z'
 BASIN = 'M69 181h118q3 0 3 4v5q0 4-5 5-9 3 0 7h11v10H60v-10h11q9-4 0-7-5-1-5-5v-5q0-4 3-4Z'
