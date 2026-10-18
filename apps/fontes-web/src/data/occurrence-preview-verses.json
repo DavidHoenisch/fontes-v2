@@ -1,0 +1,1431 @@
+{
+  "code": "H3068",
+  "content_id": "00444944246f59156b2e977158c8ab0df71d2b5cbf9e034da8e3fabc345421f6",
+  "verses": [
+    {
+      "ref_id": 19001002,
+      "label": "Psalms 1:2",
+      "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+    },
+    {
+      "ref_id": 19001006,
+      "label": "Psalms 1:6",
+      "text": "For the LORD knoweth the way of the righteous: but the way of the ungodly shall perish."
+    },
+    {
+      "ref_id": 19002002,
+      "label": "Psalms 2:2",
+      "text": "The kings of the earth set themselves, and the rulers take counsel together, against the LORD, and against his anointed, saying,"
+    },
+    {
+      "ref_id": 19002007,
+      "label": "Psalms 2:7",
+      "text": "I will declare the decree: the LORD hath said unto me, Thou art my Son; this day have I begotten thee."
+    },
+    {
+      "ref_id": 19002011,
+      "label": "Psalms 2:11",
+      "text": "Serve the LORD with fear, and rejoice with trembling."
+    },
+    {
+      "ref_id": 19003001,
+      "label": "Psalms 3:1",
+      "text": "A Psalm of David, when he fled from Absalom his son. LORD, how are they increased that trouble me! many are they that rise up against me."
+    },
+    {
+      "ref_id": 19003003,
+      "label": "Psalms 3:3",
+      "text": "But thou, O LORD, art a shield for me; my glory, and the lifter up of mine head."
+    },
+    {
+      "ref_id": 19003004,
+      "label": "Psalms 3:4",
+      "text": "I cried unto the LORD with my voice, and he heard me out of his holy hill. Selah."
+    },
+    {
+      "ref_id": 24001002,
+      "label": "Jeremiah 1:2",
+      "text": "To whom the word of the LORD came in the days of Josiah the son of Amon king of Judah, in the thirteenth year of his reign."
+    },
+    {
+      "ref_id": 24001004,
+      "label": "Jeremiah 1:4",
+      "text": "Then the word of the LORD came unto me, saying,"
+    },
+    {
+      "ref_id": 24001007,
+      "label": "Jeremiah 1:7",
+      "text": "¶ But the LORD said unto me, Say not, I am a child: for thou shalt go to all that I shall send thee, and whatsoever I command thee thou shalt speak."
+    },
+    {
+      "ref_id": 24001008,
+      "label": "Jeremiah 1:8",
+      "text": "Be not afraid of their faces: for I am with thee to deliver thee, saith the LORD."
+    },
+    {
+      "ref_id": 24001009,
+      "label": "Jeremiah 1:9",
+      "text": "Then the LORD put forth his hand, and touched my mouth. And the LORD said unto me, Behold, I have put my words in thy mouth."
+    },
+    {
+      "ref_id": 24001011,
+      "label": "Jeremiah 1:11",
+      "text": "¶ Moreover the word of the LORD came unto me, saying, Jeremiah, what seest thou? And I said, I see a rod of an almond tree."
+    },
+    {
+      "ref_id": 24001012,
+      "label": "Jeremiah 1:12",
+      "text": "Then said the LORD unto me, Thou hast well seen: for I will hasten my word to perform it."
+    },
+    {
+      "ref_id": 24001013,
+      "label": "Jeremiah 1:13",
+      "text": "And the word of the LORD came unto me the second time, saying, What seest thou? And I said, I see a seething pot; and the face thereof is toward the north."
+    },
+    {
+      "ref_id": 5001003,
+      "label": "Deuteronomy 1:3",
+      "text": "And it came to pass in the fortieth year, in the eleventh month, on the first day of the month, that Moses spake unto the children of Israel, according unto all that the LORD had given him in commandment unto them;"
+    },
+    {
+      "ref_id": 5001006,
+      "label": "Deuteronomy 1:6",
+      "text": "The LORD our God spake unto us in Horeb, saying, Ye have dwelt long enough in this mount:"
+    },
+    {
+      "ref_id": 5001008,
+      "label": "Deuteronomy 1:8",
+      "text": "Behold, I have set the land before you: go in and possess the land which the LORD sware unto your fathers, Abraham, Isaac, and Jacob, to give unto them and to their seed after them."
+    },
+    {
+      "ref_id": 5001010,
+      "label": "Deuteronomy 1:10",
+      "text": "The LORD your God hath multiplied you, and, behold, ye are this day as the stars of heaven for multitude."
+    },
+    {
+      "ref_id": 5001011,
+      "label": "Deuteronomy 1:11",
+      "text": "(The LORD God of your fathers make you a thousand times so many more as ye are, and bless you, as he hath promised you!)"
+    },
+    {
+      "ref_id": 5001019,
+      "label": "Deuteronomy 1:19",
+      "text": "¶ And when we departed from Horeb, we went through all that great and terrible wilderness, which ye saw by the way of the mountain of the Amorites, as the LORD our God commanded us; and we came to Kadesh-barnea."
+    },
+    {
+      "ref_id": 5001020,
+      "label": "Deuteronomy 1:20",
+      "text": "And I said unto you, Ye are come unto the mountain of the Amorites, which the LORD our God doth give unto us."
+    },
+    {
+      "ref_id": 5001021,
+      "label": "Deuteronomy 1:21",
+      "text": "Behold, the LORD thy God hath set the land before thee: go up and possess it, as the LORD God of thy fathers hath said unto thee; fear not, neither be discouraged."
+    },
+    {
+      "ref_id": 23001002,
+      "label": "Isaiah 1:2",
+      "text": "Hear, O heavens, and give ear, O earth: for the LORD hath spoken, I have nourished and brought up children, and they have rebelled against me."
+    },
+    {
+      "ref_id": 23001004,
+      "label": "Isaiah 1:4",
+      "text": "Ah sinful nation, a people laden with iniquity, a seed of evildoers, children that are corrupters: they have forsaken the LORD, they have provoked the Holy One of Israel unto anger, they are gone away backward."
+    },
+    {
+      "ref_id": 23001009,
+      "label": "Isaiah 1:9",
+      "text": "Except the LORD of hosts had left unto us a very small remnant, we should have been as Sodom, and we should have been like unto Gomorrah."
+    },
+    {
+      "ref_id": 23001010,
+      "label": "Isaiah 1:10",
+      "text": "¶ Hear the word of the LORD, ye rulers of Sodom; give ear unto the law of our God, ye people of Gomorrah."
+    },
+    {
+      "ref_id": 23001011,
+      "label": "Isaiah 1:11",
+      "text": "To what purpose is the multitude of your sacrifices unto me? saith the LORD: I am full of the burnt offerings of rams, and the fat of fed beasts; and I delight not in the blood of bullocks, or of lambs, or of he goats."
+    },
+    {
+      "ref_id": 23001018,
+      "label": "Isaiah 1:18",
+      "text": "Come now, and let us reason together, saith the LORD: though your sins be as scarlet, they shall be as white as snow; though they be red like crimson, they shall be as wool."
+    },
+    {
+      "ref_id": 23001020,
+      "label": "Isaiah 1:20",
+      "text": "But if ye refuse and rebel, ye shall be devoured with the sword: for the mouth of the LORD hath spoken it."
+    },
+    {
+      "ref_id": 23001024,
+      "label": "Isaiah 1:24",
+      "text": "Therefore saith the Lord, the LORD of hosts, the mighty One of Israel, Ah, I will ease me of mine adversaries, and avenge me of mine enemies:"
+    },
+    {
+      "ref_id": 4001001,
+      "label": "Numbers 1:1",
+      "text": "And the LORD spake unto Moses in the wilderness of Sinai, in the tabernacle of the congregation, on the first day of the second month, in the second year after they were come out of the land of Egypt, saying,"
+    },
+    {
+      "ref_id": 4001019,
+      "label": "Numbers 1:19",
+      "text": "As the LORD commanded Moses, so he numbered them in the wilderness of Sinai."
+    },
+    {
+      "ref_id": 4001048,
+      "label": "Numbers 1:48",
+      "text": "For the LORD had spoken unto Moses, saying,"
+    },
+    {
+      "ref_id": 4001054,
+      "label": "Numbers 1:54",
+      "text": "And the children of Israel did according to all that the LORD commanded Moses, so did they."
+    },
+    {
+      "ref_id": 4002001,
+      "label": "Numbers 2:1",
+      "text": "And the LORD spake unto Moses and unto Aaron, saying,"
+    },
+    {
+      "ref_id": 4002033,
+      "label": "Numbers 2:33",
+      "text": "But the Levites were not numbered among the children of Israel; as the LORD commanded Moses."
+    },
+    {
+      "ref_id": 4002034,
+      "label": "Numbers 2:34",
+      "text": "And the children of Israel did according to all that the LORD commanded Moses: so they pitched by their standards, and so they set forward, every one after their families, according to the house of their fathers."
+    },
+    {
+      "ref_id": 4003001,
+      "label": "Numbers 3:1",
+      "text": "These also are the generations of Aaron and Moses in the day that the LORD spake with Moses in mount Sinai."
+    },
+    {
+      "ref_id": 2003002,
+      "label": "Exodus 3:2",
+      "text": "And the angel of the LORD appeared unto him in a flame of fire out of the midst of a bush: and he looked, and, behold, the bush burned with fire, and the bush was not consumed."
+    },
+    {
+      "ref_id": 2003004,
+      "label": "Exodus 3:4",
+      "text": "And when the LORD saw that he turned aside to see, God called unto him out of the midst of the bush, and said, Moses, Moses. And he said, Here am I."
+    },
+    {
+      "ref_id": 2003007,
+      "label": "Exodus 3:7",
+      "text": "¶ And the LORD said, I have surely seen the affliction of my people which are in Egypt, and have heard their cry by reason of their taskmasters; for I know their sorrows;"
+    },
+    {
+      "ref_id": 2003015,
+      "label": "Exodus 3:15",
+      "text": "And God said moreover unto Moses, Thus shalt thou say unto the children of Israel, The LORD God of your fathers, the God of Abraham, the God of Isaac, and the God of Jacob, hath sent me unto you: this is my name for ever, and this is my memorial unto all generations."
+    },
+    {
+      "ref_id": 2003016,
+      "label": "Exodus 3:16",
+      "text": "Go, and gather the elders of Israel together, and say unto them, The LORD God of your fathers, the God of Abraham, of Isaac, and of Jacob, appeared unto me, saying, I have surely visited you, and seen that which is done to you in Egypt:"
+    },
+    {
+      "ref_id": 2003018,
+      "label": "Exodus 3:18",
+      "text": "And they shall hearken to thy voice: and thou shalt come, thou and the elders of Israel, unto the king of Egypt, and ye shall say unto him, The LORD God of the Hebrews hath met with us: and now let us go, we beseech thee, three days’ journey into the wilderness, that we may sacrifice to the LORD our God."
+    },
+    {
+      "ref_id": 2004001,
+      "label": "Exodus 4:1",
+      "text": "And Moses answered and said, But, behold, they will not believe me, nor hearken unto my voice: for they will say, The LORD hath not appeared unto thee."
+    },
+    {
+      "ref_id": 2004002,
+      "label": "Exodus 4:2",
+      "text": "And the LORD said unto him, What is that in thine hand? And he said, A rod."
+    },
+    {
+      "ref_id": 14001001,
+      "label": "2 Chronicles 1:1",
+      "text": "And Solomon the son of David was strengthened in his kingdom, and the LORD his God was with him, and magnified him exceedingly."
+    },
+    {
+      "ref_id": 14001003,
+      "label": "2 Chronicles 1:3",
+      "text": "So Solomon, and all the congregation with him, went to the high place that was at Gibeon; for there was the tabernacle of the congregation of God, which Moses the servant of the LORD had made in the wilderness."
+    },
+    {
+      "ref_id": 14001005,
+      "label": "2 Chronicles 1:5",
+      "text": "Moreover the brasen altar, that Bezaleel the son of Uri, the son of Hur, had made, he put before the tabernacle of the LORD: and Solomon and the congregation sought unto it."
+    },
+    {
+      "ref_id": 14001006,
+      "label": "2 Chronicles 1:6",
+      "text": "And Solomon went up thither to the brasen altar before the LORD, which was at the tabernacle of the congregation, and offered a thousand burnt offerings upon it."
+    },
+    {
+      "ref_id": 14001009,
+      "label": "2 Chronicles 1:9",
+      "text": "Now, O LORD God, let thy promise unto David my father be established: for thou hast made me king over a people like the dust of the earth in multitude."
+    },
+    {
+      "ref_id": 14002001,
+      "label": "2 Chronicles 2:1",
+      "text": "And Solomon determined to build an house for the name of the LORD, and an house for his kingdom."
+    },
+    {
+      "ref_id": 14002004,
+      "label": "2 Chronicles 2:4",
+      "text": "Behold, I build an house to the name of the LORD my God, to dedicate it to him, and to burn before him sweet incense, and for the continual shewbread, and for the burnt offerings morning and evening, on the sabbaths, and on the new moons, and on the solemn feasts of the LORD our God. This is an ordinance for ever to Israel."
+    },
+    {
+      "ref_id": 14002011,
+      "label": "2 Chronicles 2:11",
+      "text": "¶ Then Huram the king of Tyre answered in writing, which he sent to Solomon, Because the LORD hath loved his people, he hath made thee king over them."
+    },
+    {
+      "ref_id": 3001001,
+      "label": "Leviticus 1:1",
+      "text": "And the LORD called unto Moses, and spake unto him out of the tabernacle of the congregation, saying,"
+    },
+    {
+      "ref_id": 3001002,
+      "label": "Leviticus 1:2",
+      "text": "Speak unto the children of Israel, and say unto them, If any man of you bring an offering unto the LORD, ye shall bring your offering of the cattle, even of the herd, and of the flock."
+    },
+    {
+      "ref_id": 3001003,
+      "label": "Leviticus 1:3",
+      "text": "If his offering be a burnt sacrifice of the herd, let him offer a male without blemish: he shall offer it of his own voluntary will at the door of the tabernacle of the congregation before the LORD."
+    },
+    {
+      "ref_id": 3001005,
+      "label": "Leviticus 1:5",
+      "text": "And he shall kill the bullock before the LORD: and the priests, Aaron’s sons, shall bring the blood, and sprinkle the blood round about upon the altar that is by the door of the tabernacle of the congregation."
+    },
+    {
+      "ref_id": 3001009,
+      "label": "Leviticus 1:9",
+      "text": "But his inwards and his legs shall he wash in water: and the priest shall burn all on the altar, to be a burnt sacrifice, an offering made by fire, of a sweet savour unto the LORD."
+    },
+    {
+      "ref_id": 3001011,
+      "label": "Leviticus 1:11",
+      "text": "And he shall kill it on the side of the altar northward before the LORD: and the priests, Aaron’s sons, shall sprinkle his blood round about upon the altar."
+    },
+    {
+      "ref_id": 3001013,
+      "label": "Leviticus 1:13",
+      "text": "But he shall wash the inwards and the legs with water: and the priest shall bring it all, and burn it upon the altar: it is a burnt sacrifice, an offering made by fire, of a sweet savour unto the LORD."
+    },
+    {
+      "ref_id": 3001014,
+      "label": "Leviticus 1:14",
+      "text": "¶ And if the burnt sacrifice for his offering to the LORD be of fowls, then he shall bring his offering of turtledoves, or of young pigeons."
+    },
+    {
+      "ref_id": 9001003,
+      "label": "1 Samuel 1:3",
+      "text": "And this man went up out of his city yearly to worship and to sacrifice unto the LORD of hosts in Shiloh. And the two sons of Eli, Hophni and Phinehas, the priests of the LORD, were there."
+    },
+    {
+      "ref_id": 9001005,
+      "label": "1 Samuel 1:5",
+      "text": "But unto Hannah he gave a worthy portion; for he loved Hannah: but the LORD had shut up her womb."
+    },
+    {
+      "ref_id": 9001006,
+      "label": "1 Samuel 1:6",
+      "text": "And her adversary also provoked her sore, for to make her fret, because the LORD had shut up her womb."
+    },
+    {
+      "ref_id": 9001007,
+      "label": "1 Samuel 1:7",
+      "text": "And as he did so year by year, when she went up to the house of the LORD, so she provoked her; therefore she wept, and did not eat."
+    },
+    {
+      "ref_id": 9001009,
+      "label": "1 Samuel 1:9",
+      "text": "¶ So Hannah rose up after they had eaten in Shiloh, and after they had drunk. Now Eli the priest sat upon a seat by a post of the temple of the LORD."
+    },
+    {
+      "ref_id": 9001010,
+      "label": "1 Samuel 1:10",
+      "text": "And she was in bitterness of soul, and prayed unto the LORD, and wept sore."
+    },
+    {
+      "ref_id": 9001011,
+      "label": "1 Samuel 1:11",
+      "text": "And she vowed a vow, and said, O LORD of hosts, if thou wilt indeed look on the affliction of thine handmaid, and remember me, and not forget thine handmaid, but wilt give unto thine handmaid a man child, then I will give him unto the LORD all the days of his life, and there shall no razor come upon his head."
+    },
+    {
+      "ref_id": 9001012,
+      "label": "1 Samuel 1:12",
+      "text": "And it came to pass, as she continued praying before the LORD, that Eli marked her mouth."
+    },
+    {
+      "ref_id": 12001003,
+      "label": "2 Kings 1:3",
+      "text": "But the angel of the LORD said to Elijah the Tishbite, Arise, go up to meet the messengers of the king of Samaria, and say unto them, Is it not because there is not a God in Israel, that ye go to enquire of Baal-zebub the god of Ekron?"
+    },
+    {
+      "ref_id": 12001004,
+      "label": "2 Kings 1:4",
+      "text": "Now therefore thus saith the LORD, Thou shalt not come down from that bed on which thou art gone up, but shalt surely die. And Elijah departed."
+    },
+    {
+      "ref_id": 12001006,
+      "label": "2 Kings 1:6",
+      "text": "And they said unto him, There came a man up to meet us, and said unto us, Go, turn again unto the king that sent you, and say unto him, Thus saith the LORD, Is it not because there is not a God in Israel, that thou sendest to enquire of Baal-zebub the god of Ekron? therefore thou shalt not come down from that bed on which thou art gone up, but shalt surely die."
+    },
+    {
+      "ref_id": 12001015,
+      "label": "2 Kings 1:15",
+      "text": "And the angel of the LORD said unto Elijah, Go down with him: be not afraid of him. And he arose, and went down with him unto the king."
+    },
+    {
+      "ref_id": 12001016,
+      "label": "2 Kings 1:16",
+      "text": "And he said unto him, Thus saith the LORD, Forasmuch as thou hast sent messengers to enquire of Baal-zebub the god of Ekron, is it not because there is no God in Israel to enquire of his word? therefore thou shalt not come down off that bed on which thou art gone up, but shalt surely die."
+    },
+    {
+      "ref_id": 12001017,
+      "label": "2 Kings 1:17",
+      "text": "¶ So he died according to the word of the LORD which Elijah had spoken. And Jehoram reigned in his stead in the second year of Jehoram the son of Jehoshaphat king of Judah; because he had no son."
+    },
+    {
+      "ref_id": 12002001,
+      "label": "2 Kings 2:1",
+      "text": "And it came to pass, when the LORD would take up Elijah into heaven by a whirlwind, that Elijah went with Elisha from Gilgal."
+    },
+    {
+      "ref_id": 12002002,
+      "label": "2 Kings 2:2",
+      "text": "And Elijah said unto Elisha, Tarry here, I pray thee; for the LORD hath sent me to Beth-el. And Elisha said unto him, As the LORD liveth, and as thy soul liveth, I will not leave thee. So they went down to Beth-el."
+    },
+    {
+      "ref_id": 11001017,
+      "label": "1 Kings 1:17",
+      "text": "And she said unto him, My lord, thou swarest by the LORD thy God unto thine handmaid, saying, Assuredly Solomon thy son shall reign after me, and he shall sit upon my throne."
+    },
+    {
+      "ref_id": 11001029,
+      "label": "1 Kings 1:29",
+      "text": "And the king sware, and said, As the LORD liveth, that hath redeemed my soul out of all distress,"
+    },
+    {
+      "ref_id": 11001030,
+      "label": "1 Kings 1:30",
+      "text": "Even as I sware unto thee by the LORD God of Israel, saying, Assuredly Solomon thy son shall reign after me, and he shall sit upon my throne in my stead; even so will I certainly do this day."
+    },
+    {
+      "ref_id": 11001036,
+      "label": "1 Kings 1:36",
+      "text": "And Benaiah the son of Jehoiada answered the king, and said, Amen: the LORD God of my lord the king say so too."
+    },
+    {
+      "ref_id": 11001037,
+      "label": "1 Kings 1:37",
+      "text": "As the LORD hath been with my lord the king, even so be he with Solomon, and make his throne greater than the throne of my lord king David."
+    },
+    {
+      "ref_id": 11001048,
+      "label": "1 Kings 1:48",
+      "text": "And also thus said the king, Blessed be the LORD God of Israel, which hath given one to sit on my throne this day, mine eyes even seeing it."
+    },
+    {
+      "ref_id": 11002003,
+      "label": "1 Kings 2:3",
+      "text": "And keep the charge of the LORD thy God, to walk in his ways, to keep his statutes, and his commandments, and his judgments, and his testimonies, as it is written in the law of Moses, that thou mayest prosper in all that thou doest, and whithersoever thou turnest thyself:"
+    },
+    {
+      "ref_id": 11002004,
+      "label": "1 Kings 2:4",
+      "text": "That the LORD may continue his word which he spake concerning me, saying, If thy children take heed to their way, to walk before me in truth with all their heart and with all their soul, there shall not fail thee (said he) a man on the throne of Israel."
+    },
+    {
+      "ref_id": 26001003,
+      "label": "Ezekiel 1:3",
+      "text": "The word of the LORD came expressly unto Ezekiel the priest, the son of Buzi, in the land of the Chaldeans by the river Chebar; and the hand of the LORD was there upon him."
+    },
+    {
+      "ref_id": 26001028,
+      "label": "Ezekiel 1:28",
+      "text": "As the appearance of the bow that is in the cloud in the day of rain, so was the appearance of the brightness round about. This was the appearance of the likeness of the glory of the LORD. And when I saw it, I fell upon my face, and I heard a voice of one that spake."
+    },
+    {
+      "ref_id": 26003012,
+      "label": "Ezekiel 3:12",
+      "text": "Then the spirit took me up, and I heard behind me a voice of a great rushing, saying, Blessed be the glory of the LORD from his place."
+    },
+    {
+      "ref_id": 26003014,
+      "label": "Ezekiel 3:14",
+      "text": "So the spirit lifted me up, and took me away, and I went in bitterness, in the heat of my spirit; but the hand of the LORD was strong upon me."
+    },
+    {
+      "ref_id": 26003016,
+      "label": "Ezekiel 3:16",
+      "text": "And it came to pass at the end of seven days, that the word of the LORD came unto me, saying,"
+    },
+    {
+      "ref_id": 26003022,
+      "label": "Ezekiel 3:22",
+      "text": "¶ And the hand of the LORD was there upon me; and he said unto me, Arise, go forth into the plain, and I will there talk with thee."
+    },
+    {
+      "ref_id": 26003023,
+      "label": "Ezekiel 3:23",
+      "text": "Then I arose, and went forth into the plain: and, behold, the glory of the LORD stood there, as the glory which I saw by the river of Chebar: and I fell on my face."
+    },
+    {
+      "ref_id": 26004013,
+      "label": "Ezekiel 4:13",
+      "text": "And the LORD said, Even thus shall the children of Israel eat their defiled bread among the Gentiles, whither I will drive them."
+    },
+    {
+      "ref_id": 6001001,
+      "label": "Joshua 1:1",
+      "text": "Now after the death of Moses the servant of the LORD it came to pass, that the LORD spake unto Joshua the son of Nun, Moses’ minister, saying,"
+    },
+    {
+      "ref_id": 6001009,
+      "label": "Joshua 1:9",
+      "text": "Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest."
+    },
+    {
+      "ref_id": 6001011,
+      "label": "Joshua 1:11",
+      "text": "Pass through the host, and command the people, saying, Prepare you victuals; for within three days ye shall pass over this Jordan, to go in to possess the land, which the LORD your God giveth you to possess it."
+    },
+    {
+      "ref_id": 6001013,
+      "label": "Joshua 1:13",
+      "text": "Remember the word which Moses the servant of the LORD commanded you, saying, The LORD your God hath given you rest, and hath given you this land."
+    },
+    {
+      "ref_id": 6001015,
+      "label": "Joshua 1:15",
+      "text": "Until the LORD have given your brethren rest, as he hath given you, and they also have possessed the land which the LORD your God giveth them: then ye shall return unto the land of your possession, and enjoy it, which Moses the LORD’s servant gave you on this side Jordan toward the sunrising."
+    },
+    {
+      "ref_id": 6001017,
+      "label": "Joshua 1:17",
+      "text": "According as we hearkened unto Moses in all things, so will we hearken unto thee: only the LORD thy God be with thee, as he was with Moses."
+    },
+    {
+      "ref_id": 6002009,
+      "label": "Joshua 2:9",
+      "text": "And she said unto the men, I know that the LORD hath given you the land, and that your terror is fallen upon us, and that all the inhabitants of the land faint because of you."
+    },
+    {
+      "ref_id": 6002010,
+      "label": "Joshua 2:10",
+      "text": "For we have heard how the LORD dried up the water of the Red sea for you, when ye came out of Egypt; and what ye did unto the two kings of the Amorites, that were on the other side Jordan, Sihon and Og, whom ye utterly destroyed."
+    },
+    {
+      "ref_id": 13002003,
+      "label": "1 Chronicles 2:3",
+      "text": "¶ The sons of Judah; Er, and Onan, and Shelah: which three were born unto him of the daughter of Shua the Canaanitess. And Er, the firstborn of Judah, was evil in the sight of the LORD; and he slew him."
+    },
+    {
+      "ref_id": 13006015,
+      "label": "1 Chronicles 6:15",
+      "text": "And Jehozadak went into captivity, when the LORD carried away Judah and Jerusalem by the hand of Nebuchadnezzar."
+    },
+    {
+      "ref_id": 13006031,
+      "label": "1 Chronicles 6:31",
+      "text": "And these are they whom David set over the service of song in the house of the LORD, after that the ark had rest."
+    },
+    {
+      "ref_id": 13006032,
+      "label": "1 Chronicles 6:32",
+      "text": "And they ministered before the dwelling place of the tabernacle of the congregation with singing, until Solomon had built the house of the LORD in Jerusalem: and then they waited on their office according to their order."
+    },
+    {
+      "ref_id": 13009019,
+      "label": "1 Chronicles 9:19",
+      "text": "And Shallum the son of Kore, the son of Ebiasaph, the son of Korah, and his brethren, of the house of his father, the Korahites, were over the work of the service, keepers of the gates of the tabernacle: and their fathers, being over the host of the LORD, were keepers of the entry."
+    },
+    {
+      "ref_id": 13009020,
+      "label": "1 Chronicles 9:20",
+      "text": "And Phinehas the son of Eleazar was the ruler over them in time past, and the LORD was with him."
+    },
+    {
+      "ref_id": 13009023,
+      "label": "1 Chronicles 9:23",
+      "text": "So they and their children had the oversight of the gates of the house of the LORD, namely, the house of the tabernacle, by wards."
+    },
+    {
+      "ref_id": 13010013,
+      "label": "1 Chronicles 10:13",
+      "text": "¶ So Saul died for his transgression which he committed against the LORD, even against the word of the LORD, which he kept not, and also for asking counsel of one that had a familiar spirit, to enquire of it;"
+    },
+    {
+      "ref_id": 1002004,
+      "label": "Genesis 2:4",
+      "text": "¶ These are the generations of the heavens and of the earth when they were created, in the day that the LORD God made the earth and the heavens,"
+    },
+    {
+      "ref_id": 1002005,
+      "label": "Genesis 2:5",
+      "text": "And every plant of the field before it was in the earth, and every herb of the field before it grew: for the LORD God had not caused it to rain upon the earth, and there was not a man to till the ground."
+    },
+    {
+      "ref_id": 1002007,
+      "label": "Genesis 2:7",
+      "text": "And the LORD God formed man of the dust of the ground, and breathed into his nostrils the breath of life; and man became a living soul."
+    },
+    {
+      "ref_id": 1002008,
+      "label": "Genesis 2:8",
+      "text": "¶ And the LORD God planted a garden eastward in Eden; and there he put the man whom he had formed."
+    },
+    {
+      "ref_id": 1002009,
+      "label": "Genesis 2:9",
+      "text": "And out of the ground made the LORD God to grow every tree that is pleasant to the sight, and good for food; the tree of life also in the midst of the garden, and the tree of knowledge of good and evil."
+    },
+    {
+      "ref_id": 1002015,
+      "label": "Genesis 2:15",
+      "text": "And the LORD God took the man, and put him into the garden of Eden to dress it and to keep it."
+    },
+    {
+      "ref_id": 1002016,
+      "label": "Genesis 2:16",
+      "text": "And the LORD God commanded the man, saying, Of every tree of the garden thou mayest freely eat:"
+    },
+    {
+      "ref_id": 1002018,
+      "label": "Genesis 2:18",
+      "text": "¶ And the LORD God said, It is not good that the man should be alone; I will make him an help meet for him."
+    },
+    {
+      "ref_id": 7001001,
+      "label": "Judges 1:1",
+      "text": "Now after the death of Joshua it came to pass, that the children of Israel asked the LORD, saying, Who shall go up for us against the Canaanites first, to fight against them?"
+    },
+    {
+      "ref_id": 7001002,
+      "label": "Judges 1:2",
+      "text": "And the LORD said, Judah shall go up: behold, I have delivered the land into his hand."
+    },
+    {
+      "ref_id": 7001004,
+      "label": "Judges 1:4",
+      "text": "And Judah went up; and the LORD delivered the Canaanites and the Perizzites into their hand: and they slew of them in Bezek ten thousand men."
+    },
+    {
+      "ref_id": 7001019,
+      "label": "Judges 1:19",
+      "text": "And the LORD was with Judah; and he drave out the inhabitants of the mountain; but could not drive out the inhabitants of the valley, because they had chariots of iron."
+    },
+    {
+      "ref_id": 7001022,
+      "label": "Judges 1:22",
+      "text": "¶ And the house of Joseph, they also went up against Beth-el: and the LORD was with them."
+    },
+    {
+      "ref_id": 7002001,
+      "label": "Judges 2:1",
+      "text": "And an angel of the LORD came up from Gilgal to Bochim, and said, I made you to go up out of Egypt, and have brought you unto the land which I sware unto your fathers; and I said, I will never break my covenant with you."
+    },
+    {
+      "ref_id": 7002004,
+      "label": "Judges 2:4",
+      "text": "And it came to pass, when the angel of the LORD spake these words unto all the children of Israel, that the people lifted up their voice, and wept."
+    },
+    {
+      "ref_id": 7002005,
+      "label": "Judges 2:5",
+      "text": "And they called the name of that place Bochim: and they sacrificed there unto the LORD."
+    },
+    {
+      "ref_id": 10001012,
+      "label": "2 Samuel 1:12",
+      "text": "And they mourned, and wept, and fasted until even, for Saul, and for Jonathan his son, and for the people of the LORD, and for the house of Israel; because they were fallen by the sword."
+    },
+    {
+      "ref_id": 10001014,
+      "label": "2 Samuel 1:14",
+      "text": "And David said unto him, How wast thou not afraid to stretch forth thine hand to destroy the LORD’s anointed?"
+    },
+    {
+      "ref_id": 10001016,
+      "label": "2 Samuel 1:16",
+      "text": "And David said unto him, Thy blood be upon thy head; for thy mouth hath testified against thee, saying, I have slain the LORD’s anointed."
+    },
+    {
+      "ref_id": 10002001,
+      "label": "2 Samuel 2:1",
+      "text": "And it came to pass after this, that David enquired of the LORD, saying, Shall I go up into any of the cities of Judah? And the LORD said unto him, Go up. And David said, Whither shall I go up? And he said, Unto Hebron."
+    },
+    {
+      "ref_id": 10002005,
+      "label": "2 Samuel 2:5",
+      "text": "¶ And David sent messengers unto the men of Jabesh-gilead, and said unto them, Blessed be ye of the LORD, that ye have shewed this kindness unto your lord, even unto Saul, and have buried him."
+    },
+    {
+      "ref_id": 10002006,
+      "label": "2 Samuel 2:6",
+      "text": "And now the LORD shew kindness and truth unto you: and I also will requite you this kindness, because ye have done this thing."
+    },
+    {
+      "ref_id": 10003009,
+      "label": "2 Samuel 3:9",
+      "text": "So do God to Abner, and more also, except, as the LORD hath sworn to David, even so I do to him;"
+    },
+    {
+      "ref_id": 10003018,
+      "label": "2 Samuel 3:18",
+      "text": "Now then do it: for the LORD hath spoken of David, saying, By the hand of my servant David I will save my people Israel out of the hand of the Philistines, and out of the hand of all their enemies."
+    },
+    {
+      "ref_id": 38001001,
+      "label": "Zechariah 1:1",
+      "text": "In the eighth month, in the second year of Darius, came the word of the LORD unto Zechariah, the son of Berechiah, the son of Iddo the prophet, saying,"
+    },
+    {
+      "ref_id": 38001002,
+      "label": "Zechariah 1:2",
+      "text": "The LORD hath been sore displeased with your fathers."
+    },
+    {
+      "ref_id": 38001003,
+      "label": "Zechariah 1:3",
+      "text": "Therefore say thou unto them, Thus saith the LORD of hosts; Turn ye unto me, saith the LORD of hosts, and I will turn unto you, saith the LORD of hosts."
+    },
+    {
+      "ref_id": 38001004,
+      "label": "Zechariah 1:4",
+      "text": "Be ye not as your fathers, unto whom the former prophets have cried, saying, Thus saith the LORD of hosts; Turn ye now from your evil ways, and from your evil doings: but they did not hear, nor hearken unto me, saith the LORD."
+    },
+    {
+      "ref_id": 38001006,
+      "label": "Zechariah 1:6",
+      "text": "But my words and my statutes, which I commanded my servants the prophets, did they not take hold of your fathers? and they returned and said, Like as the LORD of hosts thought to do unto us, according to our ways, and according to our doings, so hath he dealt with us."
+    },
+    {
+      "ref_id": 38001007,
+      "label": "Zechariah 1:7",
+      "text": "¶ Upon the four and twentieth day of the eleventh month, which is the month Sebat, in the second year of Darius, came the word of the LORD unto Zechariah, the son of Berechiah, the son of Iddo the prophet, saying,"
+    },
+    {
+      "ref_id": 38001010,
+      "label": "Zechariah 1:10",
+      "text": "And the man that stood among the myrtle trees answered and said, These are they whom the LORD hath sent to walk to and fro through the earth."
+    },
+    {
+      "ref_id": 38001011,
+      "label": "Zechariah 1:11",
+      "text": "And they answered the angel of the LORD that stood among the myrtle trees, and said, We have walked to and fro through the earth, and, behold, all the earth sitteth still, and is at rest."
+    },
+    {
+      "ref_id": 20001007,
+      "label": "Proverbs 1:7",
+      "text": "¶ The fear of the LORD is the beginning of knowledge: but fools despise wisdom and instruction."
+    },
+    {
+      "ref_id": 20001029,
+      "label": "Proverbs 1:29",
+      "text": "For that they hated knowledge, and did not choose the fear of the LORD:"
+    },
+    {
+      "ref_id": 20002005,
+      "label": "Proverbs 2:5",
+      "text": "Then shalt thou understand the fear of the LORD, and find the knowledge of God."
+    },
+    {
+      "ref_id": 20002006,
+      "label": "Proverbs 2:6",
+      "text": "For the LORD giveth wisdom: out of his mouth cometh knowledge and understanding."
+    },
+    {
+      "ref_id": 20003005,
+      "label": "Proverbs 3:5",
+      "text": "¶ Trust in the LORD with all thine heart; and lean not unto thine own understanding."
+    },
+    {
+      "ref_id": 20003007,
+      "label": "Proverbs 3:7",
+      "text": "¶ Be not wise in thine own eyes: fear the LORD, and depart from evil."
+    },
+    {
+      "ref_id": 20003009,
+      "label": "Proverbs 3:9",
+      "text": "Honour the LORD with thy substance, and with the firstfruits of all thine increase:"
+    },
+    {
+      "ref_id": 20003011,
+      "label": "Proverbs 3:11",
+      "text": "¶ My son, despise not the chastening of the LORD; neither be weary of his correction:"
+    },
+    {
+      "ref_id": 30001002,
+      "label": "Amos 1:2",
+      "text": "And he said, The LORD will roar from Zion, and utter his voice from Jerusalem; and the habitations of the shepherds shall mourn, and the top of Carmel shall wither."
+    },
+    {
+      "ref_id": 30001003,
+      "label": "Amos 1:3",
+      "text": "Thus saith the LORD; For three transgressions of Damascus, and for four, I will not turn away the punishment thereof; because they have threshed Gilead with threshing instruments of iron:"
+    },
+    {
+      "ref_id": 30001005,
+      "label": "Amos 1:5",
+      "text": "I will break also the bar of Damascus, and cut off the inhabitant from the plain of Aven, and him that holdeth the sceptre from the house of Eden: and the people of Syria shall go into captivity unto Kir, saith the LORD."
+    },
+    {
+      "ref_id": 30001006,
+      "label": "Amos 1:6",
+      "text": "¶ Thus saith the LORD; For three transgressions of Gaza, and for four, I will not turn away the punishment thereof; because they carried away captive the whole captivity, to deliver them up to Edom:"
+    },
+    {
+      "ref_id": 30001009,
+      "label": "Amos 1:9",
+      "text": "¶ Thus saith the LORD; For three transgressions of Tyrus, and for four, I will not turn away the punishment thereof; because they delivered up the whole captivity to Edom, and remembered not the brotherly covenant:"
+    },
+    {
+      "ref_id": 30001011,
+      "label": "Amos 1:11",
+      "text": "¶ Thus saith the LORD; For three transgressions of Edom, and for four, I will not turn away the punishment thereof; because he did pursue his brother with the sword, and did cast off all pity, and his anger did tear perpetually, and he kept his wrath for ever:"
+    },
+    {
+      "ref_id": 30001013,
+      "label": "Amos 1:13",
+      "text": "¶ Thus saith the LORD; For three transgressions of the children of Ammon, and for four, I will not turn away the punishment thereof; because they have ripped up the women with child of Gilead, that they might enlarge their border:"
+    },
+    {
+      "ref_id": 30001015,
+      "label": "Amos 1:15",
+      "text": "And their king shall go into captivity, he and his princes together, saith the LORD."
+    },
+    {
+      "ref_id": 28001001,
+      "label": "Hosea 1:1",
+      "text": "The word of the LORD that came unto Hosea, the son of Beeri, in the days of Uzziah, Jotham, Ahaz, and Hezekiah, kings of Judah, and in the days of Jeroboam the son of Joash, king of Israel."
+    },
+    {
+      "ref_id": 28001002,
+      "label": "Hosea 1:2",
+      "text": "The beginning of the word of the LORD by Hosea. And the LORD said to Hosea, Go, take unto thee a wife of whoredoms and children of whoredoms: for the land hath committed great whoredom, departing from the LORD."
+    },
+    {
+      "ref_id": 28001004,
+      "label": "Hosea 1:4",
+      "text": "And the LORD said unto him, Call his name Jezreel; for yet a little while, and I will avenge the blood of Jezreel upon the house of Jehu, and will cause to cease the kingdom of the house of Israel."
+    },
+    {
+      "ref_id": 28001007,
+      "label": "Hosea 1:7",
+      "text": "But I will have mercy upon the house of Judah, and will save them by the LORD their God, and will not save them by bow, nor by sword, nor by battle, by horses, nor by horsemen."
+    },
+    {
+      "ref_id": 28002013,
+      "label": "Hosea 2:13",
+      "text": "And I will visit upon her the days of Baalim, wherein she burned incense to them, and she decked herself with her earrings and her jewels, and she went after her lovers, and forgat me, saith the LORD."
+    },
+    {
+      "ref_id": 28002016,
+      "label": "Hosea 2:16",
+      "text": "And it shall be at that day, saith the LORD, that thou shalt call me Ishi; and shalt call me no more Baali."
+    },
+    {
+      "ref_id": 28002020,
+      "label": "Hosea 2:20",
+      "text": "I will even betroth thee unto me in faithfulness: and thou shalt know the LORD."
+    },
+    {
+      "ref_id": 28002021,
+      "label": "Hosea 2:21",
+      "text": "And it shall come to pass in that day, I will hear, saith the LORD, I will hear the heavens, and they shall hear the earth;"
+    },
+    {
+      "ref_id": 39001001,
+      "label": "Malachi 1:1",
+      "text": "The burden of the word of the LORD to Israel by Malachi."
+    },
+    {
+      "ref_id": 39001002,
+      "label": "Malachi 1:2",
+      "text": "I have loved you, saith the LORD. Yet ye say, Wherein hast thou loved us? Was not Esau Jacob’s brother? saith the LORD: yet I loved Jacob,"
+    },
+    {
+      "ref_id": 39001004,
+      "label": "Malachi 1:4",
+      "text": "Whereas Edom saith, We are impoverished, but we will return and build the desolate places; thus saith the LORD of hosts, They shall build, but I will throw down; and they shall call them, The border of wickedness, and, The people against whom the LORD hath indignation for ever."
+    },
+    {
+      "ref_id": 39001005,
+      "label": "Malachi 1:5",
+      "text": "And your eyes shall see, and ye shall say, The LORD will be magnified from the border of Israel."
+    },
+    {
+      "ref_id": 39001006,
+      "label": "Malachi 1:6",
+      "text": "¶ A son honoureth his father, and a servant his master: if then I be a father, where is mine honour? and if I be a master, where is my fear? saith the LORD of hosts unto you, O priests, that despise my name. And ye say, Wherein have we despised thy name?"
+    },
+    {
+      "ref_id": 39001007,
+      "label": "Malachi 1:7",
+      "text": "Ye offer polluted bread upon mine altar; and ye say, Wherein have we polluted thee? In that ye say, The table of the LORD is contemptible."
+    },
+    {
+      "ref_id": 39001008,
+      "label": "Malachi 1:8",
+      "text": "And if ye offer the blind for sacrifice, is it not evil? and if ye offer the lame and sick, is it not evil? offer it now unto thy governor; will he be pleased with thee, or accept thy person? saith the LORD of hosts."
+    },
+    {
+      "ref_id": 39001009,
+      "label": "Malachi 1:9",
+      "text": "And now, I pray you, beseech God that he will be gracious unto us: this hath been by your means: will he regard your persons? saith the LORD of hosts."
+    },
+    {
+      "ref_id": 33001001,
+      "label": "Micah 1:1",
+      "text": "The word of the LORD that came to Micah the Morasthite in the days of Jotham, Ahaz, and Hezekiah, kings of Judah, which he saw concerning Samaria and Jerusalem."
+    },
+    {
+      "ref_id": 33001003,
+      "label": "Micah 1:3",
+      "text": "For, behold, the LORD cometh forth out of his place, and will come down, and tread upon the high places of the earth."
+    },
+    {
+      "ref_id": 33001012,
+      "label": "Micah 1:12",
+      "text": "For the inhabitant of Maroth waited carefully for good: but evil came down from the LORD unto the gate of Jerusalem."
+    },
+    {
+      "ref_id": 33002003,
+      "label": "Micah 2:3",
+      "text": "Therefore thus saith the LORD; Behold, against this family do I devise an evil, from which ye shall not remove your necks; neither shall ye go haughtily: for this time is evil."
+    },
+    {
+      "ref_id": 33002005,
+      "label": "Micah 2:5",
+      "text": "Therefore thou shalt have none that shall cast a cord by lot in the congregation of the LORD."
+    },
+    {
+      "ref_id": 33002007,
+      "label": "Micah 2:7",
+      "text": "¶ O thou that art named the house of Jacob, is the spirit of the LORD straitened? are these his doings? do not my words do good to him that walketh uprightly?"
+    },
+    {
+      "ref_id": 33002013,
+      "label": "Micah 2:13",
+      "text": "The breaker is come up before them: they have broken up, and have passed through the gate, and are gone out by it: and their king shall pass before them, and the LORD on the head of them."
+    },
+    {
+      "ref_id": 33003004,
+      "label": "Micah 3:4",
+      "text": "Then shall they cry unto the LORD, but he will not hear them: he will even hide his face from them at that time, as they have behaved themselves ill in their doings."
+    },
+    {
+      "ref_id": 25001005,
+      "label": "Lamentations 1:5",
+      "text": "Her adversaries are the chief, her enemies prosper; for the LORD hath afflicted her for the multitude of her transgressions: her children are gone into captivity before the enemy."
+    },
+    {
+      "ref_id": 25001009,
+      "label": "Lamentations 1:9",
+      "text": "Her filthiness is in her skirts; she remembereth not her last end; therefore she came down wonderfully: she had no comforter. O LORD, behold my affliction: for the enemy hath magnified himself."
+    },
+    {
+      "ref_id": 25001011,
+      "label": "Lamentations 1:11",
+      "text": "All her people sigh, they seek bread; they have given their pleasant things for meat to relieve the soul: see, O LORD, and consider; for I am become vile."
+    },
+    {
+      "ref_id": 25001012,
+      "label": "Lamentations 1:12",
+      "text": "¶ Is it nothing to you, all ye that pass by? behold, and see if there be any sorrow like unto my sorrow, which is done unto me, wherewith the LORD hath afflicted me in the day of his fierce anger."
+    },
+    {
+      "ref_id": 25001017,
+      "label": "Lamentations 1:17",
+      "text": "Zion spreadeth forth her hands, and there is none to comfort her: the LORD hath commanded concerning Jacob, that his adversaries should be round about him: Jerusalem is as a menstruous woman among them."
+    },
+    {
+      "ref_id": 25001018,
+      "label": "Lamentations 1:18",
+      "text": "¶ The LORD is righteous; for I have rebelled against his commandment: hear, I pray you, all people, and behold my sorrow: my virgins and my young men are gone into captivity."
+    },
+    {
+      "ref_id": 25001020,
+      "label": "Lamentations 1:20",
+      "text": "Behold, O LORD; for I am in distress: my bowels are troubled; mine heart is turned within me; for I have grievously rebelled: abroad the sword bereaveth, at home there is as death."
+    },
+    {
+      "ref_id": 25002006,
+      "label": "Lamentations 2:6",
+      "text": "And he hath violently taken away his tabernacle, as if it were of a garden: he hath destroyed his places of the assembly: the LORD hath caused the solemn feasts and sabbaths to be forgotten in Zion, and hath despised in the indignation of his anger the king and the priest."
+    },
+    {
+      "ref_id": 15001001,
+      "label": "Ezra 1:1",
+      "text": "Now in the first year of Cyrus king of Persia, that the word of the LORD by the mouth of Jeremiah might be fulfilled, the LORD stirred up the spirit of Cyrus king of Persia, that he made a proclamation throughout all his kingdom, and put it also in writing, saying,"
+    },
+    {
+      "ref_id": 15001002,
+      "label": "Ezra 1:2",
+      "text": "Thus saith Cyrus king of Persia, The LORD God of heaven hath given me all the kingdoms of the earth; and he hath charged me to build him an house at Jerusalem, which is in Judah."
+    },
+    {
+      "ref_id": 15001003,
+      "label": "Ezra 1:3",
+      "text": "Who is there among you of all his people? his God be with him, and let him go up to Jerusalem, which is in Judah, and build the house of the LORD God of Israel, (he is the God,) which is in Jerusalem."
+    },
+    {
+      "ref_id": 15001005,
+      "label": "Ezra 1:5",
+      "text": "¶ Then rose up the chief of the fathers of Judah and Benjamin, and the priests, and the Levites, with all them whose spirit God had raised, to go up to build the house of the LORD which is in Jerusalem."
+    },
+    {
+      "ref_id": 15001007,
+      "label": "Ezra 1:7",
+      "text": "¶ Also Cyrus the king brought forth the vessels of the house of the LORD, which Nebuchadnezzar had brought forth out of Jerusalem, and had put them in the house of his gods;"
+    },
+    {
+      "ref_id": 15002068,
+      "label": "Ezra 2:68",
+      "text": "¶ And some of the chief of the fathers, when they came to the house of the LORD which is at Jerusalem, offered freely for the house of God to set it up in his place:"
+    },
+    {
+      "ref_id": 15003003,
+      "label": "Ezra 3:3",
+      "text": "And they set the altar upon his bases; for fear was upon them because of the people of those countries: and they offered burnt offerings thereon unto the LORD, even burnt offerings morning and evening."
+    },
+    {
+      "ref_id": 15003005,
+      "label": "Ezra 3:5",
+      "text": "And afterward offered the continual burnt offering, both of the new moons, and of all the set feasts of the LORD that were consecrated, and of every one that willingly offered a freewill offering unto the LORD."
+    },
+    {
+      "ref_id": 36001001,
+      "label": "Zephaniah 1:1",
+      "text": "The word of the LORD which came unto Zephaniah the son of Cushi, the son of Gedaliah, the son of Amariah, the son of Hizkiah, in the days of Josiah the son of Amon, king of Judah."
+    },
+    {
+      "ref_id": 36001002,
+      "label": "Zephaniah 1:2",
+      "text": "I will utterly consume all things from off the land, saith the LORD."
+    },
+    {
+      "ref_id": 36001003,
+      "label": "Zephaniah 1:3",
+      "text": "I will consume man and beast; I will consume the fowls of the heaven, and the fishes of the sea, and the stumblingblocks with the wicked; and I will cut off man from off the land, saith the LORD."
+    },
+    {
+      "ref_id": 36001005,
+      "label": "Zephaniah 1:5",
+      "text": "And them that worship the host of heaven upon the housetops; and them that worship and that swear by the LORD, and that swear by Malcham;"
+    },
+    {
+      "ref_id": 36001006,
+      "label": "Zephaniah 1:6",
+      "text": "And them that are turned back from the LORD; and those that have not sought the LORD, nor enquired for him."
+    },
+    {
+      "ref_id": 36001007,
+      "label": "Zephaniah 1:7",
+      "text": "Hold thy peace at the presence of the Lord GOD: for the day of the LORD is at hand: for the LORD hath prepared a sacrifice, he hath bid his guests."
+    },
+    {
+      "ref_id": 36001008,
+      "label": "Zephaniah 1:8",
+      "text": "And it shall come to pass in the day of the LORD’s sacrifice, that I will punish the princes, and the king’s children, and all such as are clothed with strange apparel."
+    },
+    {
+      "ref_id": 36001010,
+      "label": "Zephaniah 1:10",
+      "text": "And it shall come to pass in that day, saith the LORD, that there shall be the noise of a cry from the fish gate, and an howling from the second, and a great crashing from the hills."
+    },
+    {
+      "ref_id": 29001001,
+      "label": "Joel 1:1",
+      "text": "The word of the LORD that came to Joel the son of Pethuel."
+    },
+    {
+      "ref_id": 29001009,
+      "label": "Joel 1:9",
+      "text": "The meat offering and the drink offering is cut off from the house of the LORD; the priests, the LORD’s ministers, mourn."
+    },
+    {
+      "ref_id": 29001014,
+      "label": "Joel 1:14",
+      "text": "¶ Sanctify ye a fast, call a solemn assembly, gather the elders and all the inhabitants of the land into the house of the LORD your God, and cry unto the LORD,"
+    },
+    {
+      "ref_id": 29001015,
+      "label": "Joel 1:15",
+      "text": "Alas for the day! for the day of the LORD is at hand, and as a destruction from the Almighty shall it come."
+    },
+    {
+      "ref_id": 29001019,
+      "label": "Joel 1:19",
+      "text": "O LORD, to thee will I cry: for the fire hath devoured the pastures of the wilderness, and the flame hath burned all the trees of the field."
+    },
+    {
+      "ref_id": 29002001,
+      "label": "Joel 2:1",
+      "text": "Blow ye the trumpet in Zion, and sound an alarm in my holy mountain: let all the inhabitants of the land tremble: for the day of the LORD cometh, for it is nigh at hand;"
+    },
+    {
+      "ref_id": 29002011,
+      "label": "Joel 2:11",
+      "text": "And the LORD shall utter his voice before his army: for his camp is very great: for he is strong that executeth his word: for the day of the LORD is great and very terrible; and who can abide it?"
+    },
+    {
+      "ref_id": 29002012,
+      "label": "Joel 2:12",
+      "text": "¶ Therefore also now, saith the LORD, turn ye even to me with all your heart, and with fasting, and with weeping, and with mourning:"
+    },
+    {
+      "ref_id": 37001001,
+      "label": "Haggai 1:1",
+      "text": "In the second year of Darius the king, in the sixth month, in the first day of the month, came the word of the LORD by Haggai the prophet unto Zerubbabel the son of Shealtiel, governor of Judah, and to Joshua the son of Josedech, the high priest, saying,"
+    },
+    {
+      "ref_id": 37001002,
+      "label": "Haggai 1:2",
+      "text": "Thus speaketh the LORD of hosts, saying, This people say, The time is not come, the time that the LORD’s house should be built."
+    },
+    {
+      "ref_id": 37001003,
+      "label": "Haggai 1:3",
+      "text": "Then came the word of the LORD by Haggai the prophet, saying,"
+    },
+    {
+      "ref_id": 37001005,
+      "label": "Haggai 1:5",
+      "text": "Now therefore thus saith the LORD of hosts; Consider your ways."
+    },
+    {
+      "ref_id": 37001007,
+      "label": "Haggai 1:7",
+      "text": "¶ Thus saith the LORD of hosts; Consider your ways."
+    },
+    {
+      "ref_id": 37001008,
+      "label": "Haggai 1:8",
+      "text": "Go up to the mountain, and bring wood, and build the house; and I will take pleasure in it, and I will be glorified, saith the LORD."
+    },
+    {
+      "ref_id": 37001009,
+      "label": "Haggai 1:9",
+      "text": "Ye looked for much, and, lo, it came to little; and when ye brought it home, I did blow upon it. Why? saith the LORD of hosts. Because of mine house that is waste, and ye run every man unto his own house."
+    },
+    {
+      "ref_id": 37001012,
+      "label": "Haggai 1:12",
+      "text": "¶ Then Zerubbabel the son of Shealtiel, and Joshua the son of Josedech, the high priest, with all the remnant of the people, obeyed the voice of the LORD their God, and the words of Haggai the prophet, as the LORD their God had sent him, and the people did fear before the LORD."
+    },
+    {
+      "ref_id": 18001006,
+      "label": "Job 1:6",
+      "text": "¶ Now there was a day when the sons of God came to present themselves before the LORD, and Satan came also among them."
+    },
+    {
+      "ref_id": 18001007,
+      "label": "Job 1:7",
+      "text": "And the LORD said unto Satan, Whence comest thou? Then Satan answered the LORD, and said, From going to and fro in the earth, and from walking up and down in it."
+    },
+    {
+      "ref_id": 18001008,
+      "label": "Job 1:8",
+      "text": "And the LORD said unto Satan, Hast thou considered my servant Job, that there is none like him in the earth, a perfect and an upright man, one that feareth God, and escheweth evil?"
+    },
+    {
+      "ref_id": 18001009,
+      "label": "Job 1:9",
+      "text": "Then Satan answered the LORD, and said, Doth Job fear God for nought?"
+    },
+    {
+      "ref_id": 18001012,
+      "label": "Job 1:12",
+      "text": "And the LORD said unto Satan, Behold, all that he hath is in thy power; only upon himself put not forth thine hand. So Satan went forth from the presence of the LORD."
+    },
+    {
+      "ref_id": 18001021,
+      "label": "Job 1:21",
+      "text": "And said, Naked came I out of my mother’s womb, and naked shall I return thither: the LORD gave, and the LORD hath taken away; blessed be the name of the LORD."
+    },
+    {
+      "ref_id": 18002001,
+      "label": "Job 2:1",
+      "text": "Again there was a day when the sons of God came to present themselves before the LORD, and Satan came also among them to present himself before the LORD."
+    },
+    {
+      "ref_id": 18002002,
+      "label": "Job 2:2",
+      "text": "And the LORD said unto Satan, From whence comest thou? And Satan answered the LORD, and said, From going to and fro in the earth, and from walking up and down in it."
+    },
+    {
+      "ref_id": 32001001,
+      "label": "Jonah 1:1",
+      "text": "Now the word of the LORD came unto Jonah the son of Amittai, saying,"
+    },
+    {
+      "ref_id": 32001003,
+      "label": "Jonah 1:3",
+      "text": "But Jonah rose up to flee unto Tarshish from the presence of the LORD, and went down to Joppa; and he found a ship going to Tarshish: so he paid the fare thereof, and went down into it, to go with them unto Tarshish from the presence of the LORD."
+    },
+    {
+      "ref_id": 32001004,
+      "label": "Jonah 1:4",
+      "text": "¶ But the LORD sent out a great wind into the sea, and there was a mighty tempest in the sea, so that the ship was like to be broken."
+    },
+    {
+      "ref_id": 32001009,
+      "label": "Jonah 1:9",
+      "text": "And he said unto them, I am an Hebrew; and I fear the LORD, the God of heaven, which hath made the sea and the dry land."
+    },
+    {
+      "ref_id": 32001010,
+      "label": "Jonah 1:10",
+      "text": "Then were the men exceedingly afraid, and said unto him, Why hast thou done this? For the men knew that he fled from the presence of the LORD, because he had told them."
+    },
+    {
+      "ref_id": 32001014,
+      "label": "Jonah 1:14",
+      "text": "Wherefore they cried unto the LORD, and said, We beseech thee, O LORD, we beseech thee, let us not perish for this man’s life, and lay not upon us innocent blood: for thou, O LORD, hast done as it pleased thee."
+    },
+    {
+      "ref_id": 32001016,
+      "label": "Jonah 1:16",
+      "text": "Then the men feared the LORD exceedingly, and offered a sacrifice unto the LORD, and made vows."
+    },
+    {
+      "ref_id": 32001017,
+      "label": "Jonah 1:17",
+      "text": "¶ Now the LORD had prepared a great fish to swallow up Jonah. And Jonah was in the belly of the fish three days and three nights."
+    },
+    {
+      "ref_id": 16001005,
+      "label": "Nehemiah 1:5",
+      "text": "And said, I beseech thee, O LORD God of heaven, the great and terrible God, that keepeth covenant and mercy for them that love him and observe his commandments:"
+    },
+    {
+      "ref_id": 16005013,
+      "label": "Nehemiah 5:13",
+      "text": "Also I shook my lap, and said, So God shake out every man from his house, and from his labour, that performeth not this promise, even thus be he shaken out, and emptied. And all the congregation said, Amen, and praised the LORD. And the people did according to this promise."
+    },
+    {
+      "ref_id": 16008001,
+      "label": "Nehemiah 8:1",
+      "text": "And all the people gathered themselves together as one man into the street that was before the water gate; and they spake unto Ezra the scribe to bring the book of the law of Moses, which the LORD had commanded to Israel."
+    },
+    {
+      "ref_id": 16008006,
+      "label": "Nehemiah 8:6",
+      "text": "And Ezra blessed the LORD, the great God. And all the people answered, Amen, Amen, with lifting up their hands: and they bowed their heads, and worshipped the LORD with their faces to the ground."
+    },
+    {
+      "ref_id": 16008009,
+      "label": "Nehemiah 8:9",
+      "text": "¶ And Nehemiah, which is the Tirshatha, and Ezra the priest the scribe, and the Levites that taught the people, said unto all the people, This day is holy unto the LORD your God; mourn not, nor weep. For all the people wept, when they heard the words of the law."
+    },
+    {
+      "ref_id": 16008010,
+      "label": "Nehemiah 8:10",
+      "text": "Then he said unto them, Go your way, eat the fat, and drink the sweet, and send portions unto them for whom nothing is prepared: for this day is holy unto our Lord: neither be ye sorry; for the joy of the LORD is your strength."
+    },
+    {
+      "ref_id": 16008014,
+      "label": "Nehemiah 8:14",
+      "text": "And they found written in the law which the LORD had commanded by Moses, that the children of Israel should dwell in booths in the feast of the seventh month:"
+    },
+    {
+      "ref_id": 16009003,
+      "label": "Nehemiah 9:3",
+      "text": "And they stood up in their place, and read in the book of the law of the LORD their God one fourth part of the day; and another fourth part they confessed, and worshipped the LORD their God."
+    },
+    {
+      "ref_id": 8001006,
+      "label": "Ruth 1:6",
+      "text": "¶ Then she arose with her daughters in law, that she might return from the country of Moab: for she had heard in the country of Moab how that the LORD had visited his people in giving them bread."
+    },
+    {
+      "ref_id": 8001008,
+      "label": "Ruth 1:8",
+      "text": "And Naomi said unto her two daughters in law, Go, return each to her mother’s house: the LORD deal kindly with you, as ye have dealt with the dead, and with me."
+    },
+    {
+      "ref_id": 8001009,
+      "label": "Ruth 1:9",
+      "text": "The LORD grant you that ye may find rest, each of you in the house of her husband. Then she kissed them; and they lifted up their voice, and wept."
+    },
+    {
+      "ref_id": 8001013,
+      "label": "Ruth 1:13",
+      "text": "Would ye tarry for them till they were grown? would ye stay for them from having husbands? nay, my daughters; for it grieveth me much for your sakes that the hand of the LORD is gone out against me."
+    },
+    {
+      "ref_id": 8001017,
+      "label": "Ruth 1:17",
+      "text": "Where thou diest, will I die, and there will I be buried: the LORD do so to me, and more also, if ought but death part thee and me."
+    },
+    {
+      "ref_id": 8001021,
+      "label": "Ruth 1:21",
+      "text": "I went out full, and the LORD hath brought me home again empty: why then call ye me Naomi, seeing the LORD hath testified against me, and the Almighty hath afflicted me?"
+    },
+    {
+      "ref_id": 8002004,
+      "label": "Ruth 2:4",
+      "text": "¶ And, behold, Boaz came from Beth-lehem, and said unto the reapers, The LORD be with you. And they answered him, The LORD bless thee."
+    },
+    {
+      "ref_id": 8002012,
+      "label": "Ruth 2:12",
+      "text": "The LORD recompense thy work, and a full reward be given thee of the LORD God of Israel, under whose wings thou art come to trust."
+    },
+    {
+      "ref_id": 35001002,
+      "label": "Habakkuk 1:2",
+      "text": "O LORD, how long shall I cry, and thou wilt not hear! even cry out unto thee of violence, and thou wilt not save!"
+    },
+    {
+      "ref_id": 35001012,
+      "label": "Habakkuk 1:12",
+      "text": "¶ Art thou not from everlasting, O LORD my God, mine Holy One? we shall not die. O LORD, thou hast ordained them for judgment; and, O mighty God, thou hast established them for correction."
+    },
+    {
+      "ref_id": 35002002,
+      "label": "Habakkuk 2:2",
+      "text": "And the LORD answered me, and said, Write the vision, and make it plain upon tables, that he may run that readeth it."
+    },
+    {
+      "ref_id": 35002013,
+      "label": "Habakkuk 2:13",
+      "text": "Behold, is it not of the LORD of hosts that the people shall labour in the very fire, and the people shall weary themselves for very vanity?"
+    },
+    {
+      "ref_id": 35002014,
+      "label": "Habakkuk 2:14",
+      "text": "For the earth shall be filled with the knowledge of the glory of the LORD, as the waters cover the sea."
+    },
+    {
+      "ref_id": 35002016,
+      "label": "Habakkuk 2:16",
+      "text": "Thou art filled with shame for glory: drink thou also, and let thy foreskin be uncovered: the cup of the LORD’s right hand shall be turned unto thee, and shameful spewing shall be on thy glory."
+    },
+    {
+      "ref_id": 35002020,
+      "label": "Habakkuk 2:20",
+      "text": "But the LORD is in his holy temple: let all the earth keep silence before him."
+    },
+    {
+      "ref_id": 35003002,
+      "label": "Habakkuk 3:2",
+      "text": "O LORD, I have heard thy speech, and was afraid: O LORD, revive thy work in the midst of the years, in the midst of the years make known; in wrath remember mercy."
+    },
+    {
+      "ref_id": 34001002,
+      "label": "Nahum 1:2",
+      "text": "God is jealous, and the LORD revengeth; the LORD revengeth, and is furious; the LORD will take vengeance on his adversaries, and he reserveth wrath for his enemies."
+    },
+    {
+      "ref_id": 34001003,
+      "label": "Nahum 1:3",
+      "text": "The LORD is slow to anger, and great in power, and will not at all acquit the wicked: the LORD hath his way in the whirlwind and in the storm, and the clouds are the dust of his feet."
+    },
+    {
+      "ref_id": 34001007,
+      "label": "Nahum 1:7",
+      "text": "The LORD is good, a strong hold in the day of trouble; and he knoweth them that trust in him."
+    },
+    {
+      "ref_id": 34001009,
+      "label": "Nahum 1:9",
+      "text": "What do ye imagine against the LORD? he will make an utter end: affliction shall not rise up the second time."
+    },
+    {
+      "ref_id": 34001011,
+      "label": "Nahum 1:11",
+      "text": "There is one come out of thee, that imagineth evil against the LORD, a wicked counsellor."
+    },
+    {
+      "ref_id": 34001012,
+      "label": "Nahum 1:12",
+      "text": "Thus saith the LORD; Though they be quiet, and likewise many, yet thus shall they be cut down, when he shall pass through. Though I have afflicted thee, I will afflict thee no more."
+    },
+    {
+      "ref_id": 34001014,
+      "label": "Nahum 1:14",
+      "text": "And the LORD hath given a commandment concerning thee, that no more of thy name be sown: out of the house of thy gods will I cut off the graven image and the molten image: I will make thy grave; for thou art vile."
+    },
+    {
+      "ref_id": 34002002,
+      "label": "Nahum 2:2",
+      "text": "For the LORD hath turned away the excellency of Jacob, as the excellency of Israel: for the emptiers have emptied them out, and marred their vine branches."
+    },
+    {
+      "ref_id": 27009002,
+      "label": "Daniel 9:2",
+      "text": "In the first year of his reign I Daniel understood by books the number of the years, whereof the word of the LORD came to Jeremiah the prophet, that he would accomplish seventy years in the desolations of Jerusalem."
+    },
+    {
+      "ref_id": 27009004,
+      "label": "Daniel 9:4",
+      "text": "And I prayed unto the LORD my God, and made my confession, and said, O Lord, the great and dreadful God, keeping the covenant and mercy to them that love him, and to them that keep his commandments;"
+    },
+    {
+      "ref_id": 27009008,
+      "label": "Daniel 9:8",
+      "text": "O Lord, to us belongeth confusion of face, to our kings, to our princes, and to our fathers, because we have sinned against thee."
+    },
+    {
+      "ref_id": 27009010,
+      "label": "Daniel 9:10",
+      "text": "Neither have we obeyed the voice of the LORD our God, to walk in his laws, which he set before us by his servants the prophets."
+    },
+    {
+      "ref_id": 27009013,
+      "label": "Daniel 9:13",
+      "text": "As it is written in the law of Moses, all this evil is come upon us: yet made we not our prayer before the LORD our God, that we might turn from our iniquities, and understand thy truth."
+    },
+    {
+      "ref_id": 27009014,
+      "label": "Daniel 9:14",
+      "text": "Therefore hath the LORD watched upon the evil, and brought it upon us: for the LORD our God is righteous in all his works which he doeth: for we obeyed not his voice."
+    },
+    {
+      "ref_id": 27009020,
+      "label": "Daniel 9:20",
+      "text": "¶ And whiles I was speaking, and praying, and confessing my sin and the sin of my people Israel, and presenting my supplication before the LORD my God for the holy mountain of my God;"
+    },
+    {
+      "ref_id": 31001001,
+      "label": "Obadiah 1:1",
+      "text": "The vision of Obadiah. Thus saith the Lord GOD concerning Edom; We have heard a rumour from the LORD, and an ambassador is sent among the heathen, Arise ye, and let us rise up against her in battle."
+    },
+    {
+      "ref_id": 31001004,
+      "label": "Obadiah 1:4",
+      "text": "Though thou exalt thyself as the eagle, and though thou set thy nest among the stars, thence will I bring thee down, saith the LORD."
+    },
+    {
+      "ref_id": 31001008,
+      "label": "Obadiah 1:8",
+      "text": "Shall I not in that day, saith the LORD, even destroy the wise men out of Edom, and understanding out of the mount of Esau?"
+    },
+    {
+      "ref_id": 31001015,
+      "label": "Obadiah 1:15",
+      "text": "For the day of the LORD is near upon all the heathen: as thou hast done, it shall be done unto thee: thy reward shall return upon thine own head."
+    },
+    {
+      "ref_id": 31001018,
+      "label": "Obadiah 1:18",
+      "text": "And the house of Jacob shall be a fire, and the house of Joseph a flame, and the house of Esau for stubble, and they shall kindle in them, and devour them; and there shall not be any remaining of the house of Esau; for the LORD hath spoken it."
+    },
+    {
+      "ref_id": 31001021,
+      "label": "Obadiah 1:21",
+      "text": "And saviours shall come up on mount Zion to judge the mount of Esau; and the kingdom shall be the LORD’s."
+    }
+  ]
+}

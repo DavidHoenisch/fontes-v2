@@ -1341,3 +1341,17 @@ html.dark .note-preview .card-meta {
 .study-switcher-line { position:absolute; left:0; bottom:-1px; height:3px; pointer-events:none; transition:transform 200ms cubic-bezier(.2,.8,.2,1), width 200ms ease; }
 .study-switcher-line::after { content:""; display:block; height:100%; margin:0 12px; border-radius:3px; background:var(--accent); }
 @media(prefers-reduced-motion:reduce) { .study-switcher-line,.study-switcher button { transition:none; } }
+
+.occurrence-explorer { margin-top:24px; }
+.occurrence-book-section { border-bottom:1px solid var(--rule); }
+.occurrence-disclosure { display:flex; align-items:center; gap:12px; width:100%; min-height:48px; padding:12px 0; background:transparent; border:0; color:inherit; text-align:left; cursor:pointer; font:inherit; }
+.occurrence-disclosure > svg { flex-shrink:0; transition:transform 160ms ease; color:var(--muted-ink); }
+.occurrence-disclosure[aria-expanded=true] > svg { transform:rotate(90deg); }
+.occurrence-disclosure:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; border-radius:8px; }
+.occurrence-book-toggle { padding-block:16px; font-weight:500; }
+.occurrence-book-toggle small { margin-left:auto; white-space:nowrap; font-size:12px; color:var(--muted-ink); font-weight:400; }
+.occurrence-reference-list { padding:0 0 16px 24px; border-left:1px solid var(--rule); margin:0 0 8px 8px; }
+.occurrence-reference .occurrence-disclosure { font-size:14px; color:var(--accent); }
+.occurrence-verse-text { padding:0 8px 16px 27px; }
+.occurrence-verse-text .scripture { font-size:18px; line-height:1.7; }
+@media(prefers-reduced-motion:reduce) { .occurrence-disclosure > svg { transition:none; } }

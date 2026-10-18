@@ -1,3 +1,5 @@
+import { OccurrenceExplorer, type OccurrencePage } from "./components/OccurrenceExplorer";
+import occurrenceVerseSample from "./data/occurrence-preview-verses.json";
 import { StudySwitcher } from "./components/StudySwitcher";
 import { ResourceUpdates } from "./components/ResourceUpdates";
 import { spotlightVerse } from "./verseArrival";
@@ -446,36 +448,6 @@ export default function App({ live }: { live?: Live }) {
     );
     setDialog(null);
   };
-  const [occurrenceBook, setOccurrenceBook] = useState<number | null>(null);
-  async function pageOccurrences(bookId: number | null, offset = 0) {
-    if (!live || !wordData) return;
-    try {
-      const r = await run("study.occurrences", {
-        code: wordData.code,
-        book_id: bookId,
-        offset,
-        limit: 8,
-      });
-      const o = r.data.occurrences as {
-        total: number;
-        books: { book_id: number; label: string; verses: number }[];
-        verses: { ref_id: number; label: string; preview: string | null }[];
-        has_more: boolean;
-        offset: number;
-      };
-      setOccurrenceBook(bookId);
-      setLiveOccurrences({
-        ...o,
-        books: o.books.map((b) => ({
-          id: b.book_id,
-          name: b.label,
-          verses: b.verses,
-        })),
-      });
-    } catch (e) {
-      showNotice(String(e));
-    }
-  }
   async function chooseDefinition(id: string) {
     const generation = ++definitionRequest.current;
     setDefinitionId(id); setDefinition(""); setDefinitionTitle("Loading dictionary…");
@@ -502,6 +474,7 @@ export default function App({ live }: { live?: Live }) {
       setFlipped(false);
       definitionRequest.current++; setDefinitionTitle(""); setDefinitionId(""); setLiveClips([]);
       setDefinition("");
+      setLiveOccurrences(null);
       const r = await run("study.word", { code });
       const data = r.data as unknown as NonNullable<typeof wordData>;
       setWordData(data);
@@ -1366,7 +1339,7 @@ export default function App({ live }: { live?: Live }) {
                           >
                             <ResponsiveContainer width="100%" height={220}>
                               <BarChart
-                                data={occurrences.books.slice(0, 5)}
+                                data={[...occurrences.books].sort((a,b)=>b.verses-a.verses).slice(0, 5)}
                                 layout="vertical"
                                 margin={{ left: 0, right: 24 }}
                               >
@@ -1403,81 +1376,22 @@ export default function App({ live }: { live?: Live }) {
                           <p className="muted small">
                             Top five books · distinct verses
                           </p>
-                          {occurrences.books.slice(0, 5).map((b) => (
-                            <div className="occurrence-book" key={b.id}>
-                              {live ? (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onPress={() => void pageOccurrences(b.id)}
-                                >
-                                  {b.name}
-                                  <ChevronRight size={14} />
-                                </Button>
-                              ) : (
-                                <span>{b.name}</span>
-                              )}
-                              <Chip size="sm" variant="soft">
-                                {b.verses.toLocaleString()} verses
-                              </Chip>
-                            </div>
-                          ))}
+                          <OccurrenceExplorer
+                            key={`${live?.state.content_id || "sample"}:${live?.state.session.translation || "kjv"}:${wordData?.code || "H3068"}`}
+                            books={occurrences.books}
+                            loadPage={async (book,offset) => {
+                              if (!live) return {verses:occurrenceVerseSample.verses.filter(v=>Math.floor(v.ref_id/1000000)===book).slice(offset,offset+8),has_more:false};
+                              const response=await run("study.occurrences",{code:wordData!.code,book_id:book,offset,limit:20});
+                              return response.data.occurrences as OccurrencePage;
+                            }}
+                            loadVerse={async ref => {
+                              if (!live) return occurrenceVerseSample.verses.find(v=>v.ref_id===ref)?.text || "";
+                              const response=await run("reading.preview",{start_ref:ref,end_ref:ref});
+                              return (response.data.verses as {text:string}[]).map(v=>v.text).join("\n\n");
+                            }}
+                          />
                         </Card.Content>
                       </Card>
-                      {live &&
-                        liveOccurrences?.verses.map((v) => (
-                          <Card key={v.ref_id} className="mt-3">
-                            <Card.Content>
-                              <Button
-                                variant="ghost"
-                                onPress={() => {
-                                  void run("reading.select", {
-                                    ref_id: v.ref_id,
-                                  })
-                                    .then(() => setPage("Read"))
-                                    .catch((e) => showNotice(String(e)));
-                                }}
-                              >
-                                {v.label}
-                                <ArrowRight size={14} />
-                              </Button>
-                              <p>{v.preview}</p>
-                            </Card.Content>
-                          </Card>
-                        ))}
-                      {live && liveOccurrences && (
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <Button
-                            variant="ghost"
-                            isDisabled={occurrenceBook === null}
-                            onPress={() => void pageOccurrences(null)}
-                          >
-                            All books
-                          </Button>
-                          <Button
-                            isDisabled={!liveOccurrences.offset}
-                            onPress={() =>
-                              void pageOccurrences(
-                                occurrenceBook,
-                                Math.max(0, liveOccurrences.offset - 8),
-                              )
-                            }
-                          >
-                            Previous
-                          </Button>
-                          <Button
-                            isDisabled={!liveOccurrences.has_more}
-                            onPress={() =>
-                              void pageOccurrences(
-                                occurrenceBook,
-                                liveOccurrences.offset + 8,
-                              )
-                            }
-                          >
-                            Next
-                          </Button>
-                        </div>
-                      )}
                       <p className="muted small mt-4">
                         {live
                           ? "Distinct verses in the installed source text."
