@@ -1,5 +1,7 @@
 # Authoring a Fontes resource
 
+You can continue using this offline XML/tooling workflow, or use the [local guided preparation wizard](../architecture/resource-preparation.md) for supported prose EPUBs, metadata, rights and cover upload. Both paths produce this same source format. The wizard renders a publisher-reviewable draft, retains derivation/decisions and requires exact preparation approval; AI themes/allusions and hosted/public publication remain separate work. Prepared source ZIPs are validated and retained without rewriting your pipeline's bytes.
+
 Status: guide to the draft source format. The [authoring CLI](cli-guide.md) implements scaffolding, validation, packaging, schema export, and the [source-submission pipeline](submission-pipeline.md); app delivery compilation and the catalog remain planned. Use the [complete Romans study example](../../specs/resource-packages/v1/examples/romans-study/) as a concrete starting point; its publisher is fictional.
 
 ## Prepare the source directory

@@ -2,9 +2,11 @@
 
 The current requirements, flows, architectural choices, and implementation gates are consolidated in [SPEC.md](../../SPEC.md). These guides explain how to apply the resource-related contracts.
 
+The [server components plan](../architecture/server-components.md) adds a Next.js/TypeScript public submission/review dashboard first, then private organization publishing/invitations and later commerce/hosted AI. The [development dashboard/API](../../apps/fontes-site/README.md) now supports metadata review and [dual-path local resource preparation](../architecture/resource-preparation.md): validated offline source ZIPs, or a guided rights/artwork/EPUB workflow with readable publisher review and source export. Organization publishing teams can now correct extracted text/references, approve a content snapshot and generate a validated source ZIP locally. The [maintainer queue](../architecture/maintainer-review.md) now accepts explicitly submitted approved packages, records independent source decisions and exports an unsigned handoff for the trusted repository pipeline. Hosted workers/storage, live release transport and private member delivery remain planned. Metadata/preparation approval is not maintainer source/rights approval. Private self-service publication needs separate authorization/feed/offline-grant contracts, not a bypass of the current exact-hash approval schema.
+
 Fontes is designed to support a default offline collection and additional resources selected from a free catalog. Resources ship independently and join one installed library, so a verse lookup can find relevant paragraphs across all installed works.
 
-This documentation describes the package system. The current reading/study data pipeline publishes signed SQLite snapshots, and source-submission validation/publication is implemented under `library/` in this repository. The modular SQLite delivery compiler, catalog, client installer, and custom publisher portal are not implemented yet.
+This documentation describes the package system. The current data pipeline publishes signed SQLite snapshots, and source-submission validation/publication is implemented under `library/` in this repository. The modular SQLite delivery compiler, catalog, client installer and hosted publisher intake/release operation remain planned. Local source preparation does not close those gates.
 
 | Audience | Start here |
 | --- | --- |

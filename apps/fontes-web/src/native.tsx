@@ -59,6 +59,7 @@ export type Workspace = {
     updated_at: string;
     color: string | null;
   }[];
+  note_organization?: import("./components/OrganizedNotes").Organization;
   notes: {
     annotation_id: string;
     document: {

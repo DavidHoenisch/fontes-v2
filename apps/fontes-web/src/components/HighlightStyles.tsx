@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 export const markColors = [
   ["Yellow", "#c59819"],
   ["Blue", "#3484d7"],
@@ -53,6 +53,11 @@ export const studySymbols = [
 ];
 export type MarkStyle = { kind: string; color: string; symbol?: string };
 export const defaultMark: MarkStyle = { kind: "Highlighter", color: "#c59819" };
+export function LayeredMark({styles, children}: {styles: MarkStyle[]; children: ReactNode}) {
+  // Keep the normal highlight underneath symbol patterns regardless of save order.
+  const ordered = [...styles].sort((a, b) => Number(b.kind === "Highlighter") - Number(a.kind === "Highlighter"));
+  return ordered.reduceRight<ReactNode>((content, style, i) => <span key={i} data-highlight-kind={style.kind} style={markCSS(style)}>{content}</span>, children);
+}
 export function markCSS(style: MarkStyle): CSSProperties {
   const c = style.color;
   const base: CSSProperties = {

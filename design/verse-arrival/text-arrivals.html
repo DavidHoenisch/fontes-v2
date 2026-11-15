@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fontes · Text arrival studies</title>
+  <link rel="stylesheet" href="text-arrivals.css">
+  <script src="text-arrivals.js" defer></script>
+</head>
+<body>
+  <main class="workspace">
+    <section class="directions" aria-labelledby="page-title">
+      <a class="brand" href="target-cues.html">fontes</a>
+      <h1 id="page-title">Text arrival studies</h1>
+      <p class="introduction">A longer, more deliberate settling into focus.</p>
+
+      <div class="choices" role="group" aria-label="Arrival treatment">
+        <button class="choice" type="button" data-choice="combined" aria-pressed="true"><span class="choice-title">Settle + resolve</span><span class="choice-description">One motion: the words settle and sharpen together.</span></button>
+        <button class="choice" type="button" data-choice="settle" aria-pressed="false"><span class="choice-title">Settle</span><span class="choice-description">The words settle a few pixels into place.</span></button>
+        <button class="choice" type="button" data-choice="resolve" aria-pressed="false"><span class="choice-title">Resolve</span><span class="choice-description">The verse comes gently into sharp focus.</span></button>
+      </div>
+
+      <form id="preview-form" class="preview-controls">
+        <label for="verse">Destination</label>
+        <div class="destination-controls">
+          <select id="verse"><option value="2">Proverbs 16:2</option><option value="3" selected>Proverbs 16:3</option><option value="4">Proverbs 16:4</option><option value="5">Proverbs 16:5</option></select>
+          <button class="play" type="submit">Preview arrival</button>
+        </div>
+        <div class="toggles"><label><input id="slow" type="checkbox"> Slow motion</label><label><input id="reduced" type="checkbox"> Reduced motion</label></div>
+        <label class="theme-label"><input id="dark" type="checkbox"> Dark appearance</label>
+      </form>
+      <p class="playback" id="playback" role="status" aria-live="polite">Settle + resolve · ready to preview</p>
+      <p class="prototype-note">Visual preview. Android adds a soft run of ticks that slows and fades.</p>
+    </section>
+
+    <section class="preview" aria-label="Fontes reading preview">
+      <div class="phone" id="phone" data-effect="combined">
+        <div class="phone-header"><span class="reference" id="reference">Proverbs 16</span><span class="edition">KJV</span></div>
+        <div class="reader" id="reader" tabindex="0" role="region" aria-label="Scripture preview">
+          <h2>Proverbs</h2><p class="chapter">Chapter 16</p><div class="verses" id="verses"></div>
+        </div>
+        <div class="phone-footer" aria-hidden="true"><span class="active">Read</span><span>Study</span><span>Notes</span><span>Library</span></div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

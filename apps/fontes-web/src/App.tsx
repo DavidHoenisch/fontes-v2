@@ -1,8 +1,17 @@
+import {ReadingSelection,type ReaderSelection} from "./components/ReadingSelection";
+import { ShareCard } from "./components/ShareCard";
+import type { ShareQuote } from "./shareCard";
+import { Share2 } from "lucide-react";
+import { SearchWorkspace } from "./components/SearchWorkspace";
+import { createLookupCache } from "./lookupCache";
+import { highlightLayer, overlappingHighlights } from "./highlightLayers";
+import { OrganizedNotes } from "./components/OrganizedNotes";
 import { OccurrenceExplorer, type OccurrencePage } from "./components/OccurrenceExplorer";
 import occurrenceVerseSample from "./data/occurrence-preview-verses.json";
 import { StudySwitcher } from "./components/StudySwitcher";
 import { ResourceUpdates } from "./components/ResourceUpdates";
-import { spotlightVerse } from "./verseArrival";
+import { arriveAtVerse } from "./verseArrival";
+import { arrivalHaptic } from "./arrivalHaptics";
 import { LibraryResourceCard, resourceIdentity } from "./components/LibraryResourceCard";
 import { ResourceCitations, type Citation } from "./components/ResourceCitations";
 import { PassageAttachment } from "./components/PassageAttachment";
@@ -26,6 +35,7 @@ import {
   studySymbols,
   markCSS,
   defaultMark,
+  LayeredMark,
   type MarkStyle,
 } from "./components/HighlightStyles";
 import {
@@ -37,7 +47,7 @@ import {
   Tooltip,
 } from "recharts";
 import previewOccurrences from "./data/occurrences.json";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, Card, Chip, Input, Tabs, TextArea } from "@heroui/react";
 import {
   ArrowDown,
@@ -87,7 +97,7 @@ const nav = [
 ] as const;
 const makeId = () => crypto.randomUUID();
 export default function App({ live }: { live?: Live }) {
-  const [page, setPage] = useState<Page>("Read"),
+  const [page, updatePage] = useState<Page>("Read"),
     [phone, setPhone] = useState(true),
     [dark, setDark] = useState(
       live
@@ -114,6 +124,8 @@ export default function App({ live }: { live?: Live }) {
   const [dialog, setDialog] = useState<
       | "licenses"
       | "highlight"
+      | "remove-highlight"
+      | "share"
       | "passages"
       | "settings"
       | "search"
@@ -132,16 +144,15 @@ export default function App({ live }: { live?: Live }) {
   const [draft, setDraft] = useState<Note | null>(null),
     [noteModal, setNoteModal] = useState<Note[] | null>(null),
     [source, setSource] = useState<Block | null>(null),
-    [selection, setSelection] = useState<{
-      quote: string;
-      anchor: string;
-      endRef?: number;
-      nativeSelection?: import("./native").NativeSelection;
-    } | null>(null),
+    [selection, setSelection] = useState<ReaderSelection | null>(null),
     [highlights, setHighlights] = useState<Record<string, string>>({}),
     [notice, setNotice] = useState(""),
     [deleteId, setDeleteId] = useState("");
+  const [shareQuote,setShareQuote]=useState<ShareQuote|null>(null);
   const [markStyle, setMarkStyle] = useState<MarkStyle>(defaultMark);
+  const [removalChoices, setRemovalChoices] = useState<{id:string;title:string;quote:string;reference:string;style:MarkStyle}[]>([]);
+  const [removingHighlight, setRemovingHighlight] = useState<string | null>(null);
+  const [highlightRemovalError, setHighlightRemovalError] = useState("");
   const [highlightStyles, setHighlightStyles] = useState<
     Record<string, MarkStyle>
   >({});
@@ -157,6 +168,17 @@ export default function App({ live }: { live?: Live }) {
     { id: string; title: string; excerpt: string; kind: string; basis: string; author: string | null }[]
   >([]);
   const [studyMode, setStudyMode] = useState("words");
+  const [wordStudyOpen, setWordStudyOpen] = useState(false);
+  const [wordLoading, setWordLoading] = useState(false);
+  const [wordError, setWordError] = useState("");
+  const wordRequest = useRef(0);
+  const [lookupCache] = useState(() => createLookupCache());
+  const [wordChooserOpen, setWordChooserOpen] = useState(false);
+  const [definitionLoading, setDefinitionLoading] = useState(false);
+  const [occurrenceLoading, setOccurrenceLoading] = useState(false);
+  const [occurrenceError, setOccurrenceError] = useState("");
+  const [occurrenceRetry, setOccurrenceRetry] = useState(0);
+  const wordReturnScroll = useRef(0);
   const [contextLoading, setContextLoading] = useState(false);
   const [articleLinks, setArticleLinks] = useState<{id: string; links: Citation[]} | null>(null);
   const [studyRef, setStudyRef] = useState("");
@@ -169,11 +191,6 @@ export default function App({ live }: { live?: Live }) {
     offset: number;
   } | null>(null);
   const [parentSource, setParentSource] = useState<string | null>(null);
-  const [searchResults, setSearchResults] = useState<
-    { id: string; ref_id: number | null; title: string; excerpt: string }[]
-  >([]);
-  const [searchMore, setSearchMore] = useState(false);
-  const [searchOffset, setSearchOffset] = useState(0);
   const [wordData, setWordData] = useState<{
     code: string;
     headwords: {
@@ -195,6 +212,29 @@ export default function App({ live }: { live?: Live }) {
   const [definitionTitle, setDefinitionTitle] = useState("");
   const [definitionId, setDefinitionId] = useState("");
   const definitionRequest = useRef(0);
+  useEffect(() => {
+    setShareQuote(null);
+    setDialog(current=>current==="share"?null:current);
+    setWordStudyOpen(false);
+    lookupCache.clear();
+    setWordData(null);
+    setDefinition("");
+    setDefinitionId("");
+    setDefinitionTitle("");
+    setLiveClips([]);
+    setLiveOccurrences(null);
+    setDefinitionLoading(false);
+    setWordLoading(false);
+    setOccurrenceLoading(false);
+    setOccurrenceError("");
+    setWordChooserOpen(false);
+    wordRequest.current++;
+    definitionRequest.current++;
+    return () => {
+      wordRequest.current++;
+      definitionRequest.current++;
+    };
+  }, [live?.state.content_id, live?.state.session.translation]);
   const [liveClips, setLiveClips] = useState<Block[]>([]);
   const occurrences = live
     ? liveOccurrences || { total: 0, books: [] }
@@ -204,14 +244,15 @@ export default function App({ live }: { live?: Live }) {
   const [attachmentPassage, setAttachmentPassage] = useState(false);
   const [pickerChapter, setPickerChapter] = useState<number | null>(null);
   const [arrival, setArrival] = useState<number | null>(null);
-  const clearSpotlight = useRef<(() => void) | null>(null);
-  useEffect(() => () => clearSpotlight.current?.(), []);
+  const clearArrival = useRef<(() => void) | null>(null);
+  useEffect(() => () => clearArrival.current?.(), []);
   const [pickerQuery, setPickerQuery] = useState("");
   const [leaveTarget, setLeaveTarget] = useState<Page>("Notes");
   const scrollRef = useRef<HTMLDivElement>(null),
     hold = useRef<ReturnType<typeof setTimeout> | null>(null),
     holdOrigin = useRef({ x: 0, y: 0 }),
     pressed = useRef(false);
+  const readerPosition = useRef({ key: "", top: 0 });
   const p = live
       ? {
           book: Math.floor(live.state.session.selected_ref / 1000000),
@@ -226,8 +267,18 @@ export default function App({ live }: { live?: Live }) {
     currentRef = live
       ? label(live.state, live.state.session.selected_ref)
       : `${book.name} ${p.chapter}:3`;
+  const readerKey = JSON.stringify([live?.state.content_id, live?.state.session.translation, p.book, p.chapter]);
+  function setPage(next: Page) {
+    // Capture before replacing the reader: shorter panes can clamp scrollTop.
+    if (page === "Read" && next !== "Read") {
+      readerPosition.current = { key: readerKey, top: scrollRef.current?.scrollTop || 0 };
+    }
+    updatePage(next);
+  }
   const run = (command: string, params: Record<string, unknown>) =>
     live!.send({ command, params });
+  const lookupKey = (kind: string, identity: string | number) =>
+    `${live?.state.content_id}:${live?.state.session.translation}:${kind}:${identity}`;
   useEffect(() => {
     if (live) {
       setNotes(nativeNotes(live.state));
@@ -241,33 +292,48 @@ export default function App({ live }: { live?: Live }) {
     }
   }, [live?.state]);
   useEffect(() => {
-    if (!live || page !== "Study") return;
+    if (!live || (wordStudyOpen ? !wordChooserOpen : page !== "Study")) return;
     let active = true;
     setContextLoading(true); setContextResources([]); setContextWords([]);
-    void run("study.context", { ref_id: live.state.session.selected_ref })
-      .then(r => { if (active) {
-        setContextWords(r.data.tokens as typeof contextWords);
-        setContextResources(r.data.resources as typeof contextResources);
+    const reference = wordStudyOpen && studyRef ? refId(live.state, studyRef) : live.state.session.selected_ref;
+    void lookupCache.load(lookupKey("context", reference), async () =>
+      (await run("study.context", { ref_id: reference })).data)
+      .then(data => { if (active) {
+        setContextWords(data.tokens as typeof contextWords);
+        setContextResources(data.resources as typeof contextResources);
       } }).catch(e => { if (active) showNotice(String(e)); })
       .finally(() => { if (active) setContextLoading(false); });
     return () => { active = false; };
-  }, [page, live?.state.session.selected_ref, live?.state.content_id]);
+  }, [page, wordStudyOpen, wordChooserOpen, studyRef, live?.state.session.selected_ref, live?.state.content_id, live?.state.session.translation]);
+  useEffect(() => {
+    if (!live || studyTab !== "occurrences" || (!wordStudyOpen && (page !== "Study" || studyMode !== "words")) || !wordData || liveOccurrences) return;
+    let active = true;
+    const generation = wordRequest.current;
+    setOccurrenceLoading(true);
+    setOccurrenceError("");
+    void lookupCache.load(lookupKey("occurrences", wordData.code), async () => {
+      const response = await run("study.occurrences", {code: wordData.code, book_id: null, offset: 0, limit: 8});
+      const result = response.data.occurrences as {
+        total: number; books: {book_id: number; label: string; verses: number}[];
+        verses: {ref_id: number; label: string; preview: string | null}[];
+        has_more: boolean; offset: number;
+      };
+      return {...result, books: result.books.map(b => ({id:b.book_id, name:b.label, verses:b.verses}))};
+    }).then(result => {
+      if (active && generation === wordRequest.current) setLiveOccurrences(result);
+    }).catch(error => {
+      if (active && generation === wordRequest.current) setOccurrenceError(String(error));
+    }).finally(() => {
+      if (active && generation === wordRequest.current) setOccurrenceLoading(false);
+    });
+    return () => {active = false;};
+  }, [page, studyMode, wordStudyOpen, studyTab, wordData?.code, live?.state.content_id, live?.state.session.translation, occurrenceRetry]);
   useEffect(() => {
     if (live && page === "Library")
       void run("library.catalog", { source_id: null, offset: 0 })
         .then((r) => setCatalog(r.data.sources as typeof catalog))
         .catch((e) => showNotice(String(e)));
   }, [page, live?.state.content_id]);
-  async function searchLibrary(offset = 0) {
-    try {
-      const r = await run("search.query", { query, limit: 30, offset });
-      setSearchResults(r.data.hits as typeof searchResults);
-      setSearchMore(Boolean(r.data.has_more));
-      setSearchOffset(offset);
-    } catch (e) {
-      showNotice(String(e));
-    }
-  }
   async function openArticle(id: string) {
     try {
       const r = await run("study.resource", { id });
@@ -312,22 +378,6 @@ export default function App({ live }: { live?: Live }) {
     }
   }
   useEffect(() => {
-    if (!live || page !== "Read" || dialog) return;
-    let timer: ReturnType<typeof setTimeout>;
-    const changed = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        const selected = readSelection(live.state);
-        if (selected) setSelection(selected);
-      }, 160);
-    };
-    document.addEventListener("selectionchange", changed);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener("selectionchange", changed);
-    };
-  }, [live?.state.passage, page, dialog]);
-  useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
     document.documentElement.dataset.accent = accent;
   }, [dark, accent]);
@@ -347,17 +397,22 @@ export default function App({ live }: { live?: Live }) {
       return () => clearTimeout(t);
     }
   }, [notice]);
-  useEffect(() => {
-    scrollRef.current?.scrollTo(0, 0);
-  }, [page, passageIndex, draft?.id]);
+  useLayoutEffect(() => {
+    if (readerPosition.current.key !== readerKey) {
+      readerPosition.current = { key: readerKey, top: 0 };
+    }
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = page === "Read" ? readerPosition.current.top : 0;
+    }
+  }, [page, readerKey, draft?.id]);
   useEffect(() => {
     if (arrival === null || page !== "Read" || dialog !== null) return;
     const frame = requestAnimationFrame(() => {
       const verse = scrollRef.current?.querySelector<HTMLElement>(`[data-verse-refs~="${arrival}"]`);
       if (!verse) return;
       verse.scrollIntoView({ block: "center", behavior: "instant" });
-      clearSpotlight.current?.();
-      clearSpotlight.current = spotlightVerse(verse);
+      clearArrival.current?.();
+      clearArrival.current = arriveAtVerse(verse, arrivalHaptic);
       setArrival(null);
     });
     return () => cancelAnimationFrame(frame);
@@ -374,16 +429,29 @@ export default function App({ live }: { live?: Live }) {
     setPage(next);
     setSelection(null);
   };
+  function closeWordStudy() {
+    if (wordStudyOpen && scrollRef.current) {
+      scrollRef.current.scrollTop = wordReturnScroll.current;
+    }
+    setWordStudyOpen(false);
+    setWordLoading(false);
+    setDefinitionLoading(false);
+    setWordChooserOpen(false);
+    wordRequest.current++;
+    definitionRequest.current++;
+  }
   function newNote(
     quote = selection?.quote || "",
     anchor = selection?.anchor || currentRef,
+    captured = selection,
   ) {
+    closeWordStudy();
     setDraft({
       id: makeId(),
       title: "",
       nativeSelection:
-        selection?.quote === quote ? selection.nativeSelection : undefined,
-      endRef: selection?.quote === quote ? selection.endRef : undefined,
+        captured?.quote === quote ? captured.nativeSelection : undefined,
+      endRef: captured?.quote === quote ? captured.endRef : undefined,
       anchor,
       quote,
       blocks: [{ id: makeId(), kind: "thought", text: "" }],
@@ -450,59 +518,56 @@ export default function App({ live }: { live?: Live }) {
   };
   async function chooseDefinition(id: string) {
     const generation = ++definitionRequest.current;
+    setWordError("");
+    setDefinitionLoading(true);
     setDefinitionId(id); setDefinition(""); setDefinitionTitle("Loading dictionary…");
     try {
-      const detail = await run("study.resource", {id});
+      const detail = await lookupCache.load(lookupKey("resource", id), async () => {
+        const response = await run("study.resource", {id});
+        return {contentId: response.state.content_id, resource: response.data.resource as {id: string; content: string; title: string; author: string | null; source: string}};
+      });
       if (generation !== definitionRequest.current) return;
-      const resource = detail.data.resource as {id: string; content: string; title: string; author: string | null; source: string};
+      const resource = detail.resource;
       setDefinition(resource.content);
       setDefinitionTitle(resourceIdentity(resource.source, "dictionary").title);
       setLiveClips([{id: resource.id, kind: "word", text: resource.content, source: resource.source, ref: resource.title,
-        native:{type:"resource",resource_id:resource.id,quote:resource.content,title:resource.title,author:resource.author,source:resource.source,content_id:detail.state.content_id}}]);
-    } catch(e) {if (generation === definitionRequest.current) showNotice(String(e));}
+        native:{type:"resource",resource_id:resource.id,quote:resource.content,title:resource.title,author:resource.author,source:resource.source,content_id:detail.contentId}}]);
+    } catch(e) {if (generation === definitionRequest.current) setWordError(String(e));}
+    finally {if (generation === definitionRequest.current) setDefinitionLoading(false);}
   }
   async function openWord(code: string, quote: string, anchor = currentRef) {
-    if (!live) return;
+    if (!wordStudyOpen) wordReturnScroll.current = scrollRef.current?.scrollTop || 0;
+    const generation = ++wordRequest.current;
+    setWordStudyOpen(true);
+    setWordLoading(Boolean(live));
+    setDefinitionLoading(false);
+    setOccurrenceLoading(false);
+    setOccurrenceError("");
+    setWordChooserOpen(false);
+    setWordError("");
+    setWordData(null);
+    setSelection(null);
     try {
-      if (anchor !== currentRef)
-        await run("reading.select", { ref_id: refId(live.state, anchor) });
       setStudyRef(anchor);
       setWordQuote(quote);
-      setPage("Study");
       setStudyMode("words");
       setStudyTab("meaning");
       setFlipped(false);
       definitionRequest.current++; setDefinitionTitle(""); setDefinitionId(""); setLiveClips([]);
       setDefinition("");
       setLiveOccurrences(null);
-      const r = await run("study.word", { code });
-      const data = r.data as unknown as NonNullable<typeof wordData>;
+      if (!live) return;
+      const data = await lookupCache.load(lookupKey("word", code), async () =>
+        (await run("study.word", { code })).data as unknown as NonNullable<typeof wordData>);
+      if (generation !== wordRequest.current) return;
       setWordData(data);
+      setWordLoading(false);
       const initialDefinition = data.definitions.find(d => d.id.startsWith("resource:strongs-")) || data.definitions[0];
       if (initialDefinition) await chooseDefinition(initialDefinition.id);
-      const o = await run("study.occurrences", {
-        code,
-        book_id: null,
-        offset: 0,
-        limit: 8,
-      });
-      const result = o.data.occurrences as {
-        total: number;
-        books: { book_id: number; label: string; verses: number }[];
-        verses: { ref_id: number; label: string; preview: string | null }[];
-        has_more: boolean;
-        offset: number;
-      };
-      setLiveOccurrences({
-        ...result,
-        books: result.books.map((b) => ({
-          id: b.book_id,
-          name: b.label,
-          verses: b.verses,
-        })),
-      });
     } catch (e) {
-      showNotice(String(e));
+      if (generation === wordRequest.current) setWordError(String(e));
+    } finally {
+      if (generation === wordRequest.current) setWordLoading(false);
     }
   }
   async function pinNote(id: string) {
@@ -531,32 +596,20 @@ export default function App({ live }: { live?: Live }) {
   function nativeInsert() {
     setDialog("insert");
   }
-  async function applyHighlight(remove = false) {
+  async function applyHighlight() {
     if (!live || !selection) return;
     try {
       const ref = refId(live.state, selection.anchor);
       const sel =
         selection.nativeSelection ||
         selectionFor(live.state, selection.anchor, selection.quote);
-      const existing = live.state.highlights.find((h) =>
-        h.selection?.spans.some((s) =>
-          sel?.spans.some(
-            (n) =>
-              s.verse_id === n.verse_id &&
-              s.start === n.start &&
-              s.end === n.end,
-          ),
-        ),
-      );
-      if (remove) {
-        if (existing)
-          await run("annotation.delete", { id: existing.annotation_id });
-      } else
-        await run("highlight.save", {
+      const style = storedStyle(markStyle);
+      const existing = highlightLayer(live.state, sel, ref, selection.endRef || ref, style);
+      await run("highlight.save", {
           id: existing?.annotation_id || null,
           start_ref: ref,
           end_ref: selection.endRef || ref,
-          style: storedStyle(markStyle),
+          style,
           selection: sel,
         });
       setDialog(null);
@@ -565,6 +618,44 @@ export default function App({ live }: { live?: Live }) {
     } catch (e) {
       showNotice(String(e));
     }
+  }
+  async function removeNativeHighlight(id: string) {
+    if (removingHighlight) return;
+    setRemovingHighlight(id);
+    setHighlightRemovalError("");
+    try {
+      await run("annotation.delete", {id});
+      setDialog(null);
+      setSelection(null);
+      window.getSelection()?.removeAllRanges();
+    } catch (e) {
+      setHighlightRemovalError(String(e));
+    } finally {
+      setRemovingHighlight(null);
+    }
+  }
+  function beginHighlightRemoval() {
+    if (!live || !selection) return;
+    setHighlightRemovalError("");
+    try {
+      const start = refId(live.state, selection.anchor);
+      const selected = selection.nativeSelection || selectionFor(live.state, selection.anchor, selection.quote);
+      const matches = overlappingHighlights(live.state, selected, start, selection.endRef || start);
+      if (!matches.length) {
+        setHighlightRemovalError("No saved highlights overlap this selection. Select part of the highlighted text, or remove it from Notebook → Highlights.");
+        return;
+      }
+      if (matches.length === 1) { void removeNativeHighlight(matches[0].id); return; }
+      setRemovalChoices(matches.map(annotation => {
+        const rich = live.state.highlights.find(h => h.annotation_id === annotation.id);
+        const style = rich ? nativeStyle(rich.style) : nativeStyle({kind:"highlighter",color:({amber:"yellow",sage:"green",rose:"pink"}[annotation.color || ""] || annotation.color || "yellow"),symbol:null});
+        const color = markColors.find(([,hex]) => hex === style.color)?.[0] || "";
+        return {id:annotation.id,style,title:`${style.symbol ? `Study symbol: ${style.symbol}` : style.kind} · ${color}`,
+          quote:rich?.selection?.spans.map(span => span.quote).join(" ") || annotation.content || "Whole verse highlight",
+          reference:label(live.state,annotation.start_ref)+(annotation.end_ref !== annotation.start_ref ? ` – ${label(live.state,annotation.end_ref)}` : "")};
+      }));
+      setDialog("remove-highlight");
+    } catch(e) { setHighlightRemovalError(String(e)); }
   }
   function renderVerse(text: string, ref: string) {
     if (live) {
@@ -581,7 +672,7 @@ export default function App({ live }: { live?: Live }) {
         if (!annotation) return [];
         if (h.selection?.translation_id === live.state.session.translation)
           return h.selection.spans
-            .filter((s) => s.verse_id === v.id)
+            .filter((s) => s.verse_id === v.id && chars.slice(s.start, s.end).join("") === s.quote)
             .map((span) => ({ ...span, style: nativeStyle(h.style) }));
         if (
           !h.selection &&
@@ -604,9 +695,9 @@ export default function App({ live }: { live?: Live }) {
         const end = stops[i + 1],
           word = chars.slice(start, end).join(""),
           link = links.find((l) => l.start <= start && l.end >= end),
-          mark = marks.find((m) => m.start <= start && m.end >= end);
+          layers = marks.filter((m) => m.start <= start && m.end >= end);
         return (
-          <span key={start} style={mark ? markCSS(mark.style) : undefined}>
+          <LayeredMark key={start} styles={layers.map(m => m.style)}>
             {link ? (
               <span
                 className="study-word"
@@ -626,7 +717,7 @@ export default function App({ live }: { live?: Live }) {
             ) : (
               word
             )}
-          </span>
+          </LayeredMark>
         );
       });
     }
@@ -657,14 +748,12 @@ export default function App({ live }: { live?: Live }) {
               aria-label="Study LORD"
               onClick={() => {
                 if (!pressed.current && !window.getSelection()?.toString()) {
-                  setStudyTab("meaning");
-                  setPage("Study");
+                  void openWord("H3068", "LORD", ref);
                 }
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  setStudyTab("meaning");
-                  setPage("Study");
+                  void openWord("H3068", "LORD", ref);
                 }
               }}
             >
@@ -676,6 +765,27 @@ export default function App({ live }: { live?: Live }) {
         )}
       </span>
     ));
+  }
+  async function openHighlight(reference: string) {
+    try {
+      let destination: number;
+      if (live) {
+        destination = refId(live.state, reference);
+        await run("reading.select", { ref_id: destination });
+      } else {
+        const match = reference.match(/^(.*) (\d+):(\d+)$/);
+        const targetBook = books.find(b => b.name === match?.[1]);
+        const index = passages.findIndex(p => p.book === targetBook?.id && p.chapter === Number(match?.[2]));
+        if (!match || !targetBook || index < 0) throw Error("This passage is unavailable in preview.");
+        destination = targetBook.id * 1000000 + Number(match[2]) * 1000 + Number(match[3]);
+        setPassageIndex(index);
+      }
+      setSelection(null);
+      setPage("Read");
+      setArrival(destination);
+    } catch (e) {
+      showNotice(String(e));
+    }
   }
   function selectPassage(index: number) {
     if (live) {
@@ -748,13 +858,6 @@ export default function App({ live }: { live?: Live }) {
     setLeaveTarget("Notes");
     setDialog("discard");
   };
-  const visibleNotes = notes
-    .filter((n) =>
-      `${n.title} ${n.anchor} ${n.blocks.map((b) => b.text).join(" ")}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-    )
-    .sort((a, b) => Number(b.pinned) - Number(a.pinned));
   function Clip({ block }: { block: Block }) {
     return (
       <Card
@@ -822,6 +925,376 @@ export default function App({ live }: { live?: Live }) {
       </div>
     );
   }
+  const wordStudyContent = (
+    <>
+      {wordLoading && <p role="status">Loading word study…</p>}
+      {wordError && <p role="alert">{wordError}</p>}
+      {!wordLoading && (!wordError || wordData) && (
+        <>
+          {!wordStudyOpen && (
+            <div className="page-heading">
+              <div>
+                <div className="eyebrow">CLOSER TO THE WORD</div>
+                <h1>Word study</h1>
+              </div>
+              <Chip variant="soft" color="accent">
+                {live ? wordData?.code || "Select a word" : "H3068"}
+              </Chip>
+            </div>
+          )}
+          {(!live || wordData) && <p className="muted intro-line">
+            {live
+              ? `From “${wordQuote}” · ${studyRef || currentRef}`
+              : "From “LORD” · Proverbs 16:3"}
+          </p>}
+          {live && (
+            <>
+              <details
+                open={wordChooserOpen || (!wordStudyOpen && !wordData)}
+                onToggle={(event) => setWordChooserOpen(event.currentTarget.open)}
+                className="study-word-chooser"
+              >
+                <summary>Words in {studyRef || currentRef}</summary>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {contextLoading && <p role="status">Loading source words…</p>}
+                  {contextWords
+                    .filter(
+                      (w, i, a) =>
+                        w.strongs &&
+                        a.findIndex(
+                          (n) =>
+                            n.position === w.position &&
+                            n.strongs === w.strongs &&
+                            n.surface === w.surface,
+                        ) === i,
+                    )
+                    .map((w, i) => (
+                      <Button
+                        key={i}
+                        variant="tertiary"
+                        size="sm"
+                        onPress={() =>
+                          void openWord(
+                            w.strongs!,
+                            w.surface,
+                            studyRef || currentRef,
+                          )
+                        }
+                      >
+                        {w.surface}
+                        <small>{w.strongs}</small>
+                      </Button>
+                    ))}
+                  {!contextLoading && contextWords.length === 0 && (
+                    <p className="muted small">
+                      No source-word analyses installed for this verse. Select a
+                      dictionary-linked word in the passage or browse a study
+                      resource.
+                    </p>
+                  )}
+                </div>
+              </details>
+            </>
+          )}
+          {live && !wordData ? (
+            <section className="empty-state study-empty-state" aria-label="Choose a word to study">
+              <BookOpenText size={32} aria-hidden="true" />
+              <h2>Choose a word to study</h2>
+              <p>Tap a linked word in Read to explore its meaning and occurrences, or choose a source word above.</p>
+              <Button variant="secondary" onPress={() => switchPage("Read")}>Go to Read</Button>
+            </section>
+          ) : <Tabs
+            selectedKey={studyTab}
+            onSelectionChange={(k) => setStudyTab(String(k))}
+          >
+            <Tabs.ListContainer>
+              <Tabs.List aria-label="Word study">
+                <Tabs.Tab id="meaning">
+                  Meaning
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+                <Tabs.Tab id="occurrences">
+                  Occurrences
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs.ListContainer>
+            <Tabs.Panel id="meaning">
+              {live && (wordData?.definitions.length || 0) > 1 && (
+                <div className="dictionary-choices">
+                  <div className="eyebrow">Dictionary source</div>
+                  <div className="flex flex-wrap gap-2">
+                    {wordData!.definitions.map((d) => (
+                      <Button
+                        key={d.id}
+                        size="sm"
+                        variant={definitionId === d.id ? "primary" : "tertiary"}
+                        aria-pressed={definitionId === d.id}
+                        onPress={() => void chooseDefinition(d.id)}
+                      >
+                        {d.title}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button
+                className={`word-card ${flipped ? "flipped" : ""}`}
+                onClick={() => setFlipped(!flipped)}
+                aria-label={flipped ? "Show Hebrew word" : "Show definition"}
+              >
+                <span className="word-card-rotor">
+                  <span className="word-face word-front" aria-hidden={flipped}>
+                    <span className="eyebrow">
+                      {live
+                        ? `${wordData?.code.startsWith("G") ? "GREEK" : "HEBREW"} HEADWORD`
+                        : "HEBREW HEADWORD"}
+                    </span>
+                    <span
+                      className={live && !wordData?.headwords[0]?.text ? "headword-unavailable" : "hebrew"}
+                      lang={live ? (wordData?.code.startsWith("G") ? "grc" : "he") : "he"}
+                      dir={live && (!wordData?.headwords[0]?.text || wordData.code.startsWith("G")) ? "ltr" : "rtl"}
+                    >
+                      {live
+                        ? wordData?.headwords[0]?.text ||
+                          "Headword unavailable"
+                        : "יְהֹוָה"}
+                    </span>
+                    <span className="transliteration">
+                      {live ? wordData?.headwords[0]?.transliteration : "Yehôvâh"}
+                    </span>
+                    <span className="word-card-footer">
+                      <span>
+                        {live
+                          ? `Reading selection: “${wordQuote}”`
+                          : "Reading selection: “LORD”"}
+                      </span>
+                      <span>↻ Meaning</span>
+                    </span>
+                  </span>
+                  <span className="word-face word-back" aria-hidden={!flipped}>
+                    <span className="eyebrow">
+                      {live
+                        ? `${definitionTitle || "Dictionary"} · ${wordData?.code || ""}`
+                        : "STRONG’S HEBREW DICTIONARY · H3068"}
+                    </span>
+                    <span className="definition-title">
+                      {live ? (
+                        definitionLoading ? (
+                          <span role="status">Loading definition…</span>
+                        ) : (
+                          definition.slice(0, 200) ||
+                          "No installed definition for this selection."
+                        )
+                      ) : (
+                        <>
+                          The self-Existent
+                          <br />
+                          or Eternal
+                        </>
+                      )}
+                    </span>
+                    <span className="word-card-footer">
+                      <span>
+                        {live
+                          ? definition.length > 200
+                            ? "Full entry below"
+                            : ""
+                          : "Jehovah, Jewish national name of God."}
+                      </span>
+                      <span>↶ Word</span>
+                    </span>
+                  </span>
+                </span>
+              </button>
+              {live && definition.length > 200 && (
+                <Card className="mt-5">
+                  <Card.Header>
+                    <Card.Title>
+                      {definitionTitle || "Full dictionary entry"}
+                    </Card.Title>
+                  </Card.Header>
+                  <Card.Content>
+                    <p className="resource-body">{definition}</p>
+                  </Card.Content>
+                </Card>
+              )}
+              <div className="section-row">
+                <h2>Keep exploring</h2>
+                <BookOpenText size={16} />
+              </div>
+              <Card>
+                <Card.Header>
+                  <Card.Title>Bring the meaning with you.</Card.Title>
+                  <Card.Description>
+                    Keep this definition beside your own observations.
+                  </Card.Description>
+                </Card.Header>
+                <Card.Footer>
+                  <Button
+                    variant="secondary"
+                    isDisabled={Boolean(
+                      live && (definitionLoading || !liveClips.length),
+                    )}
+                    onPress={() => {
+                      if (live) {
+                        newNote(wordQuote, studyRef || currentRef);
+                        setDraft((d) =>
+                          d
+                            ? {
+                                ...d,
+                                blocks: [...d.blocks, ...liveClips],
+                              }
+                            : null,
+                        );
+                        return;
+                      }
+                      newNote("LORD", "Proverbs 16:3");
+                      setDraft((d) =>
+                        d
+                          ? {
+                              ...d,
+                              blocks: [
+                                ...d.blocks,
+                                { ...samples[3], id: makeId() },
+                              ],
+                            }
+                          : null,
+                      );
+                    }}
+                  >
+                    <Plus size={16} />
+                    Collect in a note
+                  </Button>
+                </Card.Footer>
+              </Card>
+            </Tabs.Panel>
+            <Tabs.Panel id="occurrences">
+              {live && occurrenceLoading && (
+                <p role="status">Loading occurrences…</p>
+              )}
+              {live && occurrenceError && (
+                <div>
+                  <p role="alert">{occurrenceError}</p>
+                  <Button
+                    onPress={() => setOccurrenceRetry((value) => value + 1)}
+                  >
+                    Retry occurrences
+                  </Button>
+                </div>
+              )}
+              {(!live || liveOccurrences) && (
+                <>
+                  <Card className="mt-5">
+                    <Card.Header>
+                      <Card.Title>A word across the books</Card.Title>
+                      <Card.Description>
+                        {occurrences.total.toLocaleString()} distinct verses ·{" "}
+                        {live ? "Installed library" : "Source snapshot"}
+                      </Card.Description>
+                    </Card.Header>
+                    <Card.Content>
+                      <div
+                        className="occurrence-chart"
+                        role="img"
+                        aria-label="Distinct verses by book: top five books. Exact counts listed below."
+                      >
+                        <ResponsiveContainer width="100%" height={220}>
+                          <BarChart
+                            data={[...occurrences.books]
+                              .sort((a, b) => b.verses - a.verses)
+                              .slice(0, 5)}
+                            layout="vertical"
+                            margin={{ left: 0, right: 24 }}
+                          >
+                            <XAxis type="number" hide />
+                            <YAxis
+                              type="category"
+                              dataKey="name"
+                              width={100}
+                              tick={{
+                                fill: "var(--muted-ink)",
+                                fontSize: 12,
+                              }}
+                              axisLine={false}
+                              tickLine={false}
+                            />
+                            <Tooltip
+                              cursor={false}
+                              contentStyle={{
+                                background: "var(--paper)",
+                                color: "var(--ink)",
+                                borderRadius: 12,
+                              }}
+                            />
+                            <Bar
+                              dataKey="verses"
+                              name="Distinct verses"
+                              fill="var(--accent)"
+                              radius={[0, 6, 6, 0]}
+                              isAnimationActive={false}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <p className="muted small">
+                        Top five books · distinct verses
+                      </p>
+                      <OccurrenceExplorer
+                        key={`${live?.state.content_id || "sample"}:${live?.state.session.translation || "kjv"}:${wordData?.code || "H3068"}`}
+                        books={occurrences.books}
+                        loadPage={async (book, offset) => {
+                          if (!live)
+                            return {
+                              verses: occurrenceVerseSample.verses
+                                .filter(
+                                  (v) => Math.floor(v.ref_id / 1000000) === book,
+                                )
+                                .slice(offset, offset + 8),
+                              has_more: false,
+                            };
+                          const response = await run("study.occurrences", {
+                            code: wordData!.code,
+                            book_id: book,
+                            offset,
+                            limit: 20,
+                          });
+                          return response.data.occurrences as OccurrencePage;
+                        }}
+                        loadVerse={async ref => {
+                          if (!live) return occurrenceVerseSample.verses.find(v => v.ref_id === ref)?.text || "";
+                          const response = await run("reading.preview", {start_ref: ref, end_ref: ref});
+                          return (response.data.verses as {text: string}[]).map(v => v.text).join("\n\n");
+                        }}
+                        onRead={async destination => {
+                          if (live) await run("reading.select", { ref_id: destination });
+                          else {
+                            const index = passages.findIndex(p => p.book === Math.floor(destination / 1000000) && p.chapter === Math.floor(destination % 1000000 / 1000));
+                            if (index < 0) throw Error("This passage is not available in the sample library.");
+                            setPassageIndex(index);
+                          }
+                          closeWordStudy();
+                          setPage("Read");
+                          setSelection(null);
+                          setArrival(destination);
+                        }}
+                      />
+                    </Card.Content>
+                  </Card>
+                  <p className="muted small mt-4">
+                    {live
+                      ? "Distinct verses in the installed source text."
+                      : "Snapshot counts from the preview Study library. Live queries will use your installed library."}
+                  </p>
+                </>
+              )}
+            </Tabs.Panel>
+          </Tabs>}
+        </>
+      )}
+    </>
+  );
   return (
     <>
       {!live && (
@@ -1012,7 +1485,7 @@ export default function App({ live }: { live?: Live }) {
                         <div className="verse-row" key={ref} data-verse-refs={live ? live.state.passage[i].refs.join(" ") : `${p.book * 1000000 + p.chapter * 1000 + i + 1}`}>
                           <button
                             className="verse-number"
-                            aria-label={`Cross-references for ${ref}`}
+                            aria-label={`Resources for ${ref}`}
                             onClick={() =>
                               setCrossRef({
                                 id: live
@@ -1047,7 +1520,7 @@ export default function App({ live }: { live?: Live }) {
                             onContextMenu={(e) => {
                               endHold();
                               e.preventDefault();
-                              setSelection({
+                              setSelection((live && readSelection(live.state)) || {
                                 quote:
                                   window.getSelection()?.toString().trim() ||
                                   verse,
@@ -1117,289 +1590,7 @@ export default function App({ live }: { live?: Live }) {
               {page === "Study" && (
                 <section className="page-pad page-enter">
                   <StudySwitcher value={studyMode} onChange={setStudyMode} />
-                  {studyMode === "words" && <>
-                  <div className="page-heading">
-                    <div>
-                      <div className="eyebrow">CLOSER TO THE WORD</div>
-                      <h1>Word study</h1>
-                    </div>
-                    <Chip variant="soft" color="accent">
-                      {live ? wordData?.code || "Select a word" : "H3068"}
-                    </Chip>
-                  </div>
-                  <p className="muted intro-line">
-                    {live
-                      ? `From “${wordQuote}” · ${studyRef || currentRef}`
-                      : "From “LORD” · Proverbs 16:3"}
-                  </p>
-                  {live && (
-                    <>
-                      <details open={!wordData} className="study-word-chooser">
-                        <summary>Words in {currentRef}</summary>
-                        <div className="flex flex-wrap gap-2 mb-5">
-                          {contextWords
-                            .filter(
-                              (w, i, a) =>
-                                w.strongs &&
-                                a.findIndex(
-                                  (n) =>
-                                    n.position === w.position &&
-                                    n.strongs === w.strongs &&
-                                    n.surface === w.surface,
-                                ) === i,
-                            )
-                            .map((w, i) => (
-                              <Button
-                                key={i}
-                                variant="tertiary"
-                                size="sm"
-                                onPress={() =>
-                                  void openWord(w.strongs!, w.surface)
-                                }
-                              >
-                                {w.surface}
-                                <small>{w.strongs}</small>
-                              </Button>
-                            ))}
-                          {contextWords.length === 0 && (
-                            <p className="muted small">
-                              No source-word analyses installed for this verse.
-                              Select a dictionary-linked word in the passage or
-                              browse a study resource.
-                            </p>
-                          )}
-                        </div>
-                      </details>
-                    </>
-                  )}
-                  <Tabs
-                    selectedKey={studyTab}
-                    onSelectionChange={(k) => setStudyTab(String(k))}
-                  >
-                    <Tabs.ListContainer>
-                      <Tabs.List aria-label="Word study">
-                        <Tabs.Tab id="meaning">
-                          Meaning
-                          <Tabs.Indicator />
-                        </Tabs.Tab>
-                        <Tabs.Tab id="occurrences">
-                          Occurrences
-                          <Tabs.Indicator />
-                        </Tabs.Tab>
-                      </Tabs.List>
-                    </Tabs.ListContainer>
-                    <Tabs.Panel id="meaning">
-                      {live && (wordData?.definitions.length || 0) > 1 && <div className="dictionary-choices">
-                        <div className="eyebrow">Dictionary source</div>
-                        <div className="flex flex-wrap gap-2">{wordData!.definitions.map(d => <Button key={d.id} size="sm" variant={definitionId === d.id ? "primary" : "tertiary"} aria-pressed={definitionId === d.id} onPress={() => void chooseDefinition(d.id)}>{d.title}</Button>)}</div>
-                      </div>}
-
-                      <button
-                        className={`word-card ${flipped ? "flipped" : ""}`}
-                        onClick={() => setFlipped(!flipped)}
-                        aria-label={
-                          flipped ? "Show Hebrew word" : "Show definition"
-                        }
-                      >
-                        <span className="word-card-rotor">
-                          <span
-                            className="word-face word-front"
-                            aria-hidden={flipped}
-                          >
-                            <span className="eyebrow">
-                              {live
-                                ? `${wordData?.code.startsWith("G") ? "GREEK" : "HEBREW"} HEADWORD`
-                                : "HEBREW HEADWORD"}
-                            </span>
-                            <span className="hebrew" lang="he" dir="rtl">
-                              {live
-                                ? wordData?.headwords[0]?.text ||
-                                  "Choose a linked word in the passage"
-                                : "יְהֹוָה"}
-                            </span>
-                            <span className="transliteration">
-                              {live
-                                ? wordData?.headwords[0]?.transliteration
-                                : "Yehôvâh"}
-                            </span>
-                            <span className="word-card-footer">
-                              <span>
-                                {live
-                                  ? `Reading selection: “${wordQuote}”`
-                                  : "Reading selection: “LORD”"}
-                              </span>
-                              <span>↻ Meaning</span>
-                            </span>
-                          </span>
-                          <span
-                            className="word-face word-back"
-                            aria-hidden={!flipped}
-                          >
-                            <span className="eyebrow">
-                              {live
-                                ? `${definitionTitle || "Dictionary"} · ${wordData?.code || ""}`
-                                : "STRONG’S HEBREW DICTIONARY · H3068"}
-                            </span>
-                            <span className="definition-title">
-                              {live ? (
-                                definition.slice(0, 200) ||
-                                "No installed definition for this selection."
-                              ) : (
-                                <>
-                                  The self-Existent
-                                  <br />
-                                  or Eternal
-                                </>
-                              )}
-                            </span>
-                            <span className="word-card-footer">
-                              <span>
-                                {live
-                                  ? definition.length > 200
-                                    ? "Full entry below"
-                                    : ""
-                                  : "Jehovah, Jewish national name of God."}
-                              </span>
-                              <span>↶ Word</span>
-                            </span>
-                          </span>
-                        </span>
-                      </button>
-                      {live && definition.length > 200 && (
-                        <Card className="mt-5">
-                          <Card.Header>
-                            <Card.Title>{definitionTitle || "Full dictionary entry"}</Card.Title>
-                          </Card.Header>
-                          <Card.Content>
-                            <p className="resource-body">{definition}</p>
-                          </Card.Content>
-                        </Card>
-                      )}
-                      <div className="section-row">
-                        <h2>Keep exploring</h2>
-                        <BookOpenText size={16} />
-                      </div>
-                      <Card>
-                        <Card.Header>
-                          <Card.Title>Bring the meaning with you.</Card.Title>
-                          <Card.Description>
-                            Keep this definition beside your own observations.
-                          </Card.Description>
-                        </Card.Header>
-                        <Card.Footer>
-                          <Button
-                            variant="secondary"
-                            onPress={() => {
-                              if (live) {
-                                newNote(wordQuote, currentRef);
-                                setDraft((d) =>
-                                  d
-                                    ? {
-                                        ...d,
-                                        blocks: [...d.blocks, ...liveClips],
-                                      }
-                                    : null,
-                                );
-                                return;
-                              }
-                              newNote("LORD", "Proverbs 16:3");
-                              setDraft((d) =>
-                                d
-                                  ? {
-                                      ...d,
-                                      blocks: [
-                                        ...d.blocks,
-                                        { ...samples[3], id: makeId() },
-                                      ],
-                                    }
-                                  : null,
-                              );
-                            }}
-                          >
-                            <Plus size={16} />
-                            Collect in a note
-                          </Button>
-                        </Card.Footer>
-                      </Card>
-                    </Tabs.Panel>
-                    <Tabs.Panel id="occurrences">
-                      <Card className="mt-5">
-                        <Card.Header>
-                          <Card.Title>A word across the books</Card.Title>
-                          <Card.Description>
-                            {occurrences.total.toLocaleString()} distinct verses
-                            · {live ? "Installed library" : "Source snapshot"}
-                          </Card.Description>
-                        </Card.Header>
-                        <Card.Content>
-                          <div
-                            className="occurrence-chart"
-                            role="img"
-                            aria-label="Distinct verses by book: top five books. Exact counts listed below."
-                          >
-                            <ResponsiveContainer width="100%" height={220}>
-                              <BarChart
-                                data={[...occurrences.books].sort((a,b)=>b.verses-a.verses).slice(0, 5)}
-                                layout="vertical"
-                                margin={{ left: 0, right: 24 }}
-                              >
-                                <XAxis type="number" hide />
-                                <YAxis
-                                  type="category"
-                                  dataKey="name"
-                                  width={100}
-                                  tick={{
-                                    fill: "var(--muted-ink)",
-                                    fontSize: 12,
-                                  }}
-                                  axisLine={false}
-                                  tickLine={false}
-                                />
-                                <Tooltip
-                                  cursor={false}
-                                  contentStyle={{
-                                    background: "var(--paper)",
-                                    color: "var(--ink)",
-                                    borderRadius: 12,
-                                  }}
-                                />
-                                <Bar
-                                  dataKey="verses"
-                                  name="Distinct verses"
-                                  fill="var(--accent)"
-                                  radius={[0, 6, 6, 0]}
-                                  isAnimationActive={false}
-                                />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          </div>
-                          <p className="muted small">
-                            Top five books · distinct verses
-                          </p>
-                          <OccurrenceExplorer
-                            key={`${live?.state.content_id || "sample"}:${live?.state.session.translation || "kjv"}:${wordData?.code || "H3068"}`}
-                            books={occurrences.books}
-                            loadPage={async (book,offset) => {
-                              if (!live) return {verses:occurrenceVerseSample.verses.filter(v=>Math.floor(v.ref_id/1000000)===book).slice(offset,offset+8),has_more:false};
-                              const response=await run("study.occurrences",{code:wordData!.code,book_id:book,offset,limit:20});
-                              return response.data.occurrences as OccurrencePage;
-                            }}
-                            loadVerse={async ref => {
-                              if (!live) return occurrenceVerseSample.verses.find(v=>v.ref_id===ref)?.text || "";
-                              const response=await run("reading.preview",{start_ref:ref,end_ref:ref});
-                              return (response.data.verses as {text:string}[]).map(v=>v.text).join("\n\n");
-                            }}
-                          />
-                        </Card.Content>
-                      </Card>
-                      <p className="muted small mt-4">
-                        {live
-                          ? "Distinct verses in the installed source text."
-                          : "Snapshot counts from the preview Study library. Live queries will use your installed library."}
-                      </p>
-                    </Tabs.Panel>
-                  </Tabs>
-                  </>}
+                  {studyMode === "words" && !wordStudyOpen && wordStudyContent}
                   {studyMode !== "words" && <>
                     <div className="eyebrow">{studyMode === "topic" ? "NAVE’S TOPICAL BIBLE" : studyMode === "dictionary" ? "INSTALLED DICTIONARIES" : "INSTALLED COMMENTARIES"}</div>
                     <h1>{studyMode === "topic" ? "Topics" : studyMode === "dictionary" ? "Dictionaries" : "Commentary"}</h1>
@@ -1525,26 +1716,8 @@ export default function App({ live }: { live?: Live }) {
                     </p>
                   </section>
                 ) : (
-                  <section className="page-pad page-enter">
-                    <div className="page-heading">
-                      <div>
-                        <div className="eyebrow">A PLACE TO RETURN</div>
-                        <h1>Your notebook</h1>
-                      </div>
-                      <Chip size="sm" variant="soft">
-                        {notes.length}
-                      </Chip>
-                    </div>
-                    <p className="muted intro-line">
-                      Thoughts to keep. Passages to return to.
-                    </p>
-                    <Input
-                      aria-label="Search notes"
-                      placeholder="Find a thought or passage…"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="mb-5 w-full"
-                    />
+                  <section className="page-pad page-enter notes-page">
+                    <div className="page-heading"><h1>Your notebook</h1></div>
                     <Tabs
                       selectedKey={filter}
                       onSelectionChange={(k) => setFilter(String(k))}
@@ -1560,77 +1733,7 @@ export default function App({ live }: { live?: Live }) {
                         </Tabs.List>
                       </Tabs.ListContainer>
                       <Tabs.Panel id="notes">
-                        <div className="section-row">
-                          <span className="muted small">
-                            {visibleNotes.length} {visibleNotes.length === 1 ? "note" : "notes"}
-                          </span>
-                          <span className="muted small">Pinned & recent</span>
-                        </div>
-                        {visibleNotes.length ? (
-                          visibleNotes.map((n) => (
-                            <Card key={n.id} className="note-preview">
-                              <Card.Header>
-                                <div className="card-meta">
-                                  <span>{n.anchor}</span>
-                                  {n.pinned ? (
-                                    <Pin size={14} />
-                                  ) : (
-                                    <time title={n.updated}>{noteDate(n.updated)}</time>
-                                  )}
-                                </div>
-                                <Card.Title>
-                                  <button onClick={() => setNoteModal([n])}>
-                                    {n.title || "An observation"}
-                                  </button>
-                                </Card.Title>
-                              </Card.Header>
-                              <Card.Content>
-                                <button
-                                  className="note-open"
-                                  onClick={() => setNoteModal([n])}
-                                >
-                                  <p>
-                                    {n.blocks.find((b) => b.kind === "thought")
-                                      ?.text || n.quote}
-                                  </p>
-                                  <NoteContext quote={n.quote} anchor={n.anchor} live={live} />
-                                </button>
-                              </Card.Content>
-                              <Card.Footer>
-                                <span className="muted small">
-                                  {n.blocks.filter((b) => b.kind !== "thought")
-                                    .length > 0
-                                    ? `${n.blocks.filter((b) => b.kind !== "thought").length} collected pieces`
-                                    : "Personal note"}
-                                </span>
-                                <Button
-                                  isIconOnly
-                                  variant="ghost"
-                                  size="sm"
-                                  aria-label={`More actions for ${n.title}`}
-                                  onPress={() => {
-                                    setDeleteId(n.id);
-                                    setDialog("delete");
-                                  }}
-                                >
-                                  <MoreHorizontal size={18} />
-                                </Button>
-                              </Card.Footer>
-                            </Card>
-                          ))
-                        ) : (
-                          <div className="empty-state">
-                            <NotebookPen size={36} />
-                            <h2>Let a thought take root.</h2>
-                            <p>
-                              Keep a question, a prayer, or something you
-                              noticed.
-                            </p>
-                            <Button onPress={() => newNote()}>
-                              Write your first note
-                            </Button>
-                          </div>
-                        )}
+                        <OrganizedNotes notes={notes} live={live} onOpen={n=>setNoteModal([n])} onNew={()=>newNote()} onMore={n=>{setDeleteId(n.id);setDialog("delete");}} />
                       </Tabs.Panel>
                       <Tabs.Panel id="highlights">
                         <div className="pt-5 space-y-3">
@@ -1643,12 +1746,11 @@ export default function App({ live }: { live?: Live }) {
                                 );
                                 return (
                                   <Card key={a.id}>
-                                    <Card.Header>
-                                      <Card.Title>
+                                    <button className="highlight-open" aria-label={`Read ${label(live.state, a.start_ref)}`} onClick={() => void openHighlight(label(live.state, a.start_ref))}>
+                                      <span className="highlight-reference">
                                         {label(live.state, a.start_ref)}
-                                      </Card.Title>
-                                    </Card.Header>
-                                    <Card.Content>
+                                        <ArrowRight size={16} aria-hidden="true" />
+                                      </span>
                                       <span
                                         style={markCSS(
                                           h
@@ -1660,7 +1762,7 @@ export default function App({ live }: { live?: Live }) {
                                           .map((s) => s.quote)
                                           .join(" ") || "Whole verse highlight"}
                                       </span>
-                                    </Card.Content>
+                                    </button>
                                     <Card.Footer>
                                       <Button
                                         variant="ghost"
@@ -1679,10 +1781,8 @@ export default function App({ live }: { live?: Live }) {
                           ) : Object.entries(highlights).length ? (
                             Object.entries(highlights).map(([ref, quote]) => (
                               <Card key={ref}>
-                                <Card.Header>
-                                  <Card.Title>{ref}</Card.Title>
-                                </Card.Header>
-                                <Card.Content>
+                                <button className="highlight-open" aria-label={`Read ${ref}`} onClick={() => void openHighlight(ref)}>
+                                  <span className="highlight-reference">{ref}<ArrowRight size={16} aria-hidden="true" /></span>
                                   <span
                                     style={markCSS(
                                       highlightStyles[ref] || defaultMark,
@@ -1690,7 +1790,7 @@ export default function App({ live }: { live?: Live }) {
                                   >
                                     {quote}
                                   </span>
-                                </Card.Content>
+                                </button>
                                 <Card.Footer>
                                   <Button
                                     variant="ghost"
@@ -2023,7 +2123,7 @@ export default function App({ live }: { live?: Live }) {
                 <Plus size={24} />
               </Button>
             )}
-            {selection && page === "Read" && (
+            {page === "Read" && !dialog && !wordStudyOpen && <ReadingSelection key={readerKey} state={live?.state} seed={selection}>{(selection,snapshot,dismiss)=>(
               <div
                 className="selection-menu"
                 role="region"
@@ -2031,7 +2131,7 @@ export default function App({ live }: { live?: Live }) {
               >
                 <div className="selection-caption">
                   <div>
-                    <small>{selection.anchor}</small>
+                    <small>{selection.anchor}{live&&selection.endRef&&selection.endRef!==refId(live.state,selection.anchor)?` – ${label(live.state,selection.endRef)}`:""}</small>
                     <p>“{selection.quote}”</p>
                   </div>
                   <Button
@@ -2039,7 +2139,7 @@ export default function App({ live }: { live?: Live }) {
                     variant="ghost"
                     aria-label="Dismiss selection"
                     onPress={() => {
-                      setSelection(null);
+                      dismiss();setSelection(null);
                       window.getSelection()?.removeAllRanges();
                     }}
                   >
@@ -2050,24 +2150,33 @@ export default function App({ live }: { live?: Live }) {
                   <Button
                     variant="secondary"
                     fullWidth
-                    onPress={() => newNote()}
+                    onPress={() => {const selected=snapshot();newNote(selected.quote,selected.anchor,selected);}}
                   >
                     <NotebookPen size={18} /> Note
                   </Button>
                   <Button
                     fullWidth
                     onPress={() => {
+                      const selected=snapshot();setSelection(selected);
                       setMarkStyle(
-                        highlightStyles[selection.anchor] || defaultMark,
+                        highlightStyles[selected.anchor] || defaultMark,
                       );
+                      setHighlightRemovalError("");
                       setDialog("highlight");
                     }}
                   >
                     <Layers size={18} /> Highlight <ChevronRight size={14} />
                   </Button>
+                  <Button className="selection-share" aria-label="Share passage" variant="secondary" fullWidth onPress={()=>{
+                    const selected=snapshot();setSelection(selected);
+                    const edition=live?.state.translations.find(t=>t.id===live.state.session.translation);
+                    if(live && !edition) {showNotice("The selected translation's attribution is unavailable.");return;}
+                    setShareQuote({text:selected.quote,reference:selected.anchor+(selected.endRef&&live&&selected.endRef!==refId(live.state,selected.anchor)?` – ${label(live.state,selected.endRef)}`:""),source:edition?`${edition.name} (${edition.abbr})`:"King James Version (KJV)"});
+                    setDialog("share");
+                  }}><Share2 size={18}/><span className="selection-share-long">Share passage</span><span className="selection-share-short">Share</span></Button>
                 </div>
               </div>
-            )}
+            )}</ReadingSelection>}
             <nav className="bottom-nav" aria-label="Main navigation">
               {nav.map(({ page: next, icon: Icon }) => (
                 <Button
@@ -2108,11 +2217,36 @@ export default function App({ live }: { live?: Live }) {
           </aside>
         </div>
       </div>
+      <Sheet
+        title={`Word study${live && wordData ? ` · ${wordData.code}` : ""}`}
+        open={wordStudyOpen}
+        onClose={closeWordStudy}
+        edgeToEdge
+        closeLabel="Close word study"
+      >
+        <div className="word-study-content">{wordStudyContent}</div>
+      </Sheet>
       <CrossReferences
         reference={crossRef}
         onClose={() => setCrossRef(null)}
         live={live}
       />
+      <Sheet
+        title="Remove a highlight"
+        open={dialog === "remove-highlight"}
+        onClose={() => setDialog(null)}
+      >
+        <p className="muted small mb-4">Several highlights touch this selection. Choose the layer to remove; the other layers will stay.</p>
+        {highlightRemovalError && <p role="alert">{highlightRemovalError}</p>}
+        <div className="highlight-removal-list">
+          {removalChoices.map(choice => <Card key={choice.id}>
+            <Card.Header><Card.Title>{choice.title}</Card.Title><Card.Description>{choice.reference}</Card.Description></Card.Header>
+            <Card.Content><p className="highlight-removal-quote"><span style={markCSS(choice.style)}>{choice.quote}</span></p></Card.Content>
+            <Card.Footer><Button variant="ghost" isDisabled={removingHighlight !== null} onPress={() => void removeNativeHighlight(choice.id)}>Remove {choice.title}</Button></Card.Footer>
+          </Card>)}
+        </div>
+        {removingHighlight && <p role="status">Removing highlight…</p>}
+      </Sheet>
       <Sheet
         title="Highlight style"
         open={dialog === "highlight"}
@@ -2121,9 +2255,10 @@ export default function App({ live }: { live?: Live }) {
           <div className="highlight-footer">
             <Button
               variant="ghost"
+              isDisabled={removingHighlight !== null}
               onPress={() => {
                 if (live) {
-                  void applyHighlight(true);
+                  beginHighlightRemoval();
                   return;
                 }
                 if (selection)
@@ -2140,6 +2275,7 @@ export default function App({ live }: { live?: Live }) {
               Remove highlight
             </Button>
             <Button
+              isDisabled={removingHighlight !== null}
               onPress={() => {
                 if (live) {
                   void applyHighlight();
@@ -2170,12 +2306,15 @@ export default function App({ live }: { live?: Live }) {
           <small>
             {selection?.anchor} · {markStyle.symbol || markStyle.kind}
           </small>
-          <p>
+          <p tabIndex={0} role="region" aria-label="Selected Scripture preview">
             <span style={markCSS(markStyle)}>
               {selection?.quote || "Commit thy works unto the LORD"}
             </span>
           </p>
         </div>
+        {live && <p className="muted small mb-4">Different styles and study symbols can overlap. Remove finds highlights touching this selection and lets you choose a layer when needed.</p>}
+        {highlightRemovalError && <p role="alert">{highlightRemovalError}</p>}
+        {removingHighlight && <p role="status">Removing highlight…</p>}
         <div className="eyebrow mb-3">COLOR</div>
         <div className="color-choices">
           {markColors.map(([name, color]) => (
@@ -2325,6 +2464,8 @@ export default function App({ live }: { live?: Live }) {
                       <Button
                         key={i}
                         aria-label={`Chapter ${i + 1}`}
+                        variant={pickerBook === p.book && i + 1 === p.chapter ? "primary" : "tertiary"}
+                        aria-current={pickerBook === p.book && i + 1 === p.chapter ? "page" : undefined}
                         onPress={() => setPickerChapter(i + 1)}
                       >
                         {i + 1}
@@ -2494,128 +2635,12 @@ export default function App({ live }: { live?: Live }) {
           </Button>
         </div>
       </Sheet>
-      <Sheet
-        title="Explore your library"
-        open={dialog === "search"}
-        onClose={() => setDialog(null)}
-      >
-        <Input
-          className="w-full"
-          aria-label="Search preview library"
-          placeholder={
-            live
-              ? "Search Scripture and study resources…"
-              : "Find a book of the Bible…"
-          }
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        {live ? (
-          <>
-            <Button
-              className="mt-4"
-              isDisabled={!query.trim() || live.busy}
-              onPress={() => void searchLibrary()}
-            >
-              Search
-            </Button>
-            {searchResults.map((hit) => (
-              <Card key={hit.id} className="mt-3">
-                <Card.Header>
-                  <Card.Title>{hit.title}</Card.Title>
-                </Card.Header>
-                <Card.Content>
-                  <p>{hit.excerpt}</p>
-                </Card.Content>
-                <Card.Footer>
-                  <Button
-                    variant="secondary"
-                    onPress={() => {
-                      if (hit.ref_id)
-                        void run("reading.select", { ref_id: hit.ref_id })
-                          .then(() => {
-                            setDialog(null);
-                            setPage("Read");
-                          })
-                          .catch((e) => showNotice(String(e)));
-                      else void openArticle(hit.id);
-                    }}
-                  >
-                    Open
-                    <ArrowRight size={14} />
-                  </Button>
-                </Card.Footer>
-              </Card>
-            ))}
-            <div className="flex gap-2 mt-4">
-              <Button
-                isDisabled={!searchOffset}
-                onPress={() =>
-                  void searchLibrary(Math.max(0, searchOffset - 30))
-                }
-              >
-                Previous
-              </Button>
-              <Button
-                isDisabled={!searchMore}
-                onPress={() => void searchLibrary(searchOffset + 30)}
-              >
-                Next
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="space-y-3 mt-5">
-              {query ? (
-                books
-                  .filter((b) =>
-                    b.name.toLowerCase().includes(query.toLowerCase()),
-                  )
-                  .slice(0, 8)
-                  .map((b) => (
-                    <Button
-                      key={b.id}
-                      fullWidth
-                      variant="tertiary"
-                      onPress={() => {
-                        setDialog(null);
-                        setCover(b.id);
-                      }}
-                    >
-                      <BookOpen size={16} />
-                      {b.name}
-                      <ArrowRight size={16} />
-                    </Button>
-                  ))
-              ) : (
-                <>
-                  <p className="muted small">A few places to begin</p>
-                  {["Proverbs", "Psalms", "Genesis"].map((name) => (
-                    <Button
-                      key={name}
-                      variant="tertiary"
-                      fullWidth
-                      onPress={() => setQuery(name)}
-                    >
-                      {name}
-                      <ArrowRight size={16} />
-                    </Button>
-                  ))}
-                </>
-              )}
-            </div>
-            {query &&
-              !books.some((b) =>
-                b.name.toLowerCase().includes(query.toLowerCase()),
-              ) && (
-                <p className="muted mt-5">
-                  No matching books in this preview. Try “Genesis” or “Psalms”.
-                </p>
-              )}
-          </>
-        )}
-      </Sheet>
+      <ShareCard quote={dialog === "share"?shareQuote:null} onClose={()=>setDialog(null)}/>
+      <SearchWorkspace open={dialog === "search"} onClose={()=>setDialog(null)} live={live} onRead={async destination=>{
+        if(live) await run("reading.select",{ref_id:destination});
+        else {const index=passages.findIndex(p=>p.book===Math.floor(destination/1000000)&&p.chapter===Math.floor(destination%1000000/1000));if(index<0)throw Error("This passage is not available in the sample library.");setPassageIndex(index);}
+        setPage("Read");setSelection(null);setArrival(destination);
+      }}/>
       <Sheet
         title={cover ? books[cover - 1].name : ""}
         open={cover !== null}

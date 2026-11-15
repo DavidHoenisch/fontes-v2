@@ -981,6 +981,7 @@ if i>200{break;}}});
                                 .clicked()
                             {
                                 self.dispatch(Command::Search {
+ scope: Default::default(),
                                     query: self.query.clone(),
                                     offset: 0,
                                     limit: 20,

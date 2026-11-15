@@ -1,0 +1,15 @@
+.share-card-sheet .modal__heading { font: 26px/1.2 Lora,serif; }
+.share-card-sheet .sheet-eyebrow { font: 11px/1.4 Plex,sans-serif; letter-spacing:.12em; color:var(--muted-ink); }
+.share-card-sheet .sheet-description { margin-top:8px; font:14px/1.5 Plex,sans-serif; color:var(--muted-ink); }
+.share-card-preview { position:relative; width:100%; max-width:352px; margin:0 auto 24px; overflow:hidden; border-radius:12px; background:var(--art-wash); box-shadow:0 12px 32px #0002; }
+.share-card-preview canvas { display:block; width:100%; height:100%; }
+.share-card-preview > p { position:absolute; inset:40% 16px auto; text-align:center; color:var(--muted-ink); font-size:14px; }
+.share-card-backgrounds,.share-card-formats { padding:0; margin:0 0 20px; border:0; display:flex; gap:12px; min-width:0; }
+.share-card-backgrounds legend,.share-card-formats legend { margin-bottom:12px; font:500 13px Plex,sans-serif; }
+.share-card-backgrounds button { flex:1; min-width:0; border:2px solid transparent; padding:4px; border-radius:12px; text-align:left; background:transparent; color:var(--ink); cursor:pointer; }
+.share-card-backgrounds button[aria-pressed=true] { border-color:var(--accent); }
+.share-card-backgrounds img { width:100%; height:72px; object-fit:cover; border-radius:8px; }
+.share-card-backgrounds span { display:block; padding:8px 4px 4px; font:13px Plex,sans-serif; }
+.share-card-credit { color:var(--muted-ink); font:12px/1.6 Plex,sans-serif; }
+.share-card-formats .button { min-height:44px; }
+.share-card-sheet .modal__footer { display:flex; flex-direction:column; align-items:stretch; gap:8px; }

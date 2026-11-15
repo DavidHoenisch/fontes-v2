@@ -6,3 +6,12 @@
 **/node_modules/
 /apps/fontes-web/dist/
 *.tsbuildinfo
+
+# Connected dashboard: credentials and local build state
+/apps/fontes-site/.next/
+/apps/fontes-site/.env*
+!/apps/fontes-site/.env.example
+/apps/fontes-site/.neon
+/apps/fontes-site/.local/
+/apps/fontes-site/playwright-report/
+/apps/fontes-site/test-results/

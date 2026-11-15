@@ -138,11 +138,18 @@ impl Engine {
             annotations,
             highlights,
             notes,
+            note_organization: self.note_organization()?,
             saved,
             has_study: self.has_study,
         })
     }
-    pub(crate) fn search(&self, query: &str, limit: u32, offset: u32) -> Result<Data> {
+    pub(crate) fn search(
+        &self,
+        query: &str,
+        limit: u32,
+        offset: u32,
+        scope: SearchScope,
+    ) -> Result<Data> {
         if query.trim().is_empty()
             || query.len() > 512
             || !(1..=100).contains(&limit)
@@ -152,16 +159,52 @@ impl Engine {
                 "Enter 1–512 bytes of search text; limit 1–100, offset at most 10000.",
             ));
         }
+        // Resolve references without navigating or writing the reading session.
+        if scope != SearchScope::Resources && query.chars().any(|c| c.is_ascii_digit()) {
+            if let Ok(reference) = self.resolve(query) {
+                let row: Option<(String, String)> = self.content.query_row(
+                    "SELECT v.id,v.text FROM segment_refs sr CROSS JOIN verse_texts v ON v.segment_id=sr.segment_id AND v.translation_id=?2 WHERE sr.canonical_ref_id=?1 ORDER BY v.id LIMIT 1",
+                    params![reference, self.session.translation], |r| Ok((r.get(0)?,r.get(1)?)),
+                ).optional()?;
+                let hits = if offset == 0 {
+                    row.into_iter()
+                        .map(|(id, excerpt)| SearchHit {
+                            id,
+                            ref_id: Some(reference),
+                            title: label(&self.books, reference),
+                            excerpt,
+                        })
+                        .collect()
+                } else {
+                    vec![]
+                };
+                return Ok(Data::Search {
+                    hits,
+                    offset,
+                    has_more: false,
+                });
+            }
+        }
         // Literal AND terms, never executable FTS syntax. Quotes/operators in input remain literal.
         let terms = query
             .split_whitespace()
             .map(|term| format!("\"{}\"", term.replace('"', "\"\"")))
             .collect::<Vec<_>>()
             .join(" AND ");
-        let mut stmt=self.content.prepare("SELECT COALESCE(v.id,r.id), (SELECT min(sr.canonical_ref_id) FROM segment_refs sr WHERE sr.segment_id=v.segment_id), COALESCE(r.title,''), snippet(search_fts,0,'','',' … ',32) FROM search_fts JOIN search_documents d ON d.id=search_fts.rowid LEFT JOIN verse_texts v ON v.id=d.verse_text_id LEFT JOIN resources r ON r.id=d.resource_id WHERE search_fts MATCH ?1 AND (v.translation_id=?2 OR r.id IS NOT NULL) ORDER BY rank,d.id LIMIT ?3 OFFSET ?4")?;
+        let mut stmt=self.content.prepare("SELECT COALESCE(v.id,r.id), (SELECT min(sr.canonical_ref_id) FROM segment_refs sr WHERE sr.segment_id=v.segment_id), COALESCE(r.title,''), snippet(search_fts,0,'','',' … ',32) FROM search_fts JOIN search_documents d ON d.id=search_fts.rowid LEFT JOIN verse_texts v ON v.id=d.verse_text_id LEFT JOIN resources r ON r.id=d.resource_id WHERE search_fts MATCH ?1 AND (v.translation_id=?2 OR r.id IS NOT NULL) AND (?5='all' OR (?5='scripture' AND v.id IS NOT NULL) OR (?5='resources' AND r.id IS NOT NULL)) ORDER BY rank,d.id LIMIT ?3 OFFSET ?4")?;
         let mut hits = stmt
             .query_map(
-                params![terms, self.session.translation, limit + 1, offset],
+                params![
+                    terms,
+                    self.session.translation,
+                    limit + 1,
+                    offset,
+                    match scope {
+                        SearchScope::All => "all",
+                        SearchScope::Scripture => "scripture",
+                        SearchScope::Resources => "resources",
+                    }
+                ],
                 |r| {
                     let reference = r.get::<_, Option<i64>>(1)?;
                     Ok(SearchHit {
@@ -185,8 +228,12 @@ impl Engine {
     }
     pub(crate) fn context(&self, reference: i64) -> Result<Data> {
         let resources=self.content.prepare("SELECT r.id,r.title,r.author,r.type,l.link_type,CASE WHEN r.id LIKE 'resource:abbott-smith:%' THEN r.content ELSE substr(r.content,1,260) END FROM resources r JOIN resource_links l ON l.resource_id=r.id JOIN reference_ranges rr ON rr.id=l.range_id WHERE rr.start_ref_id<=?1 AND rr.end_ref_id>=?1 GROUP BY r.id,l.link_type ORDER BY CASE l.link_type WHEN 'applies_to' THEN 0 ELSE 1 END,min(rr.end_ref_id-rr.start_ref_id),r.type,r.title,r.id LIMIT 100")?.query_map([reference],summary)?.collect::<std::result::Result<Vec<_>,_>>()?;
-        let tokens=self.content.prepare("SELECT t.witness_id,t.position,t.surface,a.analysis_index,l.lemma,a.morph_system,a.morph_code,ts.strongs FROM original_tokens t JOIN segment_refs sr ON sr.segment_id=t.segment_id JOIN token_analyses a ON a.token_id=t.id LEFT JOIN lemmas l ON l.id=a.lemma_id LEFT JOIN token_strongs ts ON ts.token_id=a.token_id AND ts.analysis_index=a.analysis_index WHERE sr.canonical_ref_id=?1 ORDER BY t.witness_id,t.position,a.analysis_index,ts.strongs LIMIT 2000")?.query_map([reference],|r|Ok(TokenAnalysis{witness:r.get(0)?,position:r.get(1)?,surface:r.get(2)?,analysis_index:r.get(3)?,lemma:r.get(4)?,morph_system:r.get(5)?,morph_code:r.get(6)?,strongs:r.get(7)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
-        let cross_references = self.content.prepare("SELECT target_range.start_ref_id,target_range.end_ref_id,min(target.resource_id),(SELECT text FROM verses_by_reference v WHERE v.canonical_ref_id=target_range.start_ref_id AND v.translation_id=?2 ORDER BY v.id LIMIT 1) FROM resource_links origin JOIN reference_ranges coverage ON coverage.id=origin.range_id JOIN resources r ON r.id=origin.resource_id JOIN resource_links target ON target.resource_id=r.id JOIN reference_ranges target_range ON target_range.id=target.range_id WHERE r.type='cross_reference' AND origin.link_type='applies_to' AND coverage.start_ref_id<=?1 AND coverage.end_ref_id>=?1 AND target.link_type='cross_reference' GROUP BY target_range.start_ref_id,target_range.end_ref_id ORDER BY min(coverage.end_ref_id-coverage.start_ref_id),target_range.start_ref_id,target_range.end_ref_id LIMIT 100")?.query_map(params![reference, self.session.translation], |r| {
+        // Start with the requested canonical verse. The segment witness enables the
+        // existing (witness, segment, position) token index instead of scanning analyses.
+        let tokens=self.content.prepare("SELECT t.witness_id,t.position,t.surface,a.analysis_index,l.lemma,a.morph_system,a.morph_code,ts.strongs FROM segment_refs sr CROSS JOIN source_segments segment ON segment.id=sr.segment_id CROSS JOIN original_tokens t ON t.witness_id=segment.witness_id AND t.segment_id=segment.id CROSS JOIN token_analyses a ON a.token_id=t.id LEFT JOIN lemmas l ON l.id=a.lemma_id LEFT JOIN token_strongs ts ON ts.token_id=a.token_id AND ts.analysis_index=a.analysis_index WHERE sr.canonical_ref_id=?1 ORDER BY t.witness_id,t.position,a.analysis_index,ts.strongs LIMIT 2000")?.query_map([reference],|r|Ok(TokenAnalysis{witness:r.get(0)?,position:r.get(1)?,surface:r.get(2)?,analysis_index:r.get(3)?,lemma:r.get(4)?,morph_system:r.get(5)?,morph_code:r.get(6)?,strongs:r.get(7)?}))?.collect::<std::result::Result<Vec<_>,_>>()?;
+        // Keep coverage and target-text lookups on their existing range/reference
+        // indexes; planner reordering otherwise scans every source link/edition.
+        let cross_references = self.content.prepare("SELECT target_range.start_ref_id,target_range.end_ref_id,min(target.resource_id),(SELECT v.text FROM segment_refs sr CROSS JOIN verse_texts v ON v.segment_id=sr.segment_id AND v.translation_id=?2 WHERE sr.canonical_ref_id=target_range.start_ref_id ORDER BY v.id LIMIT 1) FROM reference_ranges coverage CROSS JOIN resource_links origin ON origin.range_id=coverage.id CROSS JOIN resources r ON r.id=origin.resource_id CROSS JOIN resource_links target ON target.resource_id=r.id CROSS JOIN reference_ranges target_range ON target_range.id=target.range_id WHERE r.type='cross_reference' AND origin.link_type='applies_to' AND coverage.start_ref_id<=?1 AND coverage.end_ref_id>=?1 AND target.link_type='cross_reference' GROUP BY target_range.start_ref_id,target_range.end_ref_id ORDER BY min(coverage.end_ref_id-coverage.start_ref_id),target_range.start_ref_id,target_range.end_ref_id LIMIT 100")?.query_map(params![reference, self.session.translation], |r| {
             let start_ref = r.get(0)?;
             let end_ref = r.get(1)?;
             let title = if start_ref == end_ref { label(&self.books, start_ref) } else { format!("{} – {}", label(&self.books, start_ref), label(&self.books, end_ref)) };

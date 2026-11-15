@@ -1,0 +1,75 @@
+@font-face { font-family: Plex; src: url('../../assets/ui/fonts/IBMPlexSans-Regular.ttf'); font-weight: 400; }
+@font-face { font-family: Plex; src: url('../../assets/ui/fonts/IBMPlexSans-Medium.ttf'); font-weight: 500 700; }
+@font-face { font-family: Lora; src: url('../../assets/ui/fonts/Lora-Regular.ttf'); }
+@font-face { font-family: Literary; src: url('../../assets/ui/fonts/CormorantGaramond-Italic.ttf'); font-style: italic; }
+
+:root { color-scheme: light; --canvas: #eeefed; --paper: #fbfaf7; --ink: #292c30; --secondary: #6e716e; --rule: #dedfd9; --teal: #087b72; --button-ink: #fffdf7; }
+:root[data-theme="dark"] { color-scheme: dark; --canvas: #101214; --paper: #16181b; --ink: #eeece7; --secondary: #a7a8aa; --rule: #313338; --teal: #8fc7c0; --button-ink: #16181b; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--canvas); font: 14px/1.5 Plex, sans-serif; }
+button, select { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible, a:focus-visible, .reader:focus-visible { outline: 2px solid var(--teal); outline-offset: 5px; }
+.workspace { display: grid; grid-template-columns: minmax(0, 350px) minmax(0, 390px); justify-content: center; align-items: center; gap: clamp(48px, 8vw, 120px); padding: 48px 32px; min-height: 100dvh; }
+.brand { font: italic 34px/1 Literary, Georgia, serif; color: var(--teal); text-decoration: none; }
+h1 { font: italic 46px/1.08 Literary, Georgia, serif; margin: 24px 0 12px; }
+.introduction { margin: 0; color: var(--secondary); }
+.choices { display: grid; margin: 32px 0; }
+.choice { position: relative; text-align: left; border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; padding: 16px 28px 16px 0; background: transparent; color: var(--secondary); }
+.choice[aria-pressed="true"] { color: var(--ink); }
+.choice[aria-pressed="true"]::after { content: ''; position: absolute; right: 4px; top: 25px; width: 5px; height: 5px; border-radius: 50%; background: var(--teal); }
+.choice-title { display: block; font-size: 17px; font-weight: 500; margin-bottom: 5px; }
+.choice-description { display: block; font-size: 13px; }
+.preview-controls > label { display: block; margin-bottom: 8px; font-size: 12px; color: var(--secondary); }
+.destination-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+select, .play { min-height: 44px; border-radius: 24px; padding: 10px 14px; }
+select { min-width: 0; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); }
+.play { color: var(--button-ink); background: var(--teal); border: 1px solid var(--teal); }
+.toggles { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+.toggles label, .preview-controls .theme-label { display: flex; gap: 7px; align-items: center; min-height: 32px; font-size: 12px; color: var(--secondary); }
+.preview-controls .theme-label { margin: 4px 0 0; }
+input { accent-color: var(--teal); width: 16px; height: 16px; margin: 0; }
+.playback { color: var(--secondary); font-size: 12px; min-height: 36px; margin: 24px 0 0; }
+.prototype-note { color: var(--secondary); font-size: 11px; margin: 8px 0 0; }
+.preview { min-width: 0; }
+.phone { height: 720px; border: 1px solid var(--rule); background: var(--paper); border-radius: 28px; display: flex; flex-direction: column; overflow: hidden; scroll-margin-top: 20px; }
+.phone-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--rule); min-height: 65px; flex-shrink: 0; }
+.reference { font-weight: 500; }
+.edition { color: var(--secondary); font-size: 12px; }
+.reader { padding: 32px 26px 180px; overflow-y: auto; flex: 1; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--rule) transparent; overscroll-behavior: contain; }
+.reader h2 { font: italic 44px/1 Literary, Georgia, serif; margin: 0 0 12px; }
+.chapter { margin: 0 0 32px; color: var(--secondary); font-size: 12px; }
+.verses { display: grid; gap: 28px; }
+.verse { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 12px; }
+.verse-number { font-size: 11px; padding-top: 8px; color: var(--secondary); }
+.verse-text { margin: 0; font: 20px/1.85 Lora, Georgia, serif; transform-origin: left center; }
+.phone-footer { padding: 20px 8px; display: flex; justify-content: space-around; flex-shrink: 0; border-top: 1px solid var(--rule); color: var(--secondary); font-size: 12px; }
+.phone-footer .active { color: var(--teal); font-weight: 500; }
+
+/* The text returns to its exact original rendering. Adjacent verses never animate. */
+.playing[data-effect="settle"] .target .verse-text { animation: text-settle var(--duration) cubic-bezier(.22, 1, .36, 1) both; }
+.playing[data-effect="resolve"] .target .verse-text { animation: text-resolve var(--duration) cubic-bezier(.22, 1, .36, 1) both; }
+.playing[data-effect="combined"] .target .verse-text { animation: text-combined var(--duration) linear both; }
+@keyframes text-settle { from { opacity: .62; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes text-resolve { from { opacity: .68; filter: blur(1.4px); } to { opacity: 1; filter: blur(0); } }
+@keyframes text-combined {
+  0% { opacity: .52; transform: translateY(6px); filter: blur(1.6px); }
+  25% { opacity: .82; transform: translateY(3.5px); filter: blur(.9px); }
+  60% { opacity: 1; transform: translateY(.5px); filter: blur(.22px); }
+  85% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.reduced .playing .target .verse-text { animation: none; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .playing .target .verse-text { animation: none !important; font-weight: 600; } }
+@media (max-width: 780px) {
+  .workspace { grid-template-columns: minmax(0, 390px); padding: 24px 20px 40px; gap: 32px; }
+  .directions { width: 100%; }
+  h1 { font-size: 40px; margin-top: 16px; }
+  .choices { margin: 20px 0; }
+  .phone { height: 650px; }
+}
+@media (max-width: 380px) {
+  .workspace { padding-inline: 16px; }
+  .reader { padding-inline: 20px; }
+  .verse-text { font-size: 19px; }
+}

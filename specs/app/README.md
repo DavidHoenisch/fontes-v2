@@ -9,7 +9,7 @@ Initial implemented contract, separate from snapshot update-protocol v1 and draf
 | `reading.select` | `ref_id: integer`; select an actual canonical anchor and its chapter |
 | `reading.chapter` | `delta: -1 or 1`; chapter movement across books; refuse movement beyond canon |
 | `reading.translation` | installed translation `id`; retain canonical selection/annotations |
-| `search.query` | `query`, optional `limit` (default 30, 1–100), `offset` (default 0, 0–10000); literal AND terms |
+| `search.query` | `query`, optional `scope` (`all` default, `scripture`, `resources`), `limit` (default 30, 1–100), `offset` (default 0, 0–10000); literal AND terms with active-edition Scripture; All/Scripture also resolve supported reference-shaped queries read-only |
 | `study.context` | `ref_id`; up to 100 typed article matches, 2,000 source analysis/Strong's rows and 100 distinct cross-reference ranges |
 | `study.resource` | article `id`; full plain text, source/rights-review and up to 500 typed links |
 | `study.word` | `code`, e.g. G25/G0025 or H7225; definitions and first 100 distinct canonical occurrence locations, total count |
@@ -26,6 +26,8 @@ Context additionally includes `cross_references` (default empty in older seriali
 Word results additionally include `headwords` (default empty when reading older responses), with `resource_id`, exact source-supplied `text` and optional `transliteration`. These come only from a definition-linked resource's structured `dictionary_entry` display metadata. Missing, blank, malformed or differently typed metadata yields no headword and does not hide definitions. A dictionary headword is not an inferred verse lemma or English alignment. Existing command inputs, IDs, SQL and protocol version are unchanged.
 
 Unknown commands/arguments and wrong types are rejected. Reference IDs must actually exist, not merely satisfy their arithmetic shape. `start_ref <= end_ref`; notes need nonblank text (maximum 100,000 UTF-8 bytes), highlights need a color. Legacy `annotation.save` colors are `amber`, `sage`, `blue`, `rose`. The additive `highlight.save` command supports richer styles and exact edition-bound selection; see [rich highlights v1](highlights-v1.md). Text size is 16–36 inclusive and line spacing 1.2–2.2 inclusive; nonfinite numbers are invalid. References are at most 256 UTF-8 bytes and search text at most 512. Exact names/OSIS/USFM are preferred; other prefixes must resolve uniquely. Explicit shorthand aliases are `j`/`jn` → John and `psalm` → Psalms; `Jo` remains ambiguous. A book without numbers opens chapter 1, verse 1. Range notation/natural-language questions are not reference-parser syntax in this slice.
+
+Search workspace refinement (2026-11-04): scope applies before paging, and a successfully parsed reference containing a digit returns the actual active-edition verse without changing the reading session. Resources scope retains literal text search. Missing text is not invented; failed reference parsing falls back to literal search. Omitted scope is backward compatible; new clients require the paired engine accepting scope. No SQL or user-data migration. See [interaction behavior, compatibility and verification](../../docs/app/search-workspace.md).
 
 ## First-run bootstrap
 

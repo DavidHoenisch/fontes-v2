@@ -377,6 +377,7 @@ fn literal_search_filters_translation_and_pages_stably() {
     let mut e = f.engine();
     let Data::Search { hits, has_more, .. } = e
         .dispatch(Command::Search {
+            scope: Default::default(),
             query: "God".into(),
             limit: 1,
             offset: 0,
@@ -391,6 +392,7 @@ fn literal_search_filters_translation_and_pages_stably() {
     assert!(!has_more);
     let Data::Search { hits, has_more, .. } = e
         .dispatch(Command::Search {
+            scope: Default::default(),
             query: "love".into(),
             limit: 1,
             offset: 0,
@@ -404,6 +406,7 @@ fn literal_search_filters_translation_and_pages_stably() {
     assert!(has_more);
     for q in ["\" OR *", "NEAR(foo)", "' OR 1=1 --"] {
         let result = e.dispatch(Command::Search {
+            scope: Default::default(),
             query: q.into(),
             limit: 10,
             offset: 0,
@@ -420,7 +423,7 @@ fn transports_share_dispatch_and_reject_invalid_arguments() {
         catalog,
         serde_json::from_str::<Value>(include_str!("../../../specs/app/commands-v1.json")).unwrap()
     );
-    assert_eq!(catalog["commands"].as_array().unwrap().len(), 19);
+    assert_eq!(catalog["commands"].as_array().unwrap().len(), 22);
     for value in [
         json!({"command":"reading.select","params":{"ref_id":"wrong"}}),
         json!({"command":"workspace.get","params":{"unexpected":true}}),
@@ -478,7 +481,7 @@ fn transports_share_dispatch_and_reject_invalid_arguments() {
         .collect::<Vec<_>>();
     assert_eq!(replies.len(), 3);
     assert_eq!(replies[0]["result"]["protocolVersion"], "2025-06-18");
-    assert_eq!(replies[1]["result"]["tools"].as_array().unwrap().len(), 19);
+    assert_eq!(replies[1]["result"]["tools"].as_array().unwrap().len(), 22);
     assert_eq!(
         replies[2]["result"]["structuredContent"]["state"]["session"]["selected_ref"],
         43003016
@@ -1385,4 +1388,134 @@ fn additional_dictionaries_keep_multiple_definitions_and_cited_articles() {
     assert_eq!(resource.content, "ἀγαπάω To love with source attribution.");
     assert!(!resource.content.contains("<"));
     assert!(resource.links.iter().any(|l| l.start_ref == Some(43003016)));
+}
+
+#[test]
+fn note_folders_and_tags_survive_reopen_and_folder_removal() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    let r = e
+        .dispatch(Command::SaveAnnotation {
+            id: None,
+            start_ref: 43003016,
+            end_ref: 43003016,
+            kind: AnnotationKind::Note,
+            color: None,
+            content: Some("Keep my words".into()),
+        })
+        .unwrap();
+    let Data::SavedAnnotation { id } = r.data else {
+        panic!()
+    };
+    assert!(r.state.note_organization.entries.is_empty());
+    let r = e
+        .dispatch(Command::SaveNoteFolder {
+            id: None,
+            name: "Sermons".into(),
+        })
+        .unwrap();
+    let folder = r.state.note_organization.folders[0].id.clone();
+    let change = NoteOrganizationChange {
+        note_id: id.clone(),
+        folder_id: Some(folder.clone()),
+        tags: vec![" Grace ".into(), "#grace".into(), "prayer".into()],
+    };
+    e.dispatch(Command::OrganizeNotes {
+        changes: vec![change.clone()],
+    })
+    .unwrap();
+    // Invalid batch must roll back valid changes made earlier in that batch.
+    let mut invalid = change.clone();
+    invalid.note_id = "missing".into();
+    let mut changed = change;
+    changed.tags = vec!["wrong".into()];
+    assert!(
+        e.dispatch(Command::OrganizeNotes {
+            changes: vec![changed, invalid]
+        })
+        .is_err()
+    );
+    drop(e);
+    let mut e = f.engine();
+    let w = e.workspace().unwrap();
+    assert_eq!(w.note_organization.entries[0].tags, vec!["grace", "prayer"]);
+    assert_eq!(w.annotations[0].content.as_deref(), Some("Keep my words"));
+    let w = e
+        .dispatch(Command::DeleteNoteFolder { id: folder })
+        .unwrap()
+        .state;
+    assert!(w.note_organization.folders.is_empty());
+    assert_eq!(w.note_organization.entries[0].folder_id, None);
+    assert_eq!(w.note_organization.entries[0].tags, vec!["grace", "prayer"]);
+    assert_eq!(w.annotations[0].id, id);
+    e.dispatch(Command::DeleteAnnotation { id }).unwrap();
+    assert!(e.workspace().unwrap().note_organization.entries.is_empty());
+}
+
+#[test]
+fn scoped_search_and_reference_lookup_preserve_reading_state() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    let before = serde_json::to_value(e.workspace().unwrap().session).unwrap();
+    for (scope, query, expected) in [
+        (SearchScope::Scripture, "God", Some("kjv16")),
+        (SearchScope::Resources, "love", Some("mh")),
+    ] {
+        let Data::Search { hits, .. } = e
+            .dispatch(Command::Search {
+                query: query.into(),
+                scope,
+                limit: 1,
+                offset: 0,
+            })
+            .unwrap()
+            .data
+        else {
+            panic!()
+        };
+        assert_eq!(hits.len(), 1);
+        if scope == SearchScope::Scripture {
+            assert_eq!(hits[0].id, expected.unwrap());
+            assert!(hits[0].ref_id.is_some());
+        } else {
+            assert!(hits[0].ref_id.is_none());
+        }
+    }
+    for reference in ["John 3:16", "j3 16", "Jn3:16"] {
+        let Data::Search { hits, has_more, .. } = e
+            .dispatch(Command::Search {
+                query: reference.into(),
+                scope: SearchScope::All,
+                limit: 10,
+                offset: 0,
+            })
+            .unwrap()
+            .data
+        else {
+            panic!()
+        };
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].ref_id, Some(43003016));
+        assert_eq!(hits[0].excerpt, "For God so loved the world.");
+        assert!(!has_more);
+    }
+    assert_eq!(
+        before,
+        serde_json::to_value(e.workspace().unwrap().session).unwrap()
+    );
+    let legacy: Command =
+        serde_json::from_value(json!({"command":"search.query","params":{"query":"God"}})).unwrap();
+    assert!(matches!(
+        legacy,
+        Command::Search {
+            scope: SearchScope::All,
+            ..
+        }
+    ));
+    assert!(
+        serde_json::from_value::<Command>(
+            json!({"command":"search.query","params":{"query":"God","scope":"invalid"}})
+        )
+        .is_err()
+    );
 }

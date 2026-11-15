@@ -1,0 +1,50 @@
+{
+  "name": "@fontes/site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 3000",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "db:seed": "node --env-file=.env.local scripts/seed.mjs",
+    "test:api": "node --env-file=.env.local scripts/smoke.mjs",
+    "test:production-auth": "node --env-file=.env.local scripts/check-production-auth.mjs",
+    "test:intake": "node --env-file=.env.local scripts/smoke-intake.mjs",
+    "test:organizations": "node --env-file=.env.local scripts/smoke-organizations.mjs",
+    "test:epub-review": "node --env-file=.env.local scripts/smoke-epub-review.mjs",
+    "test:publisher-review": "node --env-file=.env.local scripts/smoke-publisher-review.mjs",
+    "test:source-review": "node --env-file=.env.local scripts/smoke-source-review.mjs"
+  },
+  "dependencies": {
+    "@heroui/react": "3.2.6",
+    "@heroui/styles": "3.2.6",
+    "@neondatabase/auth": "0.6.0-beta",
+    "@neondatabase/serverless": "1.2.0",
+    "fast-xml-parser": "5.11.2",
+    "lucide-react": "^0.468.0",
+    "next": "16.4.2",
+    "parse5": "8.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "server-only": "^0.0.1",
+    "sharp": "0.35.5",
+    "yauzl": "3.4.0",
+    "yazl": "3.3.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/yauzl": "3.4.0",
+    "@types/yazl": "3.3.1",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}

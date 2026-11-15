@@ -3,6 +3,15 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SearchScope {
+    #[default]
+    All,
+    Scripture,
+    Resources,
+}
+
 /// IDs and argument names are the v1 frontend contract. No toolkit types cross this boundary.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "command", content = "params", deny_unknown_fields)]
@@ -28,6 +37,8 @@ pub enum Command {
     #[serde(rename = "search.query")]
     Search {
         query: String,
+        #[serde(default)]
+        scope: SearchScope,
         #[serde(default = "default_limit")]
         limit: u32,
         #[serde(default)]
@@ -59,6 +70,14 @@ pub enum Command {
         color: Option<String>,
         #[serde(default)]
         content: Option<String>,
+    },
+    #[serde(rename = "note.folder.save")]
+    SaveNoteFolder { id: Option<String>, name: String },
+    #[serde(rename = "note.folder.delete")]
+    DeleteNoteFolder { id: String },
+    #[serde(rename = "note.organize")]
+    OrganizeNotes {
+        changes: Vec<crate::NoteOrganizationChange>,
     },
     #[serde(rename = "note.passage")]
     NotePassage { ref_id: i64 },
@@ -113,6 +132,11 @@ pub fn command_catalog() -> Value {
 }
 fn description(id: &str) -> &'static str {
     match id {
+        "note.folder.save" => "Create or rename a local note folder.",
+        "note.folder.delete" => {
+            "Remove a folder, moving its notes to Inbox without deleting notes or tags."
+        }
+        "note.organize" => "Atomically move and tag up to 200 existing notes.",
         "note.passage" => {
             "Preview the exact active-edition verse for a note without changing the reading session."
         }

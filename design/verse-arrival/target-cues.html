@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fontes · Target verse animation wireframes</title>
+    <link rel="stylesheet" href="target-cues.css">
+    <script src="target-cues.js" defer></script>
+  </head>
+  <body>
+    <header class="study-header">
+      <div>
+        <a class="brand" href="index.html">fontes</a>
+        <h1>Finding your place</h1>
+        <p>Three arrival cues. The surrounding Scripture stays unchanged.</p>
+      </div>
+      <button id="theme" class="control" type="button" aria-pressed="false">Dark appearance</button>
+    </header>
+
+    <main>
+      <form id="navigation" class="study-controls" aria-label="Preview navigation">
+        <label class="reference-label" for="destination">Navigate to
+          <select id="destination" name="destination">
+            <option value="2">Proverbs 16:2</option>
+            <option value="3" selected>Proverbs 16:3</option>
+            <option value="4">Proverbs 16:4</option>
+            <option value="5">Proverbs 16:5</option>
+          </select>
+        </label>
+        <button class="control primary" type="submit">Play all three</button>
+        <label class="motion-label"><input id="reduced" type="checkbox"> Preview reduced motion</label>
+        <p class="system-motion" id="system-motion" hidden>System reduced motion is on.</p>
+      </form>
+
+      <div class="studies">
+        <section class="study" data-effect="wash" aria-labelledby="wash-title">
+          <div class="study-heading"><h2 id="wash-title">Soft arrival wash</h2><button class="control replay" type="button" aria-label="Replay soft arrival wash">Replay</button></div>
+          <p class="study-description">A tint appears behind the entire target verse, then fades.</p>
+          <div class="phone" aria-label="Soft arrival wash reading wireframe">
+            <div class="phone-header"><span class="phone-reference">Proverbs 16:3</span><span class="edition">KJV</span></div>
+            <div class="reader" tabindex="0" role="region" aria-label="Soft arrival wash Scripture preview"></div>
+            <div class="phone-footer" aria-hidden="true"><span class="current">Read</span><span>Study</span><span>Notes</span><span>Library</span></div>
+          </div>
+        </section>
+
+        <section class="study" data-effect="beacon" aria-labelledby="beacon-title">
+          <div class="study-heading"><h2 id="beacon-title">Margin beacon</h2><button class="control replay" type="button" aria-label="Replay margin beacon">Replay</button></div>
+          <p class="study-description">A fine bar draws beside the target and accents its number.</p>
+          <div class="phone" aria-label="Margin beacon reading wireframe">
+            <div class="phone-header"><span class="phone-reference">Proverbs 16:3</span><span class="edition">KJV</span></div>
+            <div class="reader" tabindex="0" role="region" aria-label="Margin beacon Scripture preview"></div>
+            <div class="phone-footer" aria-hidden="true"><span class="current">Read</span><span>Study</span><span>Notes</span><span>Library</span></div>
+          </div>
+        </section>
+
+        <section class="study" data-effect="sweep" aria-labelledby="sweep-title">
+          <div class="study-heading"><h2 id="sweep-title">Reading-start sweep</h2><button class="control replay" type="button" aria-label="Replay reading-start sweep">Replay</button></div>
+          <p class="study-description">A short underline leads into the opening words of the verse.</p>
+          <div class="phone" aria-label="Reading-start sweep reading wireframe">
+            <div class="phone-header"><span class="phone-reference">Proverbs 16:3</span><span class="edition">KJV</span></div>
+            <div class="reader" tabindex="0" role="region" aria-label="Reading-start sweep Scripture preview"></div>
+            <div class="phone-footer" aria-hidden="true"><span class="current">Read</span><span>Study</span><span>Notes</span><span>Library</span></div>
+          </div>
+        </section>
+      </div>
+      <p class="study-note">Design wireframes only. Cues last three seconds and leave no mark. The app’s current arrival animation is unchanged.</p>
+      <p id="playback-status" role="status" aria-live="polite">Choose a verse and play a cue.</p>
+    </main>
+  </body>
+</html>

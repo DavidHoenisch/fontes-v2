@@ -7,6 +7,23 @@ use std::{
     },
 };
 use tauri::{Manager, State};
+mod haptics;
+mod sharing;
+
+#[tauri::command]
+async fn share_verse_image(
+    webview: tauri::WebviewWindow,
+    data_url: String,
+    caption: String,
+) -> Result<(), String> {
+    sharing::share(&webview, data_url, caption)
+}
+
+#[tauri::command]
+fn verse_arrival_haptic(webview: tauri::WebviewWindow) -> Result<(), String> {
+    haptics::arrival(&webview)
+}
+
 struct Backend {
     host: Mutex<worker::Host>,
     data_dir: PathBuf,
@@ -188,7 +205,9 @@ pub fn run() {
             library_install,
             library_check_update,
             library_update,
-            library_cancel_update
+            library_cancel_update,
+            verse_arrival_haptic,
+            share_verse_image
         ])
         .run(tauri::generate_context!())
         .expect("Fontes startup failed");

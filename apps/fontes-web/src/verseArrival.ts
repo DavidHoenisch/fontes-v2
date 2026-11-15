@@ -1,17 +1,25 @@
-// One transient spotlight per chapter; replacing it restores every previous row.
-export function spotlightVerse(verse: HTMLElement) {
+export const VERSE_ARRIVAL_MS = 1600;
+const activeArrivals = new WeakMap<HTMLElement, () => void>();
+
+// Replacing or cancelling an arrival restores the original text and annotations.
+export function arriveAtVerse(verse: HTMLElement, onArrival?: () => void | Promise<void>) {
   const list = verse.parentElement;
-  if (!list) return () => {};
-  list.classList.remove("spotlight-active");
-  list.querySelectorAll(".verse-arrival").forEach(v => v.classList.remove("verse-arrival"));
+  if (!list || !verse.isConnected) return () => {};
+  activeArrivals.get(list)?.();
   void list.offsetWidth;
   verse.classList.add("verse-arrival");
-  list.classList.add("spotlight-active");
   const clear = () => {
     clearTimeout(timer);
-    list.classList.remove("spotlight-active");
+    if (activeArrivals.get(list) !== clear) return;
     verse.classList.remove("verse-arrival");
+    activeArrivals.delete(list);
   };
-  const timer = setTimeout(clear, 2400);
+  const timer = setTimeout(clear, VERSE_ARRIVAL_MS);
+  activeArrivals.set(list, clear);
+  try {
+    void Promise.resolve(onArrival?.()).catch(() => {});
+  } catch {
+    // Optional tactile feedback is independent of the visual cue.
+  }
   return clear;
 }

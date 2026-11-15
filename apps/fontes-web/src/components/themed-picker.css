@@ -1,0 +1,59 @@
+.themed-picker {
+  width: 100%;
+  min-width: 0;
+}
+.themed-picker .select__trigger {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px;
+  gap: 12px;
+  box-shadow: none;
+}
+.themed-picker .select__value {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+  flex: 1;
+}
+.themed-picker-popover {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px #233f4726;
+  max-height: min(360px, 55dvh);
+  overflow-y: auto;
+  min-width: var(--trigger-width);
+  max-width: calc(100vw - 32px);
+  z-index: 100;
+}
+.themed-picker-popover .list-box-item {
+  min-height: 48px;
+  padding: 12px;
+  gap: 16px;
+  justify-content: space-between;
+  white-space: normal;
+}
+.themed-picker-popover .list-box-item[data-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--accent);
+}
+.org-result-row > .themed-picker {
+  width: auto;
+  max-width: 60%;
+  flex-shrink: 0;
+}
+.org-result-row .select__trigger {
+  min-height: 44px;
+  font-size: 12px;
+}
+.org-label > .themed-picker {
+  font-size: 14px;
+}
+.org-filter-section > .themed-picker {
+  margin-top: 12px;
+}

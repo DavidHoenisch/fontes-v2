@@ -5,6 +5,8 @@ mod dictionary_text;
 mod highlights;
 mod occurrences;
 pub use highlights::*;
+mod note_organization;
+pub use note_organization::*;
 mod notes;
 pub use notes::*;
 pub use occurrences::*;
@@ -13,7 +15,7 @@ mod queries;
 pub mod transport;
 pub mod worker;
 
-pub use commands::{Command, command_catalog};
+pub use commands::{Command, SearchScope, command_catalog};
 use fontes_data_contracts::{CANONICAL_REGISTRY_JSON, SQLITE_APPLICATION_ID, USER_SCHEMA_SQL};
 pub use model::*;
 use rusqlite::{Connection, OpenFlags, OptionalExtension, params};
@@ -202,6 +204,7 @@ impl Engine {
         }
         // App-owned additive extension: preserves the published user-v1 tables and version.
         user.execute_batch("CREATE TABLE IF NOT EXISTS fontes_app_session_v1 (singleton INTEGER PRIMARY KEY CHECK(singleton=1), json TEXT NOT NULL) STRICT; CREATE TABLE IF NOT EXISTS fontes_notes_v1 (annotation_id TEXT PRIMARY KEY REFERENCES annotations(id) ON DELETE CASCADE,document_json TEXT NOT NULL) STRICT; CREATE TABLE IF NOT EXISTS fontes_highlights_v1 (annotation_id TEXT PRIMARY KEY REFERENCES annotations(id) ON DELETE CASCADE,style_json TEXT NOT NULL,selection_json TEXT) STRICT;")?;
+        user.execute_batch("CREATE TABLE IF NOT EXISTS fontes_note_folders_v1(id TEXT PRIMARY KEY,name TEXT NOT NULL) STRICT; CREATE TABLE IF NOT EXISTS fontes_note_organization_v1(note_id TEXT PRIMARY KEY REFERENCES annotations(id) ON DELETE CASCADE,folder_id TEXT REFERENCES fontes_note_folders_v1(id) ON DELETE SET NULL,tags_json TEXT NOT NULL DEFAULT '[]') STRICT; CREATE INDEX IF NOT EXISTS fontes_note_folder_index_v1 ON fontes_note_organization_v1(folder_id);")?;
         let saved: Option<String> = user
             .query_row(
                 "SELECT json FROM fontes_app_session_v1 WHERE singleton=1",
@@ -303,9 +306,10 @@ impl Engine {
             }
             Command::Search {
                 query,
+                scope,
                 limit,
                 offset,
-            } => self.search(&query, limit, offset)?,
+            } => self.search(&query, limit, offset, scope)?,
             Command::Context { ref_id } => {
                 self.validate_ref(ref_id)?;
                 self.context(ref_id)?
@@ -327,6 +331,9 @@ impl Engine {
                 style,
                 selection,
             } => self.save_highlight(id, start_ref, end_ref, style, selection)?,
+            Command::SaveNoteFolder { id, name } => self.save_note_folder(id, name)?,
+            Command::DeleteNoteFolder { id } => self.delete_note_folder(id)?,
+            Command::OrganizeNotes { changes } => self.organize_notes(changes)?,
             Command::NotePassage { ref_id } => {
                 self.validate_ref(ref_id)?;
                 let quote:String=self.content.query_row("SELECT text FROM verses_by_reference WHERE canonical_ref_id=?1 AND translation_id=?2 LIMIT 1",params![ref_id,self.session.translation],|r|r.get(0)).optional()?.ok_or_else(||Error::missing("No supplied text in this edition."))?;

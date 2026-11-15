@@ -579,6 +579,7 @@ fn real_library_desktop_and_mobile() {
         h.run_ok();
         h.state_mut().query = "forgiveness".into();
         h.state_mut().dispatch(Command::Search {
+            scope: Default::default(),
             query: "forgiveness".into(),
             limit: 30,
             offset: 0,

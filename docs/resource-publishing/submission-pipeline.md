@@ -4,6 +4,8 @@ The implemented pipeline accepts publisher source submissions, validates them, c
 
 These are **source-stage releases**: editable `.fontes-source.zip` content, standalone XML metadata, artwork, notices, and review records. They are not `.fontes.zip` app delivery packages, compiled SQLite, or a live store catalog. This distinction is part of the signed protocol, artifact names, and release notes. The delivery compiler/installer remains a separate implementation phase in [SPEC.md](../../SPEC.md).
 
+The [local dashboard maintainer queue](../architecture/maintainer-review.md) can now export a reviewed source/descriptor/approval handoff into this layout. The bundle is unsigned and does not change trusted policy, merge a repository change or publish. The pipeline below independently verifies every production gate.
+
 ## Repository layout
 
 ```text

@@ -317,6 +317,7 @@ impl FontesApp {
                         if self.destination == Destination::Search && !self.query.trim().is_empty()
                         {
                             self.dispatch(Command::Search {
+                                scope: Default::default(),
                                 query: self.query.clone(),
                                 limit: 10,
                                 offset: 0,
@@ -1045,6 +1046,7 @@ ui.horizontal(|ui|{
                                     && ui.input(|i| i.key_pressed(egui::Key::Enter))))
                         {
                             self.dispatch(Command::Search {
+                                scope: Default::default(),
                                 query: self.query.clone(),
                                 limit: 10,
                                 offset: 0,
@@ -1071,6 +1073,7 @@ ui.horizontal(|ui|{
                                 .clicked()
                             {
                                 self.dispatch(Command::Search {
+                                    scope: Default::default(),
                                     query: self.query.clone(),
                                     limit: 10,
                                     offset: self.search_offset.saturating_sub(10),
@@ -1084,6 +1087,7 @@ ui.horizontal(|ui|{
                                 .clicked()
                             {
                                 self.dispatch(Command::Search {
+                                    scope: Default::default(),
                                     query: self.query.clone(),
                                     limit: 10,
                                     offset: self.search_offset + 10,

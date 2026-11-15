@@ -185,6 +185,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -225,6 +250,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -480,6 +513,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -520,6 +578,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -761,6 +827,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -801,6 +892,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -1056,6 +1155,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -1096,6 +1220,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -1345,6 +1477,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -1385,6 +1542,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -1635,6 +1800,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -1675,6 +1865,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -1925,6 +2123,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -1965,6 +2188,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -2214,6 +2445,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -2254,6 +2510,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -2321,6 +2585,10 @@
           },
           "query": {
             "type": "string"
+          },
+          "scope": {
+            "$ref": "#/$defs/SearchScope",
+            "default": "all"
           }
         },
         "required": [
@@ -2515,6 +2783,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -2555,6 +2848,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -2805,6 +3106,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -2845,6 +3171,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -3094,6 +3428,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -3134,6 +3493,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -3383,6 +3750,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -3423,6 +3815,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -3693,6 +4093,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -3733,6 +4158,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -3827,6 +4260,981 @@
         "type": "object"
       },
       "name": "annotation.save"
+    },
+    {
+      "description": "Create or rename a local note folder.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "name": "note.folder.save"
+    },
+    {
+      "description": "Remove a folder, moving its notes to Inbox without deleting notes or tags.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "name": "note.folder.delete"
+    },
+    {
+      "description": "Atomically move and tag up to 200 existing notes.",
+      "inputSchema": {
+        "$defs": {
+          "AnnotationKind": {
+            "enum": [
+              "note",
+              "highlight"
+            ],
+            "type": "string"
+          },
+          "HighlightStyle": {
+            "additionalProperties": false,
+            "properties": {
+              "color": {
+                "$ref": "#/$defs/MarkColor"
+              },
+              "kind": {
+                "$ref": "#/$defs/MarkKind"
+              },
+              "symbol": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "color"
+            ],
+            "type": "object"
+          },
+          "MarkColor": {
+            "enum": [
+              "yellow",
+              "blue",
+              "green",
+              "orange",
+              "pink",
+              "purple",
+              "red",
+              "brown",
+              "gray"
+            ],
+            "type": "string"
+          },
+          "MarkKind": {
+            "enum": [
+              "highlighter",
+              "foreground",
+              "underline",
+              "double_underline",
+              "triple_underline",
+              "wavy_underline",
+              "box",
+              "brackets",
+              "bold",
+              "italic",
+              "strikethrough",
+              "margin_bar",
+              "symbol"
+            ],
+            "type": "string"
+          },
+          "NoteBlock": {
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "thought",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "text"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "quote": {
+                    "type": "string"
+                  },
+                  "ref_id": {
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "translation_id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "passage",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "ref_id",
+                  "translation_id",
+                  "quote"
+                ],
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "properties": {
+                  "author": {
+                    "default": null,
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "content_id": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "quote": {
+                    "type": "string"
+                  },
+                  "resource_id": {
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "title": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "const": "resource",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "resource_id",
+                  "quote"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          "NoteDocument": {
+            "additionalProperties": false,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "$ref": "#/$defs/NoteBlock"
+                },
+                "type": "array"
+              },
+              "pinned": {
+                "default": false,
+                "type": "boolean"
+              },
+              "selection": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/TextSelection"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "blocks"
+            ],
+            "type": "object"
+          },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
+          "Preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "line_spacing": {
+                "format": "float",
+                "type": "number"
+              },
+              "scripture_serif": {
+                "type": "boolean"
+              },
+              "text_size": {
+                "format": "float",
+                "type": "number"
+              },
+              "theme": {
+                "$ref": "#/$defs/ReadingTheme",
+                "default": "sea_glass"
+              },
+              "verse_numbers": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "text_size",
+              "line_spacing",
+              "verse_numbers",
+              "scripture_serif"
+            ],
+            "type": "object"
+          },
+          "ReadingTheme": {
+            "description": "Stable theme IDs; palette values and presentation remain in the UI layer.",
+            "enum": [
+              "sea_glass",
+              "ink_saffron",
+              "charcoal_raspberry",
+              "cobalt_citron",
+              "terracotta_linen",
+              "aubergine_apricot",
+              "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
+            ],
+            "type": "string"
+          },
+          "TextSelection": {
+            "additionalProperties": false,
+            "properties": {
+              "spans": {
+                "items": {
+                  "$ref": "#/$defs/TextSpan"
+                },
+                "type": "array"
+              },
+              "translation_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "translation_id",
+              "spans"
+            ],
+            "type": "object"
+          },
+          "TextSpan": {
+            "additionalProperties": false,
+            "properties": {
+              "end": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "quote": {
+                "type": "string"
+              },
+              "start": {
+                "format": "uint",
+                "minimum": 0,
+                "type": "integer"
+              },
+              "verse_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "verse_id",
+              "start",
+              "end",
+              "quote"
+            ],
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/$defs/NoteOrganizationChange"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "changes"
+        ],
+        "type": "object"
+      },
+      "name": "note.organize"
     },
     {
       "description": "Preview the exact active-edition verse for a note without changing the reading session.",
@@ -4013,6 +5421,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -4053,6 +5486,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -4303,6 +5744,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -4343,6 +5809,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -4608,6 +6082,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -4648,6 +6147,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -4923,6 +6430,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -4963,6 +6495,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -5212,6 +6752,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -5252,6 +6817,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },
@@ -5506,6 +7079,31 @@
             ],
             "type": "object"
           },
+          "NoteOrganizationChange": {
+            "additionalProperties": false,
+            "properties": {
+              "folder_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note_id": {
+                "type": "string"
+              },
+              "tags": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "note_id",
+              "tags"
+            ],
+            "type": "object"
+          },
           "Preferences": {
             "additionalProperties": false,
             "properties": {
@@ -5546,6 +7144,14 @@
               "terracotta_linen",
               "aubergine_apricot",
               "midnight_mint"
+            ],
+            "type": "string"
+          },
+          "SearchScope": {
+            "enum": [
+              "all",
+              "scripture",
+              "resources"
             ],
             "type": "string"
           },

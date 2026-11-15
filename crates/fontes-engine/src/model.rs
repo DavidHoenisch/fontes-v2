@@ -162,6 +162,8 @@ pub struct Workspace {
     pub highlights: Vec<crate::RichHighlight>,
     #[serde(default)]
     pub notes: Vec<crate::RichNote>,
+    #[serde(default)]
+    pub note_organization: crate::NoteOrganization,
     pub saved: Vec<SavedReference>,
     pub has_study: bool,
 }

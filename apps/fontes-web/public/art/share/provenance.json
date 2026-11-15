@@ -1,0 +1,21 @@
+{
+  "kind": "bundled-presentation-art",
+  "created": "2026-11-04",
+  "provenance": "Original image_gen output; atmospheric impressionist landscape direction inspired by the owner-provided reference. No reference image pixels or third-party painting copied.",
+  "assets": [
+    {
+      "file": "quiet-harbor.jpg",
+      "sha256": "496ab741a1e16c721fbb3b9ff9c68c2bf4f0b9599a3387bd1cb6e4dcf74597d8"
+    },
+    {
+      "file": "olive-hills.jpg",
+      "sha256": "ba4dcdc8928952bcb4215161466bff1179efb944c7c8068c7e06fd65993f1bdf"
+    }
+  ],
+  "processing": "PNG output encoded as JPEG at quality 85 for the bundle; no compositional edits.",
+  "subjects": {
+    "quiet-harbor.jpg": "Quiet harbor at dusk, sea-glass water, low waterfront and sails",
+    "olive-hills.jpg": "Olive hills, meadow path and cypress trees at golden dusk"
+  },
+  "reference_status": "Presentation assets, not a signed source package, library resource, licensed historical painting or production registry."
+}
