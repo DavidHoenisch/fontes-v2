@@ -2162,6 +2162,7 @@ export default function App({ live }: { live?: Live }) {
                         highlightStyles[selected.anchor] || defaultMark,
                       );
                       setHighlightRemovalError("");
+                      window.getSelection()?.removeAllRanges();
                       setDialog("highlight");
                     }}
                   >
