@@ -160,30 +160,32 @@ impl Engine {
             ));
         }
         // Resolve references without navigating or writing the reading session.
-        if scope != SearchScope::Resources && query.chars().any(|c| c.is_ascii_digit()) {
-            if let Ok(reference) = self.resolve(query) {
-                let row: Option<(String, String)> = self.content.query_row(
-                    "SELECT v.id,v.text FROM segment_refs sr CROSS JOIN verse_texts v ON v.segment_id=sr.segment_id AND v.translation_id=?2 WHERE sr.canonical_ref_id=?1 ORDER BY v.id LIMIT 1",
-                    params![reference, self.session.translation], |r| Ok((r.get(0)?,r.get(1)?)),
-                ).optional()?;
-                let hits = if offset == 0 {
-                    row.into_iter()
-                        .map(|(id, excerpt)| SearchHit {
-                            id,
-                            ref_id: Some(reference),
-                            title: label(&self.books, reference),
-                            excerpt,
-                        })
-                        .collect()
-                } else {
-                    vec![]
-                };
-                return Ok(Data::Search {
-                    hits,
-                    offset,
-                    has_more: false,
-                });
-            }
+        if scope != SearchScope::Resources
+            && query.chars().any(|c| c.is_ascii_digit())
+            && let Ok(reference) = self.resolve(query)
+        {
+            let row: Option<(String, String)> = self.content.query_row(
+                "SELECT v.id,v.text FROM segment_refs sr CROSS JOIN verse_texts v ON v.segment_id=sr.segment_id AND v.translation_id=?2 WHERE sr.canonical_ref_id=?1 ORDER BY v.id LIMIT 1",
+                params![reference, self.session.translation], |r| Ok((r.get(0)?,r.get(1)?)),
+            )
+            .optional()?;
+            let hits = if offset == 0 {
+                row.into_iter()
+                    .map(|(id, excerpt)| SearchHit {
+                        id,
+                        ref_id: Some(reference),
+                        title: label(&self.books, reference),
+                        excerpt,
+                    })
+                    .collect()
+            } else {
+                vec![]
+            };
+            return Ok(Data::Search {
+                hits,
+                offset,
+                has_more: false,
+            });
         }
         // Literal AND terms, never executable FTS syntax. Quotes/operators in input remain literal.
         let terms = query
