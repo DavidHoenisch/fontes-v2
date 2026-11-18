@@ -213,6 +213,22 @@ export default function App({ live }: { live?: Live }) {
   const [definitionId, setDefinitionId] = useState("");
   const definitionRequest = useRef(0);
   useEffect(() => {
+    if (dialog !== "highlight") return;
+    const dismiss = () => window.getSelection()?.removeAllRanges();
+    dismiss();
+    const timers = [0, 16, 32, 64, 100].map((ms) => setTimeout(dismiss, ms));
+    let frame = 0;
+    const loop = () => {
+      dismiss();
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+    return () => {
+      timers.forEach(clearTimeout);
+      cancelAnimationFrame(frame);
+    };
+  }, [dialog]);
+  useEffect(() => {
     setShareQuote(null);
     setDialog(current=>current==="share"?null:current);
     setWordStudyOpen(false);
@@ -2162,6 +2178,7 @@ export default function App({ live }: { live?: Live }) {
                         highlightStyles[selected.anchor] || defaultMark,
                       );
                       setHighlightRemovalError("");
+                      window.getSelection()?.removeAllRanges();
                       setDialog("highlight");
                     }}
                   >

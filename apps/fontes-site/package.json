@@ -23,10 +23,11 @@
     "@heroui/react": "3.2.6",
     "@heroui/styles": "3.2.6",
     "@neondatabase/auth": "0.6.0-beta",
+    "better-auth": "1.7.25",
     "@neondatabase/serverless": "1.2.0",
-    "fast-xml-parser": "5.11.2",
+    "fast-xml-parser": "5.12.1",
     "lucide-react": "^0.468.0",
-    "next": "16.4.2",
+    "next": "16.4.6",
     "parse5": "8.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -34,7 +35,7 @@
     "sharp": "0.35.5",
     "yauzl": "3.4.0",
     "yazl": "3.3.1",
-    "zod": "^4.0.0"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.0",
@@ -46,5 +47,9 @@
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.0",
     "vitest": "^4.0.0"
+  },
+  "overrides": {
+    "better-auth": "$better-auth",
+    "zod": "$zod"
   }
 }

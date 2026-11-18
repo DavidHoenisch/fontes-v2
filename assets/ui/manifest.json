@@ -572,8 +572,8 @@
   "files": [
     {
       "path": "README.md",
-      "bytes": 4085,
-      "sha256": "ce9a21e6998efa6a6dc8fe55bb5a1c5bf946a2bfb451c1dffb066648bb2d040e"
+      "bytes": 4562,
+      "sha256": "6938b146eba4771f0989b98712108aab4ea0611ac2c5abbff8950336c4a3d6b4"
     },
     {
       "path": "assets.rs",
@@ -937,8 +937,8 @@
     },
     {
       "path": "licenses/CORMORANT-GARAMOND-OFL.txt",
-      "bytes": 4387,
-      "sha256": "60700d351cac4650c51f3f9db318d2a420f8b45052dba2715eb5fec41f0f6956"
+      "bytes": 4386,
+      "sha256": "6f5a41d57400577a50aae88475b11f292f3d7de78ee7d5113c69577331d8ad31"
     }
   ],
   "themeFile": "themes.json"

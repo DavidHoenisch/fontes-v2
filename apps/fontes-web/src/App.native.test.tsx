@@ -442,6 +442,8 @@ it("clears native selection handles when sharing while retaining the selected qu
   fireEvent.click(within(panel).getByRole("button",{name:"Olive hills"}));
   expect(selection.toString()).toBe("Share a passage");
   selection.removeAllRanges();
+  fireEvent.click(within(panel).getByRole("button",{name:"Close"}));
+  await waitFor(() => expect(screen.queryByRole("dialog",{name:"Share a passage"})).toBeNull());
 });
 
 it("keeps exact repeated-word highlight spans after the sheet clears the DOM selection",async()=>{
