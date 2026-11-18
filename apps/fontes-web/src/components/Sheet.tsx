@@ -30,11 +30,17 @@ export function Sheet({
     // retain the quote/spans in React state; dismiss only the live DOM range.
     if (!open) return;
     let active = true;
-    window.getSelection()?.removeAllRanges();
-    // React's focus restoration can reinstate a range later in this commit
-    // when the floating selection controls unmount. Dismiss that range too.
-    queueMicrotask(() => { if (active) window.getSelection()?.removeAllRanges(); });
-    return () => { active = false; };
+    const dismissSelection = () => {
+      if (active) window.getSelection()?.removeAllRanges();
+    };
+    dismissSelection();
+    // React/Heroui focus moves can reinstate a DOM range after the sheet opens.
+    queueMicrotask(dismissSelection);
+    const frame = requestAnimationFrame(dismissSelection);
+    return () => {
+      active = false;
+      cancelAnimationFrame(frame);
+    };
   }, [open]);
   return (
     <Modal
